@@ -1,15 +1,14 @@
 import { Router } from 'express';
-// import AuthController from '../controllers/auth.controller';
-// import SignUpValidator from '../validations/auth/signup.validator';
+import AuthController from '../controllers/auth.controller';
+import SignInValidator from '../validations/auth/login.validator';
 
 const router = Router();
 
-// router.post(
-//   '/signup',
-//   SignUpValidator.validateData(),
-//   SignUpValidator.myValidationResult,
-//   SignUpValidator.emailAlreadyExist,
-//   AuthController.signUp,
-// );
+router.post(
+  '/signin',
+  SignInValidator.validateData(),
+  SignInValidator.myValidationResult,
+  AuthController.signIn,
+);
 
 export default router;
