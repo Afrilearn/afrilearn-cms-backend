@@ -53,12 +53,12 @@ export default class Response {
      * @param {*} res - Response Object
      * @param {*} message - error message
      */
-  static BadRequest(res, message = 'Bad request') {
-    return res.status(400).json({
-      status: '400 Bad Request',
-      error: message,
-    });
-  }
+  //   static BadRequest(res, message = 'Bad request') {
+  //     return res.status(400).json({
+  //       status: '400 Bad Request',
+  //       error: message,
+  //     });
+  //   }
 
   /**
      * @returns {JSON} - JSON error object with status 409
@@ -80,12 +80,12 @@ export default class Response {
      * @param {*} res - Response Object
      * @param {*} message - error message
      */
-  static NotFound(res, message = 'Requested data was not found') {
-    return res.status(404).json({
-      status: '404 Not Found',
-      error: message,
-    });
-  }
+  //   static NotFound(res, message = 'Requested data was not found') {
+  //     return res.status(404).json({
+  //       status: '404 Not Found',
+  //       error: message,
+  //     });
+  //   }
 
   /**
      * @returns {JSON} - JSON success object
