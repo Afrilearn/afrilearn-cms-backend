@@ -14,3 +14,5 @@ router.post(
   UserMiddleware.checkUserInexistence,
   AuthController.signup,
 );
+
+export default router;

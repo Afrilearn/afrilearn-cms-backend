@@ -1,6 +1,6 @@
 import { check, validationResult } from 'express-validator';
 import Response from '../../utils/response.utils';
-import GeneralUtils from '../../utils/general.utils';
+import HelperUtils from '../../utils/helpers.utils';
 
 /**
  *Contains Login Validator
@@ -55,7 +55,7 @@ class SignupValidator {
         .withMessage('Password length must be at least 8 characters')
         .trim()
         .escape(),
-      check('role').custom(GeneralUtils.validateMongooseId()),
+      check('role').custom(HelperUtils.validateMongooseId()),
     ];
   }
 
