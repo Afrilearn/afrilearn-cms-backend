@@ -1,5 +1,5 @@
 import Response from '../utils/response.utils';
-import CmsUsers from "../db/models/cmsUsers.model";
+import CmsUsers from '../db/models/cmsUsers.model';
 
 /**
  *Contains Users Controller
@@ -40,7 +40,7 @@ export default class UserController {
 
       Response.Success(res, { message: 'User deleted successfully' });
     } catch (err) {
-      return Response.InternalServerError(res, 'Could not delete user',err);
+      return Response.InternalServerError(res, 'Could not delete user', err);
     }
   }
 }

@@ -96,9 +96,9 @@ describe('USERS', () => {
       });
     });
 
-    describe("INVALID REQUEST PARAM", () => {
-        it("should return Invalid Request error if userId param is not a valid mongoose id", (done) => {
-            chai
+    describe('INVALID REQUEST PARAM', () => {
+      it('should return Invalid Request error if userId param is not a valid mongoose id', (done) => {
+        chai
           .request(app)
           .patch(`${baseUrl}/invalidmongooseid`)
           .set('token', adminToken)
@@ -115,9 +115,9 @@ describe('USERS', () => {
               .property('errors')
               .to.include('Invalid mongoose ID');
             done();
-          })
-        })
-    })
+          });
+      });
+    });
 
     describe('FAKE INTERNAL SERVER ERROR', () => {
       let stub;
@@ -433,9 +433,9 @@ describe('USERS', () => {
       });
     });
 
-    describe("INVALID REQUEST PARAM", () => {
-        it("should return Invalid Request error if userId param is not a valid mongoose id", (done) => {
-            chai
+    describe('INVALID REQUEST PARAM', () => {
+      it('should return Invalid Request error if userId param is not a valid mongoose id', (done) => {
+        chai
           .request(app)
           .delete(`${baseUrl}/invalidmongooseid`)
           .set('token', adminToken)
@@ -451,9 +451,9 @@ describe('USERS', () => {
               .property('errors')
               .to.include('Invalid mongoose ID');
             done();
-          })
-        })
-    })
+          });
+      });
+    });
 
     describe('FAKE INTERNAL SERVER ERROR', () => {
       let stub;
