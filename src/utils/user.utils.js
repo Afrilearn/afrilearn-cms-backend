@@ -1,6 +1,6 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { config } from 'dotenv';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { config } from "dotenv";
 
 config();
 
@@ -29,8 +29,12 @@ export default {
   //   return randomNum;
   // },
 
-  generateToken(data) {
-    const token = jwt.sign({ data }, process.env.SECRET, { expiresIn: '30d' });
+  generateToken(id, role, firstName) {
+    const token = jwt.sign(
+      { data: { id, role, firstName } },
+      process.env.SECRET,
+      { expiresIn: "30d" }
+    );
     return token;
   },
 };
