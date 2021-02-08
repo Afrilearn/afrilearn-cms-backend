@@ -4,9 +4,9 @@ import logger from '../config';
 
 config();
 
-// const url = process.env.ATLAS_URL;
+const url = process.env.ATLAS_URL;
 
-mongoose.connect('mongodb://localhost/Afrilearn', {
+mongoose.connect(url, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
