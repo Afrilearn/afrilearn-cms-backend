@@ -5,8 +5,10 @@ import sinon from 'sinon';
 import CmsUser from '../db/models/cmsUsers.model';
 import userUtils from '../utils/user.utils';
 import Response from '../utils/response.utils';
+import Helper from "../utils/helpers.utils";
 
 import app from '../index';
+import mongoose from 'mongoose';
 
 chai.should();
 chai.use(Sinonchai);
@@ -20,21 +22,9 @@ const user = {
   role: '5fc8f4b99d1e3023e4942152',
 };
 const invalidToken = 'invalid.jwt.token';
-const staffToken = userUtils.generateToken({
-  role: {
-    name: 'Staff',
-  },
-});
-const moderatorToken = userUtils.generateToken({
-  role: {
-    name: 'Moderator',
-  },
-});
-const adminToken = userUtils.generateToken({
-  role: {
-    name: 'Administrator',
-  },
-});
+const staffToken = userUtils.generateToken(Helper.createMongooseId, "1", "Staff User");
+const moderatorToken = userUtils.generateToken(Helper.createMongooseId, "2", "Moderator User");
+const adminToken = userUtils.generateToken(Helper.createMongooseId, "3", "Administrator User");
 
 const baseUrl = '/api/v1/auth/signup';
 
@@ -140,10 +130,10 @@ describe(`/POST ${baseUrl}`, () => {
         .send(user)
         .end((err, res) => {
           res.should.have.status(403);
-          res.body.should.have.property('status').to.equals('403 Forbidden');
+          res.body.should.have.property('status').to.equals('401 Unauthorized');
           res.body.should.have
             .property('error')
-            .to.equals('Administrator access only');
+            .to.equals('Not authorized to access data');
           done();
         });
     });
@@ -155,10 +145,10 @@ describe(`/POST ${baseUrl}`, () => {
         .send(user)
         .end((err, res) => {
           res.should.have.status(403);
-          res.body.should.have.property('status').to.equals('403 Forbidden');
+          res.body.should.have.property('status').to.equals('401 Unauthorized');
           res.body.should.have
             .property('error')
-            .to.equals('Administrator access only');
+            .to.equals('Not authorized to access data');
           done();
         });
     });
