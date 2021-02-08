@@ -4,6 +4,7 @@ import UserMiddleware from '../middlewares/user.middleware';
 import UserValidator from '../validations/user.validator';
 import UserController from '../controllers/users.controller';
 import ParamsValidator from '../validations/params.validator';
+import AfrilearnUserController from '../controllers/afrilearnUsers.controller';
 
 const router = Router();
 
@@ -34,6 +35,13 @@ router.get(
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('1'),
   UserController.fetchAllCmsUsers,
+);
+
+router.get(
+  '/afrilearn',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('1'),
+  AfrilearnUserController.fetchAllAfrilearnUsers,
 );
 
 export default router;

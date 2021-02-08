@@ -4,6 +4,7 @@ import Sinonchai from 'sinon-chai';
 import sinon from 'sinon';
 import mongoose from 'mongoose';
 import Users from '../db/models/cmsUsers.model';
+import AfrilearnUsers from '../db/models/users.model';
 import userUtils from '../utils/user.utils';
 import Response from '../utils/response.utils';
 
@@ -91,7 +92,9 @@ describe('USERS', () => {
               .to.equals(userUpdate.email);
             res.body.data.user.should.have.property('role');
             res.body.data.user.role.should.not.equals(user.role.toHexString());
-            res.body.data.user.should.have.property('createdAt').not.to.equals(res.body.data.user.updatedAt);
+            res.body.data.user.should.have
+              .property('createdAt')
+              .not.to.equals(res.body.data.user.updatedAt);
             done();
           });
       });
@@ -563,13 +566,20 @@ describe('USERS', () => {
     describe('FETCH CMS USERS SUCCESSFULLY', () => {
       before(async () => {
         await Users.deleteMany();
+        const users = [];
         for (let i = 1; i < 4; i += 1) {
-          Users.create({
-            ...user,
-            firstName: user.firstName + i,
-            email: user.email + i,
-          });
+          users.push(
+            (async () => {
+              const usr = await Users.create({
+                ...user,
+                firstName: user.firstName + i,
+                email: user.email + i,
+              });
+              return usr;
+            })(),
+          );
         }
+        await Promise.all(users);
       });
       after((done) => {
         Users.deleteMany((err) => {
@@ -586,10 +596,16 @@ describe('USERS', () => {
             res.body.should.have.property('status').to.equals('Success');
             res.body.data.should.have.property('users');
             res.body.data.users.length.should.equals(3);
-            res.body.data.users.forEach((sub, index) => {
-              sub.firstName.should.equals(`${user.firstName}${index + 1}`);
-              sub.email.should.equals(`${user.email}${index + 1}`);
-            });
+            const checks = res.body.data.users.map((user) => ({
+              firstName: user.firstName,
+              email: user.email,
+            }));
+            for (let i = 1; i < 4; i += 1) {
+              checks.should.deep.include({
+                firstName: `${user.firstName}${i}`,
+                email: `${user.email}${i}`,
+              });
+            }
             done();
           });
       });
@@ -637,6 +653,110 @@ describe('USERS', () => {
         chai
           .request(app)
           .get(baseUrl)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have
+              .property('status')
+              .to.equals('401 Unauthorized');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+  });
+
+  describe(`/GET ${baseUrl}/afrilearn`, () => {
+    describe('FETCH AFRILEARN USERS SUCCESSFULLY', () => {
+      before(async () => {
+        await AfrilearnUsers.deleteMany();
+        const users = [];
+        for (let i = 1; i < 4; i += 1) {
+          users.push(
+            (async () => {
+              const usr = await AfrilearnUsers.create({
+                fullName: user.firstName + i,
+                email: user.email + i,
+              });
+              return usr;
+            })(),
+          );
+        }
+        await Promise.all(users);
+      });
+      after((done) => {
+        AfrilearnUsers.deleteMany((err) => {
+          if (!err) done();
+        });
+      });
+      it('should fetch all afrilearn users', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/afrilearn`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('status').to.equals('Success');
+            res.body.data.should.have.property('users');
+            res.body.data.users.length.should.equals(3);
+            const checks = res.body.data.users.map((user) => ({
+              fullName: user.fullName,
+              email: user.email,
+            }));
+            for (let i = 1; i < 4; i += 1) {
+              checks.should.deep.include({
+                fullName: `${user.firstName}${i}`,
+                email: `${user.email}${i}`,
+              });
+            }
+            done();
+          });
+      });
+    });
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub;
+      before(() => {
+        stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+      });
+      after(() => {
+        stub.restore();
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/afrilearn`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Could not fetch afrilearn users');
+            done();
+          });
+      });
+    });
+
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/afrilearn`)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have
+              .property('status')
+              .to.equals('401 Unauthorized');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/afrilearn`)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have
