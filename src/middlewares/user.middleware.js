@@ -21,7 +21,7 @@ export default class UsersMiddleware {
     if (!user) {
       return Response.NotFound(res, 'User with the given id does not exist');
     }
-    req.body.dbUser = user;
+    req.dbUser = user;
     return next();
   }
 
