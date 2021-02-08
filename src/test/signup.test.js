@@ -411,11 +411,9 @@ describe(`/POST ${baseUrl}`, () => {
   });
 
   describe('USER INEXISTENCE', () => {
-    before((done) => {
-      CmsUser.deleteMany({ email: user.email }, (err) => {
-        if (!err) done();
-      });
-      CmsUser.create(user);
+    before(async () => {
+      await CmsUser.deleteMany({ email: user.email });
+      await CmsUser.create(user);
     });
     after((done) => {
       CmsUser.deleteMany({ email: user.email }, (err) => {

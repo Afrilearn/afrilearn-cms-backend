@@ -80,12 +80,12 @@ export default class Response {
      * @param {*} res - Response Object
      * @param {*} message - error message
      */
-  //   static NotFound(res, message = 'Requested data was not found') {
-  //     return res.status(404).json({
-  //       status: '404 Not Found',
-  //       error: message,
-  //     });
-  //   }
+  static NotFound(res, message) {
+    return res.status(404).json({
+      status: '404 Not Found',
+      error: message,
+    });
+  }
 
   /**
      * @returns {JSON} - JSON success object
@@ -93,7 +93,7 @@ export default class Response {
      * @param {*} data - data to send back on success
      * @param {*} status - res status, 200 by default
      */
-  static Success(res, data, status) {
+  static Success(res, data, status = 200) {
     return res.status(status).json({
       status: 'Success',
       data,
