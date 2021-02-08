@@ -27,9 +27,21 @@ const userUpdate = {
   role: mongoose.Types.ObjectId(),
 };
 const invalidToken = 'invalid.jwt.token';
-const staffToken = userUtils.generateToken(mongoose.Types.ObjectId(), '1', 'Staff User');
-const moderatorToken = userUtils.generateToken(mongoose.Types.ObjectId(), '2', 'Moderator User');
-const adminToken = userUtils.generateToken(mongoose.Types.ObjectId(), '3', 'Administrator User');
+const staffToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '1',
+  'Staff User',
+);
+const moderatorToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '2',
+  'Moderator User',
+);
+const adminToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '3',
+  'Administrator User',
+);
 
 const baseUrl = '/api/v1/users';
 
@@ -79,6 +91,7 @@ describe('USERS', () => {
               .to.equals(userUpdate.email);
             res.body.data.user.should.have.property('role');
             res.body.data.user.role.should.not.equals(user.role.toHexString());
+            res.body.data.user.should.have.property('createdAt').not.to.equals(res.body.data.user.updatedAt);
             done();
           });
       });
@@ -176,7 +189,9 @@ describe('USERS', () => {
           .send(userUpdate)
           .end((err, res) => {
             res.should.have.status(403);
-            res.body.should.have.property('status').to.equals('401 Unauthorized');
+            res.body.should.have
+              .property('status')
+              .to.equals('401 Unauthorized');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -191,7 +206,9 @@ describe('USERS', () => {
           .send(userUpdate)
           .end((err, res) => {
             res.should.have.status(403);
-            res.body.should.have.property('status').to.equals('401 Unauthorized');
+            res.body.should.have
+              .property('status')
+              .to.equals('401 Unauthorized');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -507,7 +524,9 @@ describe('USERS', () => {
           .set('token', staffToken)
           .end((err, res) => {
             res.should.have.status(403);
-            res.body.should.have.property('status').to.equals('401 Unauthorized');
+            res.body.should.have
+              .property('status')
+              .to.equals('401 Unauthorized');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -532,6 +551,100 @@ describe('USERS', () => {
             res.body.should.have
               .property('error')
               .to.equals('User with the given id does not exist');
+            done();
+          });
+      });
+    });
+  });
+
+  // GET CMS USERS IMPLEMENTATION
+
+  describe(`/GET ${baseUrl}`, () => {
+    describe('FETCH CMS USERS SUCCESSFULLY', () => {
+      before(async () => {
+        await Users.deleteMany();
+        for (let i = 1; i < 4; i += 1) {
+          Users.create({
+            ...user,
+            firstName: user.firstName + i,
+            email: user.email + i,
+          });
+        }
+      });
+      after((done) => {
+        Users.deleteMany((err) => {
+          if (!err) done();
+        });
+      });
+      it('should fetch all cms users', (done) => {
+        chai
+          .request(app)
+          .get(baseUrl)
+          .set('token', staffToken)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('status').to.equals('Success');
+            res.body.data.should.have.property('users');
+            res.body.data.users.length.should.equals(3);
+            res.body.data.users.forEach((sub, index) => {
+              sub.firstName.should.equals(`${user.firstName}${index + 1}`);
+              sub.email.should.equals(`${user.email}${index + 1}`);
+            });
+            done();
+          });
+      });
+    });
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub;
+      before(() => {
+        stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+      });
+      after(() => {
+        stub.restore();
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .get(baseUrl)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Could not fetch cms users');
+            done();
+          });
+      });
+    });
+
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .get(baseUrl)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have
+              .property('status')
+              .to.equals('401 Unauthorized');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .get(baseUrl)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have
+              .property('status')
+              .to.equals('401 Unauthorized');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
             done();
           });
       });

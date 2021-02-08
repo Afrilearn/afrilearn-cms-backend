@@ -29,4 +29,11 @@ router.delete(
   UserController.deleteUser,
 );
 
+router.get(
+  '/',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('1'),
+  UserController.fetchAllCmsUsers,
+);
+
 export default router;

@@ -70,4 +70,21 @@ export default class UserController {
       return Response.InternalServerError(res, 'Could not delete user', err);
     }
   }
+
+  /**
+   * @memberof UserController
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} if no error occurs
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async fetchAllCmsUsers(req, res) {
+    try {
+      const users = await CmsUsers.find();
+
+      return Response.Success(res, { users });
+    } catch (err) {
+      return Response.InternalServerError(res, 'Could not fetch cms users', err);
+    }
+  }
 }
