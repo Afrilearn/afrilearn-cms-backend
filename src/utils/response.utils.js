@@ -14,7 +14,7 @@ export default class Response {
     return res.status(500).json({
       status: '500 Internal server error',
       error: message,
-      errors: err || [message],
+      errors: err,
     });
   }
 
@@ -67,7 +67,7 @@ export default class Response {
      */
   static ConflictingRequest(
     res,
-    message = 'Submitted data conflicts with existing data',
+    message,
   ) {
     return res.status(409).json({
       status: '409 Conflicting Request',
@@ -93,7 +93,7 @@ export default class Response {
      * @param {*} data - data to send back on success
      * @param {*} status - res status, 200 by default
      */
-  static Success(res, data, status = 200) {
+  static Success(res, data, status) {
     return res.status(status).json({
       status: 'Success',
       data,
