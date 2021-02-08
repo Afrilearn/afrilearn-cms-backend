@@ -17,11 +17,11 @@ export default class UserController {
    */
   static async editUser(req, res) {
     try {
-      const { dbUser, ...update } = req.body;
-      dbUser.set(update);
-      const result = await dbUser.save();
+      const dbUser = req.dbUser;
+      dbUser.set({...req.body, updatedAt: Date.now()});
+      const user = await dbUser.save();
 
-      Response.Success(res, { user: result });
+      Response.Success(res, { user });
     } catch (err) {
       return Response.InternalServerError(res, 'Could not edit user', err);
     }
