@@ -6,7 +6,6 @@ import mongoose from 'mongoose';
 import Users from '../db/models/cmsUsers.model';
 import userUtils from '../utils/user.utils';
 import Response from '../utils/response.utils';
-import Helper from "../utils/helpers.utils";
 
 import app from '../index';
 
@@ -28,9 +27,9 @@ const userUpdate = {
   role: mongoose.Types.ObjectId(),
 };
 const invalidToken = 'invalid.jwt.token';
-const staffToken = userUtils.generateToken(Helper.createMongooseId, "1", "Staff User");
-const moderatorToken = userUtils.generateToken(Helper.createMongooseId, "2", "Moderator User");
-const adminToken = userUtils.generateToken(Helper.createMongooseId, "3", "Administrator User");
+const staffToken = userUtils.generateToken(mongoose.Types.ObjectId(), '1', 'Staff User');
+const moderatorToken = userUtils.generateToken(mongoose.Types.ObjectId(), '2', 'Moderator User');
+const adminToken = userUtils.generateToken(mongoose.Types.ObjectId(), '3', 'Administrator User');
 
 const baseUrl = '/api/v1/users';
 

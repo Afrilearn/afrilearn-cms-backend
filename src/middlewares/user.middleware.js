@@ -1,5 +1,6 @@
 import CmsUser from '../db/models/cmsUsers.model';
 import Response from '../utils/response.utils';
+import UserUtils from '../utils/user.utils';
 
 /**
  * Contains Users Middlewares
@@ -40,6 +41,28 @@ export default class UsersMiddleware {
       return Response.ConflictingRequest(
         res,
         'User with the given email already exists',
+      );
+    }
+    return next();
+  }
+
+  /**
+   * @memberof CategoryMiddleware
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @param {*} next - Passes control to next function
+   * @returns {JSON} Error response if passwords are equal
+   * @returns {JSON} passes control to the next function if passwords are unequal
+   */
+  static async checkPasswordsInequality(req, res, next) {
+    const passwordsEqual = await UserUtils.verifyPassword(
+      req.body.password,
+      req.dbUser.password,
+    );
+    if (passwordsEqual) {
+      return Response.BadRequest(
+        res,
+        'Submitted password is the same as current password',
       );
     }
     return next();

@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
-import Response from "../utils/response.utils";
+import jwt from 'jsonwebtoken';
+import Response from '../utils/response.utils';
 
 /**
  *Contains Auth Middlewares
@@ -36,20 +36,20 @@ class AuthMiddleware {
 
   /**
    * @memberof AuthMiddleware
-   * @param {*} level - The minimum level permitted to access  data
+   * @param {*} role - The minimum level permitted to access  data
    * @returns {JSON} Error response if user is not up to level
    * @returns {JSON} passes control to the next function
    */
-  static grantAccess(role = "3") {
-    const roles = ["1", "2", "3"];
+  static grantAccess(role = '3') {
+    const roles = ['1', '2', '3'];
     const roleIndex = roles.findIndex((val) => val === role);
     return (req, res, next) => {
       if (
         roles.findIndex((val) => val === req.data.role) < roleIndex
       ) {
         return res.status(403).json({
-          status: "401 Unauthorized",
-          error: `Not authorized to access data`,
+          status: '401 Unauthorized',
+          error: 'Not authorized to access data',
         });
       }
       return next();

@@ -53,12 +53,12 @@ export default class Response {
      * @param {*} res - Response Object
      * @param {*} message - error message
      */
-  //   static BadRequest(res, message = 'Bad request') {
-  //     return res.status(400).json({
-  //       status: '400 Bad Request',
-  //       error: message,
-  //     });
-  //   }
+  static BadRequest(res, message) {
+    return res.status(400).json({
+      status: '400 Bad Request',
+      error: message,
+    });
+  }
 
   /**
      * @returns {JSON} - JSON error object with status 409

@@ -16,10 +16,4 @@ export default class GeneralUtils {
       throw new Error('Invalid mongoose ID');
     };
   }
-  /**
-   * @returns {MongooseID} new mongooseID
-   */
-  static createMongooseId(){
-    return new mongoose.Types.ObjectId();
-  }
 }

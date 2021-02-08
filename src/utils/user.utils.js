@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { config } from "dotenv";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { config } from 'dotenv';
 
 config();
 
@@ -10,10 +10,10 @@ export default {
     return pass;
   },
 
-  //   async verifyPassword(plainText, hashedText) {
-  //     const isMatch = await bcrypt.compare(plainText, hashedText);
-  //     return isMatch;
-  //   },
+  async verifyPassword(plainText, hashedText) {
+    const isMatch = await bcrypt.compare(plainText, hashedText);
+    return isMatch;
+  },
 
   // async randomIntInc(low, high) {
   //   return Math.floor(Math.random() * (high - low + 1) + low);
@@ -33,7 +33,7 @@ export default {
     const token = jwt.sign(
       { data: { id, role, firstName } },
       process.env.SECRET,
-      { expiresIn: "30d" }
+      { expiresIn: '30d' },
     );
     return token;
   },

@@ -2,13 +2,12 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import Sinonchai from 'sinon-chai';
 import sinon from 'sinon';
+import mongoose from 'mongoose';
 import CmsUser from '../db/models/cmsUsers.model';
 import userUtils from '../utils/user.utils';
 import Response from '../utils/response.utils';
-import Helper from "../utils/helpers.utils";
 
 import app from '../index';
-import mongoose from 'mongoose';
 
 chai.should();
 chai.use(Sinonchai);
@@ -22,9 +21,9 @@ const user = {
   role: '5fc8f4b99d1e3023e4942152',
 };
 const invalidToken = 'invalid.jwt.token';
-const staffToken = userUtils.generateToken(Helper.createMongooseId, "1", "Staff User");
-const moderatorToken = userUtils.generateToken(Helper.createMongooseId, "2", "Moderator User");
-const adminToken = userUtils.generateToken(Helper.createMongooseId, "3", "Administrator User");
+const staffToken = userUtils.generateToken(mongoose.Types.ObjectId(), '1', 'Staff User');
+const moderatorToken = userUtils.generateToken(mongoose.Types.ObjectId(), '2', 'Moderator User');
+const adminToken = userUtils.generateToken(mongoose.Types.ObjectId(), '3', 'Administrator User');
 
 const baseUrl = '/api/v1/auth/signup';
 
@@ -60,6 +59,7 @@ describe(`/POST ${baseUrl}`, () => {
             .property('email')
             .to.equals(user.email);
           res.body.data.user.should.have.property('role').to.equals(user.role);
+          res.body.data.user.should.have.property('createdAt').to.equals(res.body.data.user.updatedAt);
           done();
         });
     });

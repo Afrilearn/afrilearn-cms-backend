@@ -1,5 +1,6 @@
 import Response from '../utils/response.utils';
 import CmsUsers from '../db/models/cmsUsers.model';
+import UsersUtils from '../utils/user.utils';
 
 /**
  *Contains Users Controller
@@ -17,13 +18,39 @@ export default class UserController {
    */
   static async editUser(req, res) {
     try {
-      const dbUser = req.dbUser;
-      dbUser.set({...req.body, updatedAt: Date.now()});
+      const { dbUser } = req;
+      dbUser.set({ ...req.body, updatedAt: Date.now() });
       const user = await dbUser.save();
 
       Response.Success(res, { user });
     } catch (err) {
       return Response.InternalServerError(res, 'Could not edit user', err);
+    }
+  }
+
+  /**
+   * @memberof UserController
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} if no error occurs
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async changePassword(req, res) {
+    try {
+      const { password } = req.body;
+
+      const encryptpassword = await UsersUtils.encryptPassword(password);
+
+      await CmsUsers.findByIdAndUpdate(req.body.userId, {
+        password: encryptpassword,
+      });
+
+      Response.Success(res, { message: 'Password changed successfully' });
+    } catch (err) {
+      return Response.InternalServerError(
+        res,
+        'Could not change user password',
+      );
     }
   }
 
