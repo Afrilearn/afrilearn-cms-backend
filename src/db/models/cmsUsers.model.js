@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: mongoose.Schema.ObjectId,
-      ref: 'role',
+      ref: 'cmsRoles',
     },
     isActivated: {
       type: Boolean,
