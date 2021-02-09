@@ -1,3 +1,4 @@
+/* eslint-disable valid-jsdoc */
 // import Auth from '../db/models/users.model';
 // import Helper from '../utils/user.utils';
 // import AuthServices from '../services/auth.services';
@@ -79,7 +80,6 @@ class AuthController {
     //   });
     // }
   }
-
 
 }
 export default AuthController;
