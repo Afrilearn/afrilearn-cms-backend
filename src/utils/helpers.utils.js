@@ -7,13 +7,14 @@ import mongoose from 'mongoose';
  */
 export default class GeneralUtils {
   /**
-     * @returns {true} if id is valid mongoose id
-     * @throws {Error} throws invalid mongoose ID error
-     */
-  static validateMongooseId() {
+   * @param {*} fieldName - name of validated id
+   * @returns {true} if id is valid mongoose id
+   * @throws {Error} throws invalid mongoose ID error
+   */
+  static validateMongooseId(fieldName) {
     return (val) => {
       if (mongoose.Types.ObjectId.isValid(val)) return true;
-      throw new Error('Invalid mongoose ID');
+      throw new Error(`${fieldName} is not a valid mongoose ID`);
     };
   }
 }

@@ -6,12 +6,17 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    imageUrl: {
+    alias: {
       type: String,
+      required: true,
     },
     categoryId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'courseCategory',
+      ref: 'coursecategory',
+    },
+    creatorId: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'cmsuser',
     },
   },
   {
