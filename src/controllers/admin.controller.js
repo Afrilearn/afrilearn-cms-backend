@@ -3,9 +3,9 @@ import EnrolledCourse from '../db/models/enrolledCourses.model';
 
 class AdminController {
   static async allEnrolledCourse(req, res) {
-    const { id } = req.params;
+    const { _id } = req.params;
     try {
-      const courses = EnrolledCourse.find({ id });
+      const courses = EnrolledCourse.find({ _id });
       res.status(200).json({
         status: 'success',
         data: courses,

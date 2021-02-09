@@ -18,10 +18,10 @@ class LessonController {
    */
 
   static async addVideo(req, res) {
-    const { id, videoUrl } = req.body;
+    const { _id, videoUrl } = req.body;
     try {
       const result = await Lesson.updateOne(
-        { _id: id },
+        { _id },
         { $addToSet: { videoUrls: [...videoUrl] } },
       );
       res.status(200).json({
@@ -68,7 +68,7 @@ class LessonController {
    */
 
   static async createQuiz(req, res) {
-    const { id } = req.data;
+    const { _id } = req.data;
     const {
       lessonId,
       question,
@@ -83,7 +83,7 @@ class LessonController {
     try {
       const newQuiz = await Question.create({
         lessonId,
-        creator_Id: id,
+        creator_Id: _id,
         question,
         question_image,
         question_position,
@@ -106,10 +106,10 @@ class LessonController {
   }
 
   static async remove(req, res) {
-    const { id } = req.params;
+    const { _id } = req.params;
 
     try {
-      const result = await Question.findByIdAndRemove(id);
+      const result = await Question.findByIdAndRemove(_id);
       res.status(202).json({
         status: 'success',
         data: result,
@@ -123,7 +123,7 @@ class LessonController {
   }
 
   static async modify(req, res) {
-    const { id } = req.params;
+    const { _id } = req.params;
     const {
       question,
       question_image,
@@ -145,7 +145,7 @@ class LessonController {
     };
 
     try {
-      const updatedDoc = Question.findByIdAndUpdate(id, newDoc, { new: true });
+      const updatedDoc = Question.findByIdAndUpdate(_id, newDoc, { new: true });
       res.status(201).json({
         status: 'success',
         data: updatedDoc,
