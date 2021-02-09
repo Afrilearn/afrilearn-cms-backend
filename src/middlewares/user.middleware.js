@@ -15,15 +15,15 @@ export default class UsersMiddleware {
    * @returns {JSON} Error response if user doesn't exist
    * @returns {JSON} passes control to the next function if user exists
    */
-  static async checkUserExistence(req, res, next) {
-    const condition = { _id: req.body.userId || req.params.userId };
-    const user = await CmsUser.findOne(condition);
-    if (!user) {
-      return Response.NotFound(res, 'User with the given id does not exist');
-    }
-    req.body.dbUser = user;
-    return next();
-  }
+  //   static async checkUserExistence(req, res, next) {
+  //     const condition = { _id: req.body.userId || req.params.userId };
+  //     const user = await CmsUser.findOne(condition);
+  //     if (!user) {
+  //       return Response.NotFound(res, 'User with the given id does not exist');
+  //     }
+  //     req.body.dbUser = user;
+  //     return next();
+  //   }
 
   /**
    * @memberof CategoryMiddleware

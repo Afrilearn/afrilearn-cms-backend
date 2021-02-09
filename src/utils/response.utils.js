@@ -30,18 +30,6 @@ export default class {
     });
   }
 
-  /**
-     * @param {Object} res
-     * @param {Object|string} error
-     * @returns {Object} response
-     */
-  static InternalServerError(res, error) {
-    return res.status(500).json({
-      status: 'error',
-      error,
-    });
-  }
-
   static InternalServerError(res, message, err) {
     return res.status(500).json({
       status: '500 Internal server error',
