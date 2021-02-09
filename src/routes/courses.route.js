@@ -37,4 +37,15 @@ router.delete(
   CoursesController.deleteCourse,
 );
 
+router.post(
+  '/past-question/:courseId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  ParamsValidator.validateMongooseId('courseId'),
+  CourseValidator.validatePastQuestionData(),
+  CourseValidator.pastQuestionValidationResult,
+  CoursesMiddleware.checkPastQuestionUnlinked,
+  CoursesController.linkPastQuestion,
+);
+
 export default router;

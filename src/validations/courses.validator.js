@@ -115,4 +115,36 @@ export default class CourseValidator {
     }
     return next();
   }
+
+  /**
+   * @returns {Object} error object with errors arrays if past question id is invalid
+   */
+  static validatePastQuestionData() {
+    return [
+      check('pastQuestionId')
+        .exists()
+        .withMessage('Past question id is required')
+        .notEmpty()
+        .withMessage('Past question id cannot be empty')
+        .isString()
+        .withMessage('Past question id must be a string')
+        .custom(HelperUtils.validateMongooseId('Past question id')),
+    ];
+  }
+
+  /**
+   * @returns {JSON} JSON error object if course contains invalid data
+   * @returns {next} - passes control to next function if all course data are valid
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @param {*} next - Passes control to next function
+   */
+  static async pastQuestionValidationResult(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errArr = errors.array().map(({ msg }) => msg);
+      return Response.InvalidDataRequest(res, errArr);
+    }
+    return next();
+  }
 }
