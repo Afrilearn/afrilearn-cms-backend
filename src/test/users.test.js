@@ -93,6 +93,7 @@ describe('USERS', () => {
               .to.equals(userUpdate.email);
             res.body.data.user.should.have.property('role');
             res.body.data.user.role.should.not.equals(user.role.toHexString());
+            res.body.data.user.should.have.property('updatedAt');
             res.body.data.user.should.have
               .property('createdAt')
               .not.to.equals(res.body.data.user.updatedAt);
