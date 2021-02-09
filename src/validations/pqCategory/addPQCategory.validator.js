@@ -30,11 +30,7 @@ class AddPQCategory {
         .isEmpty()
         .withMessage('CategoryId cannot be empty')
         .isNumeric()
-<<<<<<< HEAD
         .withMessage('CategoryId is invalid'),
-=======
-        .withMessage('CategoryId is invalid')
->>>>>>> 5ddb91ff21f56c9691cbbf15a79de902b440736f
     ];
   }
 
