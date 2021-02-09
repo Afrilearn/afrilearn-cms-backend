@@ -72,8 +72,8 @@ describe(`/POST ${baseUrl}`, () => {
             .property('email')
             .to.equals(user.email);
           res.body.data.user.should.have.property('role').to.equals(user.role);
-          res.body.data.course.should.have.property('createdAt');
-          res.body.data.course.should.have.property('updatedAt');
+          res.body.data.user.should.have.property('createdAt');
+          res.body.data.user.should.have.property('updatedAt');
           done();
         });
     });
