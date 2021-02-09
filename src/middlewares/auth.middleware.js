@@ -40,14 +40,16 @@ class AuthMiddleware {
    * @returns {JSON} Error response if user is not up to level
    * @returns {JSON} passes control to the next function
    */
-  static grantAccess(role = '3') {
-    const roles = ['1', '2', '3'];
+  static grantAccess(role = '602209d72792e63fc841de3e') {
+    const roles = [
+      '602209ab2792e63fc841de3c',
+      '602209c32792e63fc841de3d',
+      '602209d72792e63fc841de3e',
+    ];
     const roleIndex = roles.findIndex((val) => val === role);
     return (req, res, next) => {
-      if (
-        roles.findIndex((val) => val === req.data.role) < roleIndex
-      ) {
-        return res.status(403).json({
+      if (roles.findIndex((val) => val === req.data.role) < roleIndex) {
+        return res.status(401).json({
           status: '401 Unauthorized',
           error: 'Not authorized to access data',
         });

@@ -33,14 +33,14 @@ router.delete(
 router.get(
   '/',
   AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess('1'),
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   UserController.fetchAllCmsUsers,
 );
 
 router.get(
   '/afrilearn',
   AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess('1'),
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   AfrilearnUserController.fetchAllAfrilearnUsers,
 );
 

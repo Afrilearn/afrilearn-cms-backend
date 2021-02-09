@@ -27,20 +27,21 @@ const userUpdate = {
   email: 'janetdame@example.com',
   role: mongoose.Types.ObjectId(),
 };
+
 const invalidToken = 'invalid.jwt.token';
 const staffToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
-  '1',
+  '602209ab2792e63fc841de3c',
   'Staff User',
 );
 const moderatorToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
-  '2',
+  '602209c32792e63fc841de3d',
   'Moderator User',
 );
 const adminToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
-  '3',
+  '602209d72792e63fc841de3e',
   'Administrator User',
 );
 
@@ -117,7 +118,7 @@ describe('USERS', () => {
               .to.equals('Request contains invalid data');
             res.body.should.have
               .property('errors')
-              .to.include('Invalid mongoose ID');
+              .to.include('userId is not a valid mongoose ID');
             done();
           });
       });
@@ -184,14 +185,14 @@ describe('USERS', () => {
     });
 
     describe('ADMIN ACCESS', () => {
-      it('should return 403 with error if user is not moderator or admin', (done) => {
+      it('should return 401 with error if user is not moderator or admin', (done) => {
         chai
           .request(app)
           .patch(`${baseUrl}/${userId}`)
           .set('token', staffToken)
           .send(userUpdate)
           .end((err, res) => {
-            res.should.have.status(403);
+            res.should.have.status(401);
             res.body.should.have
               .property('status')
               .to.equals('401 Unauthorized');
@@ -201,14 +202,14 @@ describe('USERS', () => {
             done();
           });
       });
-      it('should return 403 with error if user is not moderator or admin', (done) => {
+      it('should return 401 with error if user is not moderator or admin', (done) => {
         chai
           .request(app)
           .patch(`${baseUrl}/${userId}`)
           .set('token', moderatorToken)
           .send(userUpdate)
           .end((err, res) => {
-            res.should.have.status(403);
+            res.should.have.status(401);
             res.body.should.have
               .property('status')
               .to.equals('401 Unauthorized');
@@ -339,7 +340,7 @@ describe('USERS', () => {
             .to.equals('Request contains invalid data');
           res.body.should.have
             .property('errors')
-            .to.include('Invalid mongoose ID');
+            .to.include('Role is not a valid mongoose ID');
           done();
         });
       });
@@ -457,7 +458,7 @@ describe('USERS', () => {
               .to.equals('Request contains invalid data');
             res.body.should.have
               .property('errors')
-              .to.include('Invalid mongoose ID');
+              .to.include('userId is not a valid mongoose ID');
             done();
           });
       });
@@ -520,13 +521,13 @@ describe('USERS', () => {
     });
 
     describe('ADMIN ACCESS', () => {
-      it('should return 403 with error if user is not moderator or admin', (done) => {
+      it('should return 401 with error if user is not moderator or admin', (done) => {
         chai
           .request(app)
           .delete(`${baseUrl}/${userId}`)
           .set('token', staffToken)
           .end((err, res) => {
-            res.should.have.status(403);
+            res.should.have.status(401);
             res.body.should.have
               .property('status')
               .to.equals('401 Unauthorized');

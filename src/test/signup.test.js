@@ -20,10 +20,23 @@ const user = {
   password: '12345678',
   role: '5fc8f4b99d1e3023e4942152',
 };
+
 const invalidToken = 'invalid.jwt.token';
-const staffToken = userUtils.generateToken(mongoose.Types.ObjectId(), '1', 'Staff User');
-const moderatorToken = userUtils.generateToken(mongoose.Types.ObjectId(), '2', 'Moderator User');
-const adminToken = userUtils.generateToken(mongoose.Types.ObjectId(), '3', 'Administrator User');
+const staffToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209ab2792e63fc841de3c',
+  'Staff User',
+);
+const moderatorToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209c32792e63fc841de3d',
+  'Moderator User',
+);
+const adminToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209d72792e63fc841de3e',
+  'Administrator User',
+);
 
 const baseUrl = '/api/v1/auth/signup';
 
@@ -59,7 +72,9 @@ describe(`/POST ${baseUrl}`, () => {
             .property('email')
             .to.equals(user.email);
           res.body.data.user.should.have.property('role').to.equals(user.role);
-          res.body.data.user.should.have.property('createdAt').to.equals(res.body.data.user.updatedAt);
+          res.body.data.user.should.have
+            .property('createdAt')
+            .to.equals(res.body.data.user.updatedAt);
           done();
         });
     });
@@ -122,14 +137,14 @@ describe(`/POST ${baseUrl}`, () => {
   });
 
   describe('ADMIN ACCESS', () => {
-    it('should return 403 with error if user is moderator', (done) => {
+    it('should return 401 with error if user is moderator', (done) => {
       chai
         .request(app)
         .post(baseUrl)
         .set('token', moderatorToken)
         .send(user)
         .end((err, res) => {
-          res.should.have.status(403);
+          res.should.have.status(401);
           res.body.should.have.property('status').to.equals('401 Unauthorized');
           res.body.should.have
             .property('error')
@@ -137,14 +152,14 @@ describe(`/POST ${baseUrl}`, () => {
           done();
         });
     });
-    it('should return 403 with error if user is staff', (done) => {
+    it('should return 401 with error if user is staff', (done) => {
       chai
         .request(app)
         .post(baseUrl)
         .set('token', staffToken)
         .send(user)
         .end((err, res) => {
-          res.should.have.status(403);
+          res.should.have.status(401);
           res.body.should.have.property('status').to.equals('401 Unauthorized');
           res.body.should.have
             .property('error')
@@ -395,6 +410,30 @@ describe(`/POST ${baseUrl}`, () => {
           res.body.should.have
             .property('errors')
             .to.include('Invalid email address');
+          done();
+        });
+    });
+    it('should not signup user if role is an invalid mongoose ID', (done) => {
+      request
+        .send({
+          firstName: 'John',
+          lastName: 'Doe',
+          password: '12345678',
+          email: 'johndoe@example',
+          phoneNumber: '1234567890',
+          role: 'invalidmongooseid',
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.have
+            .property('status')
+            .to.equals('400 Invalid Request');
+          res.body.should.have
+            .property('error')
+            .to.equals('Request contains invalid data');
+          res.body.should.have
+            .property('errors')
+            .to.include('Role is not a valid mongoose ID');
           done();
         });
     });
