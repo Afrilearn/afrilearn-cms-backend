@@ -31,12 +31,53 @@ export default class {
   }
 
   /**
+     * Defines the specification for internal server error
      * @param {Object} res
      * @param {Object|string} error
      * @returns {Object} response
      */
   static InternalServerError(res, error) {
     return res.status(500).json({
+      status: 'error',
+      error,
+    });
+  }
+
+  /**
+   * Defines the specification for conflicting resource
+   * @param {object} res (ServerResponse)
+   * @param {object} error
+   * @returns {object} ServerResponse
+   */
+  static ConflictError(res, error) {
+    return res.status(409).json({
+      status: 'error',
+      error,
+    });
+  }
+
+  /**
+   * Defines the specification for a resource not found error
+   * @param {object} res (ServerResponse)
+   * @param {string} message
+   * @returns {object} ServerResponse
+   */
+  static NotFoundError(res, message) {
+    return res.status(404).json({
+      status: 'error',
+      error: { message },
+    });
+  }
+
+  /**
+   * Defines the specification for bad request error cases
+   * @param {object} res (ServerResponse object)
+   * @param {object} error
+   * @param {number} code
+   * @returns {object} ServerResponse
+   */
+  static BadRequestError(res, error, code = 400) {
+    return res.status(code).json({
       status: 'error',
       error,
     });

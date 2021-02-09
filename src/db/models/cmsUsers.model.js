@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema(
       unique: true,
     },
     role: {
-      type: mongoose.Schema.ObjectId,
+      type: String,
       ref: 'role',
     },
     isActivated: {
