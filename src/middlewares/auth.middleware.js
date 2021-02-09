@@ -48,7 +48,7 @@ class AuthMiddleware {
     ];
     const roleIndex = roles.findIndex((val) => val === role);
     return (req, res, next) => {
-      if (roleIndex >= 0 && roles.findIndex((val) => val === req.data.role) < roleIndex) {
+      if (roleIndex < 0 || roles.findIndex((val) => val === req.data.role) < roleIndex) {
         return res.status(401).json({
           status: '401 Unauthorized',
           error: 'Not authorized to access data',

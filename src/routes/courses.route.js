@@ -3,6 +3,7 @@ import AuthMiddleware from '../middlewares/auth.middleware';
 import CourseValidator from '../validations/courses.validator';
 import CoursesMiddleware from '../middlewares/courses.middleware';
 import CoursesController from '../controllers/courses.controller';
+import ParamsValidator from '../validations/params.validator';
 
 const router = Router();
 
@@ -14,6 +15,17 @@ router.post(
   CourseValidator.courseCreationValidationResult,
   CoursesMiddleware.checkCourseInexistence,
   CoursesController.createCourse,
+);
+
+router.patch(
+  '/:courseId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  ParamsValidator.validateMongooseId('courseId'),
+  CourseValidator.validateCourseEditData(),
+  CourseValidator.courseEditValidationResult,
+  CoursesMiddleware.checkCourseExistence,
+  CoursesController.editCourse,
 );
 
 export default router;

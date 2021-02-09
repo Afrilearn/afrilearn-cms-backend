@@ -23,13 +23,13 @@ export default class GeneralServices {
     next,
     Collection,
     condition,
-    name = 'Document',
+    name,
   ) {
     const result = await Collection.findOne(condition);
     if (!result) {
       return Response.NotFound(res, `${name} does not exist`);
     }
-    req.body.dbResult = result;
+    req.dbResult = result;
     return next();
   }
 
@@ -47,7 +47,7 @@ export default class GeneralServices {
     next,
     Collection,
     condition,
-    name = 'Document',
+    name,
   ) {
     const result = await Collection.findOne(condition);
     if (result) {
