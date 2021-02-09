@@ -65,10 +65,10 @@ class PaymentController {
 
   static async modifyPaymentPlan(req, res) {
     const { name, amount, duration } = req.body;
-    const { _id } = req.params;
+    const { id } = req.params;
     try {
       const editedPlan = await PaymentPlan.findOneAndUpdate(
-        { _id },
+        { id },
         {
           name,
           amount,
@@ -89,9 +89,9 @@ class PaymentController {
   }
 
   static async removePlan(req, res) {
-    const { _id } = req.params;
+    const { id } = req.params;
     try {
-      const removed = PaymentPlan.findByIdAndRemove(_id);
+      const removed = PaymentPlan.findByIdAndRemove(id);
 
       res.status(204).json({
         status: 'success',

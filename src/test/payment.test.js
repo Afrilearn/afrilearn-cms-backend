@@ -45,7 +45,7 @@ describe('PAYMENT Endpoint', () => {
     });
   });
   describe('GET/api/v1/plan/payment-transactions', () => {
-    it('should return array of payment plans', (done) => {
+    it('should return array of all transactions on the platform', (done) => {
       chai
         .request(app)
         .set('Authorization', `Bearer ${token}`)
@@ -60,7 +60,7 @@ describe('PAYMENT Endpoint', () => {
     });
   });
   describe('GET/api/v1/plan/add-payment-plan', () => {
-    it('should return array of payment plans', (done) => {
+    it('should create a new payment plan', (done) => {
       const body = {
         name: '',
         amount: '',
@@ -71,6 +71,46 @@ describe('PAYMENT Endpoint', () => {
         .request(app)
         .set('Authorization', `Bearer ${token}`)
         .post('/api/v1/plan/add-payment-plan')
+        .send(body)
+        .end((err, res) => {
+          res.should.have.status(201);
+          res.body.should.be.a('object');
+          res.body.should.have.property('data');
+          res.body.data.should.be.a('array');
+          done();
+        });
+    });
+  });
+  describe('GET/api/v1/plan/edit-payment-plan', () => {
+    it('should edit existing payment plan', (done) => {
+      const _id = 'hhjhj893hsbcbjsvj43';
+      const body = {
+        name: '',
+        amount: '',
+        duration: '',
+        category: '',
+      };
+      chai
+        .request(app)
+        .set('Authorization', `Bearer ${token}`)
+        .put(`/api/v1/plan/edit-payment-plan ${_id}`)
+        .send(body)
+        .end((err, res) => {
+          res.should.have.status(201);
+          res.body.should.be.a('object');
+          res.body.should.have.property('data');
+          res.body.data.should.be.a('array');
+          done();
+        });
+    });
+  });
+  describe('GET/api/v1/plan/remove-payment-plan', () => {
+    it('should remove a payment plan from the data base', (done) => {
+      const _id = '6hy8gjh8eghhjwhjhjjw';
+      chai
+        .request(app)
+        .delete(`/api/v1/plan/remove-payment-plan/${_id}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(body)
         .end((err, res) => {
           res.should.have.status(201);

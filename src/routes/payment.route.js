@@ -26,14 +26,14 @@ router.post(
 );
 
 router.put(
-  '/edit-payment-plan',
+  '/edit-payment-plan/:id',
   Validator,
   checkIsAdminStatus,
   PaymentController.modifyPaymentPlan,
 );
 
 router.delete(
-  '/remove-payment-plan',
+  '/remove-payment-plan/:id',
   Validator,
   checkIsAdminStatus,
   PaymentController.removePlan,

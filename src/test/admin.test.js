@@ -28,13 +28,14 @@ before((done) => {
     });
 });
 
-describe('LESSON Endpoint', () => {
-  describe('GET/api/v1/lesson/quiz', () => {
-    it('should return array of available quiz', (done) => {
+describe('ADMIN Endpoint', () => {
+  describe('GET/api/v1/admin/', () => {
+    it('should return array of a user enrolled courses', (done) => {
+      const id = '7uih98943hjjdsjhjh';
       chai
         .request(app)
+        .get(`/api/v1/admin/ ${id}`)
         .set('Authorization', `Bearer ${token}`)
-        .get('/api/v1/lesson/quiz')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('object');

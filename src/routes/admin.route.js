@@ -5,6 +5,6 @@ import checkIsAdminStatus from '../middlewares/isAdmin.middleware';
 
 const router = Router();
 
-router.get('/admin-enrolled', Validator, checkIsAdminStatus, AdminController.allEnrolledCourse);
+router.get('/admin-enrolled/:id', Validator, checkIsAdminStatus, AdminController.allEnrolledCourse);
 
 export default router;
