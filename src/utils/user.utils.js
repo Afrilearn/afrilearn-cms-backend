@@ -20,6 +20,11 @@ export default class UserUtils {
     process.env.SECRET, { expiresIn: '30d' });
   }
 
+  static async encryptPassword(password) {
+    const pass = await bcrypt.hash(password, 8);
+    return pass;
+  }
+
   /**
    * @param {object} user
    * @param {string} password
