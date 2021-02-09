@@ -1,11 +1,27 @@
 /* eslint-disable require-jsdoc */
 import PaymentPlan from '../db/models/paymentPlans.model';
 import CourseCategory from '../db/models/courseCategories.model';
+import Payment from '../db/models/payments.model';
 
 class PaymentController {
   static async getAllPaymentPlan(req, res) {
     try {
       const plans = PaymentPlan.find();
+      res.status(200).json({
+        status: 'success',
+        data: plans,
+      });
+    } catch (error) {
+      res.status(400).json({
+        status: 'error',
+        data: error.message,
+      });
+    }
+  }
+
+  static async getAllTransactions(req, res) {
+    try {
+      const plans = Payment.find();
       res.status(200).json({
         status: 'success',
         data: plans,

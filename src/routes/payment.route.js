@@ -11,6 +11,12 @@ router.get(
   checkIsAdminStatus,
   PaymentController.getAllPaymentPlan,
 );
+router.get(
+  '/payment-transactions',
+  Validator,
+  checkIsAdminStatus,
+  PaymentController.getAllTransactions,
+);
 
 router.post(
   '/add-payment-plan',
