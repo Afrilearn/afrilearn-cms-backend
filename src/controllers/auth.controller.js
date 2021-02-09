@@ -28,7 +28,7 @@ class AuthController {
       const data = { token, user };
       return Response.Success(res, data);
     } catch (err) {
-      return Response.InternalServerError(res, 'Error Logging in User');
+      return Response.InternalServerError(res, 'Error Logging in user', err);
     }
   }
 

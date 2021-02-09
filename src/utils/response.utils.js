@@ -31,6 +31,26 @@ export default class {
   }
 
   /**
+     * @param {Object} res
+     * @param {Object|string} error
+     * @returns {Object} response
+     */
+  static InternalServerError(res, error) {
+    return res.status(500).json({
+      status: 'error',
+      error,
+    });
+  }
+
+  static InternalServerError(res, message, err) {
+    return res.status(500).json({
+      status: '500 Internal server error',
+      error: message,
+      errors: err || [message],
+    });
+  }
+
+  /**
      * @returns {JSON} - JSON error object with 400 status
      * @param {*} res - Response Object
      * @param {*} errs - thrown errors
@@ -49,10 +69,10 @@ export default class {
     }
   
     /**
-     * @returns {JSON} - JSON error object with status 401
-     * @param {*} res - Response Object
-     * @param {*} message - error message
-     */
+       * @returns {JSON} - JSON error object with status 401
+       * @param {*} res - Response Object
+       * @param {*} message - error message
+       */
     static Unauthorised(res, message = 'Not authorized to access data') {
       return res.status(401).json({
         status: '401 Unauthorized',
@@ -61,53 +81,17 @@ export default class {
     }
   
     /**
-     * @returns {JSON} - JSON error object with status 400
-     * @param {*} res - Response Object
-     * @param {*} message - error message
-     */
-    static BadRequest(res, message = 'Bad request') {
-      return res.status(400).json({
-        status: '400 Bad Request',
-        error: message,
-      });
-    }
-  
-    /**
-     * @returns {JSON} - JSON error object with status 409
-     * @param {*} res - Response Object
-     * @param {*} message - error message
-     */
+       * @returns {JSON} - JSON error object with status 409
+       * @param {*} res - Response Object
+       * @param {*} message - error message
+       */
     static ConflictingRequest(
       res,
-      message = 'Submitted data conflicts with existing data',
+      message,
     ) {
       return res.status(409).json({
         status: '409 Conflicting Request',
         error: message,
       });
     }
-  
-    /**
-     * @returns {JSON} - JSON error object with status 404
-     * @param {*} res - Response Object
-     * @param {*} message - error message
-     */
-    static NotFound(res, message = 'Requested data was not found') {
-      return res.status(404).json({
-        status: '404 Not Found',
-        error: message,
-      });
-    }
-
-  /**
-     * @param {Object} res
-     * @param {Object|string} error
-     * @returns {Object} response
-     */
-  static InternalServerError(res, error) {
-    return res.status(500).json({
-      status: 'error',
-      error,
-    });
-  }
 }
