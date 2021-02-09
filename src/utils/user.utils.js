@@ -13,9 +13,15 @@ export default class UserUtils {
    * @param {string} lastName
    * @returns {string} token
    */
+<<<<<<< HEAD
   static generateToken({ id, role, firstName }) {
     return jwt.sign({
       id, role, firstName,
+=======
+  static generateToken({id, role, firstName}) {
+    return jwt.sign({
+      id, role, firstName
+>>>>>>> 5ddb91ff21f56c9691cbbf15a79de902b440736f
     },
     process.env.SECRET, { expiresIn: '30d' });
   }

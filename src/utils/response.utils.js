@@ -42,7 +42,6 @@ export default class {
       error,
     });
   }
-
   /**
    * Defines the specification for conflicting resource
    * @param {object} res (ServerResponse)

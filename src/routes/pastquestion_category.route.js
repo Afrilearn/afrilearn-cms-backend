@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import AuthMiddleware from '../middlewares/auth.middleware';
+import AuthMiddleware from '../middlewares/auth.middleware'
 import PQCategoryController from '../controllers/pastquestions_category.controller';
 import PQCategoryMiddleware from '../middlewares/pqCategory.middleware';
-import AddPQCategoryValidator from '../validations/pqCategory/addPQCategory.validator';
+import AddPQCategoryValidator from '../validations/pqCategory/addPQCategory.validator'
 
 const router = Router();
+
 
 router.post(
   '/pqcategory',
@@ -17,10 +18,10 @@ router.post(
 );
 
 router.get(
-  '/pqcategory',
-  AuthMiddleware.verifyUserToken,
-  PQCategoryController.getAllCategories,
-);
+    '/pqcategory',
+    AuthMiddleware.verifyUserToken,
+    PQCategoryController.getAllCategories,
+  );
 
 router.get(
   '/pqcategory/:id',
@@ -32,14 +33,14 @@ router.put(
   '/pqcategory/:id',
   AuthMiddleware.verifyUserToken,
   AuthMiddleware.verifyManager,
-  PQCategoryController.updateCategory,
-);
+  PQCategoryController.updateCategory
+)
 
 router.delete(
-  '/pqcategory/:id',
-  AuthMiddleware.verifyUserToken,
-  AuthMiddleware.verifyManager,
-  PQCategoryController.deleteCategory,
-);
+    '/pqcategory/:id',
+    AuthMiddleware.verifyUserToken,
+    AuthMiddleware.verifyManager,
+    PQCategoryController.deleteCategory,
+  );
 
 export default router;

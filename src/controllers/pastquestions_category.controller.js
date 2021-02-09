@@ -15,7 +15,8 @@ export default class PastQuestionsCategoryController {
      */
   static async getOneCategory(req, res, next) {
     const pqCategoryId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) return Response.BadRequestError(res, 'CategoryId is invalid');
+    if(!mongoose.Types.ObjectId.isValid(pqCategoryId))
+      return Response.BadRequestError(res, 'CategoryId is invalid');
     try {
       const pqCategory = await PQCategory.findById(pqCategoryId);
       return pqCategory
@@ -43,7 +44,7 @@ export default class PastQuestionsCategoryController {
     }
   }
 
-  /**
+/**
  * Handles updte of past question category
  * @param {ServerRequest} req
  * @param {ServerResponse} res
@@ -51,7 +52,8 @@ export default class PastQuestionsCategoryController {
  */
   static async updateCategory(req, res) {
     const pqCategoryId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) return Response.BadRequestError(res, 'CategoryId is invalid');
+    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) 
+      return Response.BadRequestError(res, 'CategoryId is invalid');
     try {
       const pqCategory = await PQCategory.findOne({ _id: pqCategoryId });
       if (!pqCategory) return Response.NotFoundError(res, 'category does not exist');
@@ -69,15 +71,17 @@ export default class PastQuestionsCategoryController {
  * @param {ServerResponse} res
  * @returns {ServerResponse} response
  */
-  static async deleteCategory(req, res) {
+static async deleteCategory(req, res) {
     const pqCategoryId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) return Response.BadRequestError(res, 'CategoryId is invalid');
+    if(!mongoose.Types.ObjectId.isValid(pqCategoryId))
+      return Response.BadRequestError(res, 'CategoryId is invalid');
     try {
-      const pqCategory = await PQCategory.findOne({ _id: pqCategoryId });
-      if (!pqCategory) { return Response.NotFoundError(res, 'category does not exist'); }
-      await PQCategory.deleteOne({ _id: pqCategoryId });
+      const pqCategory = await PQCategory.findOne({ _id : pqCategoryId });
+      if(!pqCategory) 
+        return Response.NotFoundError(res, 'category does not exist');
+      await PQCategory.deleteOne({ _id : pqCategoryId });
       return Response.Success(res, {
-        message: 'past question category deleted successfully',
+        message: 'past question category deleted successfully'
       }, 200);
     } catch (error) {
       return Response.InternalServerError(res, 'Could not delete category');
@@ -92,7 +96,8 @@ export default class PastQuestionsCategoryController {
   static async getAllCategories(req, res) {
     try {
       const pqCategories = await PQCategory.find({});
-      if (pqCategories.length < 1) { return Response.NotFoundError(res, 'No past question category has been added'); }
+      if (pqCategories.length < 1) 
+        return Response.NotFoundError(res, 'No past question category has been added');
       return Response.Success(res, pqCategories, 200);
     } catch (error) {
       return Response.InternalServerError(res, 'Could not return past question categories.');

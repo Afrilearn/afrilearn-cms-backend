@@ -20,7 +20,7 @@ const testAdminUser = {
   lastName: 'Adegbohungbe',
   role: 'admin',
   email: 'loisdex@test.com',
-  password: bcrypt.hashSync('password123', 10),
+  password: bcrypt.hashSync('password123', 10)
 };
 
 const testStaffUser = {
@@ -28,14 +28,13 @@ const testStaffUser = {
   lastName: 'Doe',
   role: 'staff',
   email: 'loisdoe@example.com',
-  password: bcrypt.hashSync('password123', 10),
+  password: bcrypt.hashSync('password123', 10)
 };
 
 const testPQCategroy = {
-  name: 'TestPQ',
-  categoryId: 1,
-};
-
+  name : 'TestPQ',
+  categoryId : 1
+}
 let adminUser;
 let staffUser;
 let adminToken;
