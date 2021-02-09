@@ -39,7 +39,7 @@ export default class UserValidators {
         .not()
         .isEmpty()
         .withMessage('Role cannot be empty')
-        .custom(HelperUtils.validateMongooseId()),
+        .custom(HelperUtils.validateMongooseId('Role')),
     ];
   }
 
@@ -72,7 +72,7 @@ export default class UserValidators {
         .not()
         .isEmpty()
         .withMessage('User id cannot be empty')
-        .custom(HelperUtils.validateMongooseId()),
+        .custom(HelperUtils.validateMongooseId('User id')),
       check('password')
         .exists()
         .withMessage('Password is required')

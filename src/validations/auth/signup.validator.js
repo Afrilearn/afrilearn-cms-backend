@@ -55,7 +55,7 @@ class SignupValidator {
         .withMessage('Password length must be at least 8 characters')
         .trim()
         .escape(),
-      check('role').custom(HelperUtils.validateMongooseId()),
+      check('role').custom(HelperUtils.validateMongooseId('Role')),
     ];
   }
 

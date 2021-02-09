@@ -16,7 +16,7 @@ export default class ParamsValidator {
   static validateMongooseId(param) {
     return [
       check(param)
-        .custom(HelperUtils.validateMongooseId()),
+        .custom(HelperUtils.validateMongooseId(param)),
     ];
   }
 
