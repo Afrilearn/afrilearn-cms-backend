@@ -81,8 +81,9 @@ describe('COURSES', () => {
               .property('creatorId')
               .to.equals(course.creatorId.toHexString());
             res.body.data.course.should.have
-              .property('createdAt')
-              .to.equals(res.body.data.course.updatedAt);
+              .property('createdAt');
+            res.body.data.course.should.have
+              .property('updatedAt');
             done();
           });
       });
@@ -108,6 +109,10 @@ describe('COURSES', () => {
             res.body.data.course.should.have
               .property('creatorId')
               .to.equals(course.creatorId.toHexString());
+            res.body.data.course.should.have
+              .property('createdAt');
+            res.body.data.course.should.have
+              .property('updatedAt');
             done();
           });
       });
