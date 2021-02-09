@@ -23,7 +23,7 @@ class AuthController {
       if (!user) return Response.UnauthorizedError(res, signinError);
       const confirmPassword = await Helper.validateUserPassword(user, req.body.password);
       if (!confirmPassword) return Response.UnauthorizedError(res, signinError);
-      const token = Helper.generateToken(user._id, user.role, user.firstName, user.lastName);
+      const token = Helper.generateToken({ id: user._id, role: user.role, firstName: user.firstName});
       Helper.setCookie(res, token);
       const data = { token, user };
       return Response.Success(res, data);
