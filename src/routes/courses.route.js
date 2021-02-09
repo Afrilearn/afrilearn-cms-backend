@@ -28,4 +28,13 @@ router.patch(
   CoursesController.editCourse,
 );
 
+router.delete(
+  '/:courseId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  ParamsValidator.validateMongooseId('courseId'),
+  CoursesMiddleware.checkCourseExistence,
+  CoursesController.deleteCourse,
+);
+
 export default router;

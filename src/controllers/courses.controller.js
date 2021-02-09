@@ -42,4 +42,20 @@ export default class CoursesController {
       Response.InternalServerError(res, 'Could not edit course', err);
     }
   }
+
+  /**
+   * @memberof CoursesController
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} if no error occurs
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async deleteCourse(req, res) {
+    try {
+      await Courses.deleteOne({ _id: req.params.courseId });
+      Response.Success(res, { message: 'Course deleted successfully' });
+    } catch (err) {
+      Response.InternalServerError(res, 'Could not delete course');
+    }
+  }
 }
