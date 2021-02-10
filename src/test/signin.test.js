@@ -22,21 +22,12 @@ const testUserDetails = {
 };
 
 describe(`POST ${signinUrl}`, () => {
-  before((done) => {
-    CmsUser.deleteMany({ email: testUserDetails.email }, (err) => {
-      if (!err) {
-        done();
-      }
-    });
-    const user = new CmsUser(testUserDetails);
-    user.save();
+  beforeEach(async () => {
+    await CmsUser.deleteOne({ email: testUserDetails.email });
+    await CmsUser.create(testUserDetails);
   });
-  after((done) => {
-    CmsUser.deleteMany({ email: testUserDetails.email }, (err) => {
-      if (!err) {
-        done();
-      }
-    });
+  afterEach(async () => {
+    await CmsUser.deleteOne({ email: testUserDetails.email });
   });
   describe('SUCCESS', () => {
     it('should sign in a user successfully', async () => {
