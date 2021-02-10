@@ -11,7 +11,7 @@ export default class {
    */
   static UnauthorizedError(res, error, code) {
     return res.status(code || 401).json({
-      status: "error",
+      status: 'error',
       error,
     });
   }
@@ -25,7 +25,7 @@ export default class {
    */
   static Success(res, data, code = 200) {
     return res.status(code).json({
-      status: "success",
+      status: 'success',
       data,
     });
   }
@@ -37,7 +37,7 @@ export default class {
    */
   static InternalServerError(res, error) {
     return res.status(500).json({
-      status: "error",
+      status: 'error',
       error,
     });
   }
@@ -50,7 +50,7 @@ export default class {
    */
   static ConflictError(res, error) {
     return res.status(409).json({
-      status: "error",
+      status: 'error',
       error,
     });
   }
@@ -58,12 +58,12 @@ export default class {
   /**
    * Defines the specification for a resource not found error
    * @param {object} res (ServerResponse)
-   * @param {string} message
+   * @param {string} error (Error message)
    * @returns {object} ServerResponse
    */
   static NotFoundError(res, error) {
     return res.status(404).json({
-      status: "error",
+      status: 'error',
       error,
     });
   }
@@ -77,14 +77,21 @@ export default class {
    */
   static BadRequestError(res, error, code = 400) {
     return res.status(code).json({
-      status: "error",
+      status: 'error',
       error,
     });
   }
 
-  static InvalidRequestParamsError(res, errors, error = "Your request contains invalid parameters") {
+  /**
+   * Defines the specification for invalid request params error cases
+   * @param {*} res (ServerResponse object)
+   * @param {*} errors
+   * @param {*} error
+   * @returns {json} (Error details)
+   */
+  static InvalidRequestParamsError(res, errors, error = 'Your request contains invalid parameters') {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       error,
       errors,
     });
