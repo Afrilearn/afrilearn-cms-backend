@@ -13,14 +13,14 @@ export default class courseCategoryValidator {
      */
   static validateCourseCategoryData() {
     return [
-      check("name")
+      check('name')
         .exists()
-        .withMessage("Category name is required")
+        .withMessage('Category name is required')
         .isString()
-        .withMessage("Category name must be a string")
+        .withMessage('Category name must be a string')
         .not()
         .isEmpty()
-        .withMessage("Category name cannot be empty")
+        .withMessage('Category name cannot be empty'),
     ];
   }
 
