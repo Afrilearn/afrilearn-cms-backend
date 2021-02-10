@@ -44,7 +44,7 @@ let pqCategory;
 
 const route = '/api/v1/pqcategory';
 
-beforeEach(async () => {
+before(async () => {
   await CmsUser.deleteOne({ email: testAdminUser.email });
   await CmsUser.deleteOne({ email: testStaffUser.email });
   adminUser = await CmsUser.create(testAdminUser);
@@ -57,7 +57,7 @@ beforeEach(async () => {
   });
   pqCategory = await PQCategory.create(testPQCategroy);
 });
-afterEach(async () => {
+after(async () => {
   await CmsUser.deleteMany({ _id: adminUser._id });
   await CmsUser.deleteMany({ _id: staffUser._id });
   await PQCategory.deleteMany({ name: testPQCategroy.name });
