@@ -21,16 +21,14 @@ const auth = {
         || req.body.authorization
         || req.headers['x-access-token'];
 
-      if (!token) 
-        return Response.UnauthorizedError(res, 'No token provided!');
+      if (!token) { return Response.UnauthorizedError(res, 'No token provided!'); }
 
       if (token.startsWith('Bearer')) token = token.slice(7);
       const decoded = auth.verifyToken(token);
 
-      if (decoded.error) 
-        return Response.UnauthorizedError(res, 'Invalid authentication token.');
+      if (decoded.error) { return Response.UnauthorizedError(res, 'Invalid authentication token.'); }
+      const user = await CmsUser.findOne({ id: decoded.payload._id });
 
-      const user = await CmsUser.findOne({ id: decoded.payload._id});
       if (!user) return Response.UnauthorizedError(res, 'Failed to authenticate token', 401);
       req.currentUser = user;
       const { payload } = decoded;
@@ -38,17 +36,16 @@ const auth = {
       req.tokenData = payload;
       return next();
     } catch (error) {
-        return Response.InternalServerError(res, 'Internal Server Error.');
+      return Response.InternalServerError(res, 'Internal Server Error.');
     }
   },
 
   async verifyManager(req, res, next) {
     try {
-      if (!((req.tokenData.role === 'moderator') || (req.tokenData.role === 'admin'))) 
-        return Response.UnauthorizedError(res, 'You are not permitted to perform this action');
+      if (!((req.tokenData.role === 'moderator') || (req.tokenData.role === 'admin'))) { return Response.UnauthorizedError(res, 'You are not permitted to perform this action'); }
       return next();
     } catch (error) {
-        return Response.InternalServerError(res, 'Error Accessing Route');
+      return Response.InternalServerError(res, 'Error Accessing Route');
     }
   },
 
