@@ -21,7 +21,7 @@ export default class CoursesController {
 
       Response.Success(res, { course: result }, 201);
     } catch (err) {
-      Response.InternalServerError(res, 'Could not create course', err);
+      Response.InternalServerError(res, 'Error creating course');
     }
   }
 
@@ -40,7 +40,7 @@ export default class CoursesController {
 
       Response.Success(res, { course: result });
     } catch (err) {
-      Response.InternalServerError(res, 'Could not edit course', err);
+      Response.InternalServerError(res, 'Error editing course');
     }
   }
 
@@ -56,7 +56,7 @@ export default class CoursesController {
       await Courses.deleteOne({ _id: req.params.courseId });
       Response.Success(res, { message: 'Course deleted successfully' });
     } catch (err) {
-      Response.InternalServerError(res, 'Could not delete course', err);
+      Response.InternalServerError(res, 'Error deleting course');
     }
   }
 
@@ -79,8 +79,7 @@ export default class CoursesController {
     } catch (err) {
       return Response.InternalServerError(
         res,
-        'Could not link past question',
-        err,
+        'Error linking past question',
       );
     }
   }

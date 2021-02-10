@@ -5,6 +5,7 @@ import AuthMiddleware from '../middlewares/auth.middleware';
 import UserMiddleware from '../middlewares/user.middleware';
 import UserValidator from '../validations/user.validator';
 import UserController from '../controllers/users.controller';
+import SignInValidator from '../validations/auth/login.validator';
 
 const router = Router();
 router.post(
@@ -26,6 +27,12 @@ router.patch(
   UserMiddleware.checkUserExistence,
   UserMiddleware.checkPasswordsInequality,
   UserController.changePassword,
+);
+router.post(
+  '/signin',
+  SignInValidator.validateData(),
+  SignInValidator.myValidationResult,
+  AuthController.signIn,
 );
 
 export default router;

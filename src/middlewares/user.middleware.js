@@ -20,7 +20,7 @@ export default class UsersMiddleware {
     const condition = { _id: req.body.userId || req.params.userId };
     const user = await CmsUser.findOne(condition);
     if (!user) {
-      return Response.NotFound(res, 'User with the given id does not exist');
+      return Response.NotFoundError(res, 'User with the given id does not exist');
     }
     req.dbUser = user;
     return next();
@@ -38,7 +38,7 @@ export default class UsersMiddleware {
     const condition = { email: req.body.email };
     const user = await CmsUser.findOne(condition);
     if (user) {
-      return Response.ConflictingRequest(
+      return Response.ConflictError(
         res,
         'User with the given email already exists',
       );
@@ -60,7 +60,7 @@ export default class UsersMiddleware {
       req.dbUser.password,
     );
     if (passwordsEqual) {
-      return Response.BadRequest(
+      return Response.BadRequestError(
         res,
         'Submitted password is the same as current password',
       );

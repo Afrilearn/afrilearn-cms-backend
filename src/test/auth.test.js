@@ -89,7 +89,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
         .send({ userId, password: `${user.password}new` })
         .end((err, res) => {
           res.status.should.equals(200);
-          res.body.should.have.property('status').to.equals('Success');
+          res.body.should.have.property('status').to.equals('success');
           res.body.should.have.property('data');
           res.body.data.should.have
             .property('message')
@@ -117,7 +117,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
           res.should.have.status(500);
           res.body.should.have
             .property('error')
-            .to.equals('Could not change user password');
+            .to.equals('Error changing password');
           done();
         });
     });
@@ -130,21 +130,21 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
         .patch(`${baseUrl}/change_password`)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');
           done();
         });
     });
-    it('should return 401 status with error message if an invalid token is provided', (done) => {
+    it('should return 401 with error message if an invalid token is provided', (done) => {
       chai
         .request(app)
         .patch(`${baseUrl}/change_password`)
         .set('token', invalidToken)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');
@@ -161,7 +161,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
         .set('token', staffToken)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');
@@ -175,7 +175,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
         .set('token', moderatorToken)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');
@@ -197,7 +197,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
         .send({ userId, password: user.password })
         .end((err, res) => {
           res.status.should.equals(404);
-          res.body.should.have.property('status').to.equals('404 Not Found');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('User with the given id does not exist');
@@ -221,12 +221,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
       delete dynamicInput.password;
       request.send(dynamicInput).end((err, res) => {
         res.should.have.status(400);
-        res.body.should.have
-          .property('status')
-          .to.equals('400 Invalid Request');
-        res.body.should.have
-          .property('error')
-          .to.equals('Request contains invalid data');
+        res.body.should.have.property('status').to.equals('error');
         res.body.should.have
           .property('errors')
           .to.include('Password is required');
@@ -237,12 +232,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
       dynamicInput.password = 2;
       request.send(dynamicInput).end((err, res) => {
         res.should.have.status(400);
-        res.body.should.have
-          .property('status')
-          .to.equals('400 Invalid Request');
-        res.body.should.have
-          .property('error')
-          .to.equals('Request contains invalid data');
+        res.body.should.have.property('status').to.equals('error');
         res.body.should.have
           .property('errors')
           .to.include('Password must be a string');
@@ -253,12 +243,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
       dynamicInput.password = '1234567';
       request.send(dynamicInput).end((err, res) => {
         res.should.have.status(400);
-        res.body.should.have
-          .property('status')
-          .to.equals('400 Invalid Request');
-        res.body.should.have
-          .property('error')
-          .to.equals('Request contains invalid data');
+        res.body.should.have.property('status').to.equals('error');
         res.body.should.have
           .property('errors')
           .to.include('Password length must be at least 8 characters');
@@ -269,12 +254,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
       delete dynamicInput.userId;
       request.send(dynamicInput).end((err, res) => {
         res.should.have.status(400);
-        res.body.should.have
-          .property('status')
-          .to.equals('400 Invalid Request');
-        res.body.should.have
-          .property('error')
-          .to.equals('Request contains invalid data');
+        res.body.should.have.property('status').to.equals('error');
         res.body.should.have
           .property('errors')
           .to.include('User id is required');
@@ -285,12 +265,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
       dynamicInput.userId = 3;
       request.send(dynamicInput).end((err, res) => {
         res.should.have.status(400);
-        res.body.should.have
-          .property('status')
-          .to.equals('400 Invalid Request');
-        res.body.should.have
-          .property('error')
-          .to.equals('Request contains invalid data');
+        res.body.should.have.property('status').to.equals('error');
         res.body.should.have
           .property('errors')
           .to.include('User id must be a string');
@@ -301,12 +276,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
       dynamicInput.userId = '';
       request.send(dynamicInput).end((err, res) => {
         res.should.have.status(400);
-        res.body.should.have
-          .property('status')
-          .to.equals('400 Invalid Request');
-        res.body.should.have
-          .property('error')
-          .to.equals('Request contains invalid data');
+        res.body.should.have.property('status').to.equals('error');
         res.body.should.have
           .property('errors')
           .to.include('User id cannot be empty');
@@ -317,12 +287,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
       dynamicInput.userId = 'invalidmongooseid';
       request.send(dynamicInput).end((err, res) => {
         res.should.have.status(400);
-        res.body.should.have
-          .property('status')
-          .to.equals('400 Invalid Request');
-        res.body.should.have
-          .property('error')
-          .to.equals('Request contains invalid data');
+        res.body.should.have.property('status').to.equals('error');
         res.body.should.have
           .property('errors')
           .to.include('User id is not a valid mongoose ID');
@@ -349,7 +314,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
         .send({ userId, password: unhashedPassword })
         .end((err, res) => {
           res.status.should.equals(400);
-          res.body.should.have.property('status').to.equals('400 Bad Request');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Submitted password is the same as current password');

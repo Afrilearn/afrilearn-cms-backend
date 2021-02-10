@@ -24,7 +24,7 @@ export default class UserController {
 
       Response.Success(res, { user });
     } catch (err) {
-      return Response.InternalServerError(res, 'Could not edit user', err);
+      return Response.InternalServerError(res, 'Error editing user');
     }
   }
 
@@ -47,10 +47,7 @@ export default class UserController {
 
       Response.Success(res, { message: 'Password changed successfully' });
     } catch (err) {
-      return Response.InternalServerError(
-        res,
-        'Could not change user password',
-      );
+      return Response.InternalServerError(res, 'Error changing password');
     }
   }
 
@@ -67,7 +64,7 @@ export default class UserController {
 
       Response.Success(res, { message: 'User deleted successfully' });
     } catch (err) {
-      return Response.InternalServerError(res, 'Could not delete user', err);
+      return Response.InternalServerError(res, 'Error deleting user');
     }
   }
 
@@ -84,7 +81,7 @@ export default class UserController {
 
       return Response.Success(res, { users });
     } catch (err) {
-      return Response.InternalServerError(res, 'Could not fetch cms users', err);
+      return Response.InternalServerError(res, 'Error fetching cms users');
     }
   }
 }

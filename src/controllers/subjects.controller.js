@@ -21,7 +21,7 @@ export default class SubjectsController {
 
       return Response.Success(res, { subjects: result });
     } catch (err) {
-      Response.InternalServerError(res, 'Could not fetch subjects', err);
+      Response.InternalServerError(res, 'Error fetching subjects');
     }
   }
 }

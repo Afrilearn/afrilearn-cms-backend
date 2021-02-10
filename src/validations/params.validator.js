@@ -31,7 +31,7 @@ export default class ParamsValidator {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
-      return Response.InvalidDataRequest(res, errArr);
+      return Response.InvalidRequestParamsError(res, errArr);
     }
     return next();
   }

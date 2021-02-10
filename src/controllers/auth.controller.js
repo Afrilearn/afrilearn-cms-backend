@@ -1,5 +1,5 @@
 import CmsUser from '../db/models/cmsUsers.model';
-import userUtils from '../utils/user.utils';
+import Helper from '../utils/user.utils';
 import Response from '../utils/response.utils';
 
 /**
@@ -21,7 +21,7 @@ export default class AuthController {
         firstName, lastName, password, email, role,
       } = req.body;
 
-      const encryptpassword = await userUtils.encryptPassword(password);
+      const encryptpassword = await Helper.encryptPassword(password);
 
       const newUser = {
         firstName,
@@ -35,7 +35,37 @@ export default class AuthController {
 
       return Response.Success(res, { user: result }, 201);
     } catch (err) {
-      return Response.InternalServerError(res, 'Could not signup user', err);
+      return Response.InternalServerError(res, 'Error signing up user');
+    }
+  }
+
+  /**
+   * Handles signIn requests
+   * @param {ServerRequest} req
+   * @param {ServerResponse} res
+   * @returns {ServerResponse} response
+   */
+  static async signIn(req, res) {
+    const signinError = { message: 'Incorrect email or password' };
+    try {
+      const user = await CmsUser.findOne({ email: req.body.email });
+      if (!user) return Response.UnauthorizedError(res, signinError);
+      const confirmPassword = await Helper.validateUserPassword(
+        user,
+        req.body.password,
+      );
+      if (!confirmPassword) return Response.UnauthorizedError(res, signinError);
+      const token = Helper.generateToken(
+        user._id,
+        user.role,
+        user.firstName,
+        user.lastName,
+      );
+      Helper.setCookie(res, token);
+      const data = { token, user };
+      return Response.Success(res, data);
+    } catch (err) {
+      return Response.InternalServerError(res, 'Error Logging in User');
     }
   }
 }

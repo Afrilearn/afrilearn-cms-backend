@@ -67,7 +67,7 @@ describe(`/GET ${baseUrl}`, () => {
         .set('token', adminToken)
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.have.property('status').to.equals('Success');
+          res.body.should.have.property('status').to.equals('success');
           res.body.data.should.have.property('subjects');
           res.body.data.subjects.length.should.equals(3);
           const names = res.body.data.subjects.map((subject) => subject.name);
@@ -84,7 +84,7 @@ describe(`/GET ${baseUrl}`, () => {
         .set('token', moderatorToken)
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.have.property('status').to.equals('Success');
+          res.body.should.have.property('status').to.equals('success');
           res.body.data.should.have.property('subjects');
           res.body.data.subjects.length.should.equals(3);
           const names = res.body.data.subjects.map((subject) => subject.name);
@@ -101,7 +101,7 @@ describe(`/GET ${baseUrl}`, () => {
         .set('token', staffToken)
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.have.property('status').to.equals('Success');
+          res.body.should.have.property('status').to.equals('success');
           res.body.data.should.have.property('subjects');
           res.body.data.subjects.length.should.equals(3);
           const names = res.body.data.subjects.map((subject) => subject.name);
@@ -130,7 +130,7 @@ describe(`/GET ${baseUrl}`, () => {
           res.should.have.status(500);
           res.body.should.have
             .property('error')
-            .to.equals('Could not fetch subjects');
+            .to.equals('Error fetching subjects');
           done();
         });
     });
@@ -143,7 +143,7 @@ describe(`/GET ${baseUrl}`, () => {
         .get(baseUrl)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');
@@ -157,7 +157,7 @@ describe(`/GET ${baseUrl}`, () => {
         .set('token', invalidToken)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');

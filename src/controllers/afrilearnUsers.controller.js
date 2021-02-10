@@ -24,7 +24,7 @@ export default class UserController {
         users,
       });
     } catch (err) {
-      return Response.InternalServerError(res, 'Could not fetch afrilearn users', err);
+      return Response.InternalServerError(res, 'Error fetching afrilearn users');
     }
   }
 }

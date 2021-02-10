@@ -27,7 +27,7 @@ export default class GeneralServices {
   ) {
     const result = await Collection.findOne(condition);
     if (!result) {
-      return Response.NotFound(res, `${name} does not exist`);
+      return Response.NotFoundError(res, `${name} does not exist`);
     }
     req.dbResult = result;
     return next();
@@ -51,7 +51,7 @@ export default class GeneralServices {
   ) {
     const result = await Collection.findOne(condition);
     if (result) {
-      return Response.ConflictingRequest(res, `${name} already exists`);
+      return Response.ConflictError(res, `${name} already exists`);
     }
     return next();
   }

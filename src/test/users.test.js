@@ -80,7 +80,7 @@ describe('USERS', () => {
           .send(userUpdate)
           .end((err, res) => {
             res.should.have.status(200);
-            res.body.should.have.property('status').to.equals('Success');
+            res.body.should.have.property('status').to.equals('success');
             res.body.data.should.have.property('user');
             res.body.data.user.should.have
               .property('firstName')
@@ -113,10 +113,7 @@ describe('USERS', () => {
             res.should.have.status(400);
             res.body.should.have
               .property('status')
-              .to.equals('400 Invalid Request');
-            res.body.should.have
-              .property('error')
-              .to.equals('Request contains invalid data');
+              .to.equals('error');
             res.body.should.have
               .property('errors')
               .to.include('userId is not a valid mongoose ID');
@@ -143,7 +140,7 @@ describe('USERS', () => {
             res.should.have.status(500);
             res.body.should.have
               .property('error')
-              .to.equals('Could not edit user');
+              .to.equals('Error editing user');
             done();
           });
       });
@@ -159,7 +156,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -176,7 +173,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -196,7 +193,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -213,7 +210,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -238,10 +235,7 @@ describe('USERS', () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('First name cannot be empty');
@@ -254,10 +248,7 @@ describe('USERS', () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('First name must be a string');
@@ -270,10 +261,7 @@ describe('USERS', () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Last name cannot be empty');
@@ -286,10 +274,7 @@ describe('USERS', () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Last name must be a string');
@@ -303,10 +288,7 @@ describe('USERS', () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Role cannot be empty');
@@ -319,10 +301,7 @@ describe('USERS', () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Role must be a string');
@@ -335,10 +314,7 @@ describe('USERS', () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Role is not a valid mongoose ID');
@@ -352,10 +328,7 @@ describe('USERS', () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Invalid email address');
@@ -369,10 +342,7 @@ describe('USERS', () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Cannot change password through this endpoint');
@@ -394,7 +364,7 @@ describe('USERS', () => {
           .send(userUpdate)
           .end((err, res) => {
             res.status.should.equals(404);
-            res.body.should.have.property('status').to.equals('404 Not Found');
+            res.body.should.have.property('status').to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('User with the given id does not exist');
@@ -433,7 +403,7 @@ describe('USERS', () => {
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
-            res.body.should.have.property('status').to.equals('Success');
+            res.body.should.have.property('status').to.equals('success');
             res.body.should.have.property('data');
             res.body.data.should.have
               .property('message')
@@ -453,10 +423,7 @@ describe('USERS', () => {
             res.should.have.status(400);
             res.body.should.have
               .property('status')
-              .to.equals('400 Invalid Request');
-            res.body.should.have
-              .property('error')
-              .to.equals('Request contains invalid data');
+              .to.equals('error');
             res.body.should.have
               .property('errors')
               .to.include('userId is not a valid mongoose ID');
@@ -482,7 +449,7 @@ describe('USERS', () => {
             res.should.have.status(500);
             res.body.should.have
               .property('error')
-              .to.equals('Could not delete user');
+              .to.equals('Error deleting user');
             done();
           });
       });
@@ -496,7 +463,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -512,7 +479,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -531,7 +498,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -552,7 +519,7 @@ describe('USERS', () => {
           .set('token', adminToken)
           .end((err, res) => {
             res.status.should.equals(404);
-            res.body.should.have.property('status').to.equals('404 Not Found');
+            res.body.should.have.property('status').to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('User with the given id does not exist');
@@ -595,7 +562,7 @@ describe('USERS', () => {
           .set('token', staffToken)
           .end((err, res) => {
             res.should.have.status(200);
-            res.body.should.have.property('status').to.equals('Success');
+            res.body.should.have.property('status').to.equals('success');
             res.body.data.should.have.property('users');
             res.body.data.users.length.should.equals(3);
             const checks = res.body.data.users.map((user) => ({
@@ -629,7 +596,7 @@ describe('USERS', () => {
             res.should.have.status(500);
             res.body.should.have
               .property('error')
-              .to.equals('Could not fetch cms users');
+              .to.equals('Error fetching cms users');
             done();
           });
       });
@@ -644,7 +611,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -659,7 +626,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -699,7 +666,7 @@ describe('USERS', () => {
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
-            res.body.should.have.property('status').to.equals('Success');
+            res.body.should.have.property('status').to.equals('success');
             res.body.data.should.have.property('users');
             res.body.data.users.length.should.equals(3);
             const checks = res.body.data.users.map((user) => ({
@@ -733,7 +700,7 @@ describe('USERS', () => {
             res.should.have.status(500);
             res.body.should.have
               .property('error')
-              .to.equals('Could not fetch afrilearn users');
+              .to.equals('Error fetching afrilearn users');
             done();
           });
       });
@@ -748,7 +715,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
@@ -763,7 +730,7 @@ describe('USERS', () => {
             res.should.have.status(401);
             res.body.should.have
               .property('status')
-              .to.equals('401 Unauthorized');
+              .to.equals('error');
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');

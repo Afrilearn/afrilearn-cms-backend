@@ -1,102 +1,92 @@
 /**
- * Contains Responses
- *
- * @class Response
+ * Defines reusable responses
  */
-export default class Response {
+export default class {
   /**
-     * @returns {JSON} - JSON error object with 500 status
-     * @param {*} res - Response Object
-     * @param {*} message - error message
-     * @param {*} err - thrown error
-     */
-  static InternalServerError(res, message, err) {
-    return res.status(500).json({
-      status: '500 Internal server error',
-      error: message,
-      errors: err,
+   * Defines the specification for the "unauthorized error" response cases
+   * @param {Object} res
+   * @param {Object} error
+   * @param {number} code
+   * @returns {Object} response
+   */
+  static UnauthorizedError(res, error, code) {
+    return res.status(code || 401).json({
+      status: "error",
+      error,
     });
   }
 
   /**
-     * @returns {JSON} - JSON error object with 400 status
-     * @param {*} res - Response Object
-     * @param {*} errs - thrown errors
-     * @param {*} message - error message
-     */
-  static InvalidDataRequest(
-    res,
-    errs,
-    message = 'Request contains invalid data',
-  ) {
-    return res.status(400).json({
-      status: '400 Invalid Request',
-      error: message,
-      errors: errs,
-    });
-  }
-
-  /**
-     * @returns {JSON} - JSON error object with status 401
-     * @param {*} res - Response Object
-     * @param {*} message - error message
-     */
-  static Unauthorised(res, message = 'Not authorized to access data') {
-    return res.status(401).json({
-      status: '401 Unauthorized',
-      error: message,
-    });
-  }
-
-  /**
-     * @returns {JSON} - JSON error object with status 400
-     * @param {*} res - Response Object
-     * @param {*} message - error message
-     */
-  static BadRequest(res, message) {
-    return res.status(400).json({
-      status: '400 Bad Request',
-      error: message,
-    });
-  }
-
-  /**
-     * @returns {JSON} - JSON error object with status 409
-     * @param {*} res - Response Object
-     * @param {*} message - error message
-     */
-  static ConflictingRequest(
-    res,
-    message,
-  ) {
-    return res.status(409).json({
-      status: '409 Conflicting Request',
-      error: message,
-    });
-  }
-
-  /**
-     * @returns {JSON} - JSON error object with status 404
-     * @param {*} res - Response Object
-     * @param {*} message - error message
-     */
-  static NotFound(res, message) {
-    return res.status(404).json({
-      status: '404 Not Found',
-      error: message,
-    });
-  }
-
-  /**
-     * @returns {JSON} - JSON success object
-     * @param {*} res - Response Object
-     * @param {*} data - data to send back on success
-     * @param {*} status - res status, 200 by default
-     */
-  static Success(res, data, status = 200) {
-    return res.status(status).json({
-      status: 'Success',
+   * Defines the specification for the "success" response cases
+   * @param {Object} res
+   * @param {Object} data
+   * @param {number} code
+   * @returns {ServerResponse} response
+   */
+  static Success(res, data, code = 200) {
+    return res.status(code).json({
+      status: "success",
       data,
+    });
+  }
+
+  /**
+   * @param {Object} res
+   * @param {Object|string} error
+   * @returns {Object} response
+   */
+  static InternalServerError(res, error) {
+    return res.status(500).json({
+      status: "error",
+      error,
+    });
+  }
+
+  /**
+   * Defines the specification for conflicting resource
+   * @param {object} res (ServerResponse)
+   * @param {object} error
+   * @returns {object} ServerResponse
+   */
+  static ConflictError(res, error) {
+    return res.status(409).json({
+      status: "error",
+      error,
+    });
+  }
+
+  /**
+   * Defines the specification for a resource not found error
+   * @param {object} res (ServerResponse)
+   * @param {string} message
+   * @returns {object} ServerResponse
+   */
+  static NotFoundError(res, error) {
+    return res.status(404).json({
+      status: "error",
+      error,
+    });
+  }
+
+  /**
+   * Defines the specification for bad request error cases
+   * @param {object} res (ServerResponse object)
+   * @param {object} error
+   * @param {number} code
+   * @returns {object} ServerResponse
+   */
+  static BadRequestError(res, error, code = 400) {
+    return res.status(code).json({
+      status: "error",
+      error,
+    });
+  }
+
+  static InvalidRequestParamsError(res, errors, error = "Your request contains invalid parameters") {
+    return res.status(400).json({
+      status: "error",
+      error,
+      errors,
     });
   }
 }

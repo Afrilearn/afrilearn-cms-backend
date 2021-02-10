@@ -60,7 +60,7 @@ describe(`/POST ${baseUrl}`, () => {
         .send(user)
         .end((err, res) => {
           res.should.have.status(201);
-          res.body.should.have.property('status').to.equals('Success');
+          res.body.should.have.property('status').to.equals('success');
           res.body.data.should.have.property('user');
           res.body.data.user.should.have
             .property('firstName')
@@ -97,7 +97,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(500);
           res.body.should.have
             .property('error')
-            .to.equals('Could not signup user');
+            .to.equals('Error signing up user');
           done();
         });
     });
@@ -111,7 +111,7 @@ describe(`/POST ${baseUrl}`, () => {
         .send(user)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');
@@ -126,7 +126,7 @@ describe(`/POST ${baseUrl}`, () => {
         .send(user)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');
@@ -144,7 +144,7 @@ describe(`/POST ${baseUrl}`, () => {
         .send(user)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');
@@ -159,7 +159,7 @@ describe(`/POST ${baseUrl}`, () => {
         .send(user)
         .end((err, res) => {
           res.should.have.status(401);
-          res.body.should.have.property('status').to.equals('401 Unauthorized');
+          res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('Not authorized to access data');
@@ -188,10 +188,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('First name is required');
@@ -212,10 +209,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('First name cannot be empty');
@@ -235,10 +229,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Last name is required');
@@ -259,10 +250,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Last name cannot be empty');
@@ -282,10 +270,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Password is required');
@@ -306,10 +291,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Password cannot be empty');
@@ -330,10 +312,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Password length must be at least 8 characters');
@@ -353,11 +332,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
-
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Email is required');
@@ -378,10 +353,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Email cannot be empty');
@@ -402,10 +374,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Invalid email address');
@@ -426,10 +395,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(400);
           res.body.should.have
             .property('status')
-            .to.equals('400 Invalid Request');
-          res.body.should.have
-            .property('error')
-            .to.equals('Request contains invalid data');
+            .to.equals('error');
           res.body.should.have
             .property('errors')
             .to.include('Role is not a valid mongoose ID');
@@ -458,7 +424,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.should.have.status(409);
           res.body.should.have
             .property('status')
-            .to.equals('409 Conflicting Request');
+            .to.equals('error');
           res.body.should.have
             .property('error')
             .to.equals('User with the given email already exists');
