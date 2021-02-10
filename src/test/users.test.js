@@ -506,6 +506,7 @@ describe('USERS', () => {
           });
       });
     });
+    //
     describe('USER EXISTENCE', () => {
       beforeEach((done) => {
         Users.deleteMany((err) => {
