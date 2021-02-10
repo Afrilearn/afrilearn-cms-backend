@@ -1,5 +1,6 @@
 import Courses from '../db/models/courses.model';
 import RelatedPastQuestions from '../db/models/relatedPastQuestions.model';
+import Subjects from '../db/models/subjects.model';
 import Response from '../utils/response.utils';
 
 /**
@@ -80,6 +81,30 @@ export default class CoursesController {
       return Response.InternalServerError(
         res,
         'Error linking past question',
+      );
+    }
+  }
+
+  /**
+   * @memberof CoursesController
+   * @param {*} req - Request Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} if no error occurs
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async linkSubject(req, res) {
+    try {
+      await Subjects.create({
+        courseId: req.params.courseId,
+        mainSubjectId: req.body.mainSubjectId,
+      });
+      const course = await Courses.findOne({ _id: req.params.courseId });
+
+      Response.Success(res, { course }, 201);
+    } catch (err) {
+      return Response.InternalServerError(
+        res,
+        'Error linking subject',
       );
     }
   }

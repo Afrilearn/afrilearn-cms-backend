@@ -147,4 +147,36 @@ export default class CourseValidator {
     }
     return next();
   }
+
+  /**
+   * @returns {Object} error object with errors arrays if past question id is invalid
+   */
+  static validateSubjectData() {
+    return [
+      check('mainSubjectId')
+        .exists()
+        .withMessage('Subject id is required')
+        .notEmpty()
+        .withMessage('Subject id cannot be empty')
+        .isString()
+        .withMessage('Subject id must be a string')
+        .custom(HelperUtils.validateMongooseId('Subject id')),
+    ];
+  }
+
+  /**
+   * @returns {JSON} JSON error object if course contains invalid data
+   * @returns {next} - passes control to next function if all course data are valid
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @param {*} next - Passes control to next function
+   */
+  static async subjectValidationResult(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errArr = errors.array().map(({ msg }) => msg);
+      return Response.InvalidRequestParamsError(res, errArr);
+    }
+    return next();
+  }
 }

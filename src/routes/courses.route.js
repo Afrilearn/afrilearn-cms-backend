@@ -48,4 +48,15 @@ router.post(
   CoursesController.linkPastQuestion,
 );
 
+router.post(
+  '/subject/:courseId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  ParamsValidator.validateMongooseId('courseId'),
+  CourseValidator.validateSubjectData(),
+  CourseValidator.subjectValidationResult,
+  CoursesMiddleware.checkSubjectUnlinked,
+  CoursesController.linkSubject,
+);
+
 export default router;

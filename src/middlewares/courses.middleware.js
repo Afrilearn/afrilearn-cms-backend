@@ -1,5 +1,6 @@
 import Courses from '../db/models/courses.model';
 import RelatedPastQuestions from '../db/models/relatedPastQuestions.model';
+import Subjects from '../db/models/subjects.model';
 import GeneralServices from '../services/general.services';
 
 /**
@@ -51,7 +52,7 @@ export default class CoursesMiddleware {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    * @returns {JSON} Error response if related past question exists
-   * @returns {JSON} passes control to the next function if related
+   * @returns {Function} passes control to the next function if related
    * past question doesn't exist
    */
   static async checkPastQuestionUnlinked(req, res, next) {
@@ -64,6 +65,28 @@ export default class CoursesMiddleware {
         pastQuestionTypeId: req.body.pastQuestionId,
       },
       'Related past question',
+    );
+  }
+
+  /**
+   * @memberof CategoryMiddleware
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @param {*} next - Passes control to next function
+   * @returns {JSON} Error response if related subject exists
+   * @returns {Function} passes control to the next function if related
+   * subject doesn't exist
+   */
+  static async checkSubjectUnlinked(req, res, next) {
+    GeneralServices.checkDocInexistence(
+      res,
+      next,
+      Subjects,
+      {
+        courseId: req.params.courseId,
+        mainSubjectId: req.body.mainSubjectId,
+      },
+      'Related subject',
     );
   }
 }

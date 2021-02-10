@@ -9,6 +9,7 @@ import Response from '../utils/response.utils';
 
 import app from '../index';
 import RelatedPastQuestions from '../db/models/relatedPastQuestions.model';
+import Subjects from '../db/models/subjects.model';
 
 chai.should();
 chai.use(Sinonchai);
@@ -1015,6 +1016,239 @@ describe('COURSES', () => {
             res.body.should.have
               .property('error')
               .to.equals('Related past question already exists');
+            done();
+          });
+      });
+    });
+  });
+
+  describe(`/POST ${baseUrl}/subject/:courseId`, () => {
+    let courseId, mainSubjectId;
+    beforeEach(() => {
+      mainSubjectId = mongoose.Types.ObjectId();
+      courseId = mongoose.Types.ObjectId();
+    });
+    describe('LINK SUBJECT SUCCESSFULLY', () => {
+      let dbCourse;
+      beforeEach(async () => {
+        dbCourse = await Courses.create(course);
+        courseId = dbCourse._id;
+      });
+      afterEach(async () => {
+        await Courses.deleteMany({ _id: courseId });
+        await Subjects.deleteMany({
+          courseId,
+          mainSubjectId,
+        });
+      });
+      it('should create a new related subject if user is admin', (done) => {
+        chai
+          .request(app)
+          .post(`${baseUrl}/subject/${courseId}`)
+          .set('token', adminToken)
+          .send({ mainSubjectId })
+          .end((err, res) => {
+            res.should.have.status(201);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have.property('course');
+            res.body.data.course.should.have
+              .property('name')
+              .to.equals(dbCourse.name);
+            res.body.data.course.should.have
+              .property('alias')
+              .to.equals(dbCourse.alias);
+            res.body.data.course.should.have
+              .property('categoryId')
+              .to.equals(dbCourse.categoryId.toHexString());
+            res.body.data.course.should.have
+              .property('creatorId')
+              .to.equals(dbCourse.creatorId.toHexString());
+            res.body.data.course.should.have.property('createdAt');
+            res.body.data.course.should.have.property('updatedAt');
+            done();
+          });
+        it('should create a new related subject if user is moderator', (done) => {
+          chai
+            .request(app)
+            .post(`${baseUrl}/subject/${courseId}`)
+            .set('token', moderatorToken)
+            .send({ mainSubjectId })
+            .end((err, res) => {
+              res.should.have.status(201);
+              res.body.should.have.property('status').to.equals('success');
+              res.body.data.should.have.property('course');
+              res.body.data.course.should.have
+                .property('name')
+                .to.equals(dbCourse.name);
+              res.body.data.course.should.have
+                .property('alias')
+                .to.equals(dbCourse.alias);
+              res.body.data.course.should.have
+                .property('categoryId')
+                .to.equals(dbCourse.categoryId.toHexString());
+              res.body.data.course.should.have
+                .property('creatorId')
+                .to.equals(dbCourse.creatorId.toHexString());
+              res.body.data.course.should.have.property('createdAt');
+              res.body.data.course.should.have.property('updatedAt');
+              done();
+            });
+        });
+      });
+    });
+
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub;
+      before(() => {
+        stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+      });
+      after(() => {
+        stub.restore();
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .post(`${baseUrl}/subject/${courseId}`)
+          .set('token', adminToken)
+          .send({ mainSubjectId })
+          .end((err, res) => {
+            res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Error linking subject');
+            done();
+          });
+      });
+    });
+
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .post(`${baseUrl}/subject/${courseId}`)
+          .send({ mainSubjectId })
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .post(`${baseUrl}/subject/${courseId}`)
+          .set('token', invalidToken)
+          .send({ mainSubjectId })
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+
+    describe('ADMIN ACCESS', () => {
+      it('should return 401 with error if user is not moderator or admin', (done) => {
+        chai
+          .request(app)
+          .post(`${baseUrl}/subject/${courseId}`)
+          .set('token', staffToken)
+          .send({ mainSubjectId })
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+
+    describe('INPUT VALIDATION', () => {
+      let request;
+      beforeEach(() => {
+        request = chai
+          .request(app)
+          .post(`${baseUrl}/subject/${courseId}`)
+          .set('token', moderatorToken);
+      });
+      it('should not link subject if subject id is not provided', (done) => {
+        request.send({}).end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('errors')
+            .to.include('Subject id is required');
+          done();
+        });
+      });
+      it('should not link subject if subject id is empty', (done) => {
+        request.send({ mainSubjectId: '' }).end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('errors')
+            .to.include('Subject id cannot be empty');
+          done();
+        });
+      });
+      it('should not link subject if subject id is not a string', (done) => {
+        request.send({ mainSubjectId: 2 }).end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('errors')
+            .to.include('Subject id must be a string');
+          done();
+        });
+      });
+      it('should not link subject if subject id is not a valid mongoose id', (done) => {
+        request
+          .send({ mainSubjectId: 'invalidmongooseid' })
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('errors')
+              .to.include('Subject id is not a valid mongoose ID');
+            done();
+          });
+      });
+    });
+
+    describe('SUBJECT LINK INEXISTENT', () => {
+      beforeEach((done) => {
+        Subjects.create(
+          { courseId, mainSubjectId },
+          (err) => {
+            if (!err) done();
+          },
+        );
+      });
+      afterEach((done) => {
+        Subjects.deleteMany((err) => {
+          if (!err) done();
+        });
+      });
+      it("should not link subject to course if it's already linked", (done) => {
+        chai
+          .request(app)
+          .post(`${baseUrl}/subject/${courseId}`)
+          .set('token', moderatorToken)
+          .send({ courseId, mainSubjectId })
+          .end((err, res) => {
+            res.status.should.equals(409);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Related subject already exists');
             done();
           });
       });
