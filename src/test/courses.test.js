@@ -10,6 +10,7 @@ import Response from '../utils/response.utils';
 import app from '../index';
 import RelatedPastQuestions from '../db/models/relatedPastQuestions.model';
 import Subjects from '../db/models/subjects.model';
+import MainSubjects from '../db/models/mainSubjects.model';
 
 chai.should();
 chai.use(Sinonchai);
@@ -205,7 +206,9 @@ describe('COURSES', () => {
         request.send(dynamicCourse).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
-          res.body.should.have.property('errors').to.include('Name is required');
+          res.body.should.have
+            .property('errors')
+            .to.include('Name is required');
           done();
         });
       });
@@ -382,16 +385,6 @@ describe('COURSES', () => {
 
   describe(`/PATCH ${baseUrl}/:courseId`, () => {
     let courseId;
-    beforeEach(async () => {
-      await Courses.deleteMany();
-      const createdCourse = await Courses.create(course);
-      courseId = createdCourse._id;
-    });
-    afterEach((done) => {
-      Courses.deleteMany((err) => {
-        if (!err) done();
-      });
-    });
     describe('SUCCESS', () => {
       beforeEach(async () => {
         await Courses.deleteMany();
@@ -462,11 +455,17 @@ describe('COURSES', () => {
 
     describe('FAKE INTERNAL SERVER ERROR', () => {
       let stub;
-      before(() => {
+      beforeEach(async () => {
         stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+        await Courses.deleteMany();
+        const createdCourse = await Courses.create(course);
+        courseId = createdCourse._id;
       });
-      after(() => {
+      afterEach((done) => {
         stub.restore();
+        Courses.deleteMany((err) => {
+          if (!err) done();
+        });
       });
       it('returns status of 500', (done) => {
         chai
@@ -1210,27 +1209,22 @@ describe('COURSES', () => {
         });
       });
       it('should not link subject if subject id is not a valid mongoose id', (done) => {
-        request
-          .send({ mainSubjectId: 'invalidmongooseid' })
-          .end((err, res) => {
-            res.should.have.status(400);
-            res.body.should.have.property('status').to.equals('error');
-            res.body.should.have
-              .property('errors')
-              .to.include('Subject id is not a valid mongoose ID');
-            done();
-          });
+        request.send({ mainSubjectId: 'invalidmongooseid' }).end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('errors')
+            .to.include('Subject id is not a valid mongoose ID');
+          done();
+        });
       });
     });
 
     describe('SUBJECT LINK INEXISTENT', () => {
       beforeEach((done) => {
-        Subjects.create(
-          { courseId, mainSubjectId },
-          (err) => {
-            if (!err) done();
-          },
-        );
+        Subjects.create({ courseId, mainSubjectId }, (err) => {
+          if (!err) done();
+        });
       });
       afterEach((done) => {
         Subjects.deleteMany((err) => {
@@ -1249,6 +1243,132 @@ describe('COURSES', () => {
             res.body.should.have
               .property('error')
               .to.equals('Related subject already exists');
+            done();
+          });
+      });
+    });
+  });
+
+  describe(`GET/ ${baseUrl}/:courseId/subjects`, () => {
+    const courseId = mongoose.Types.ObjectId();
+    describe('FETCH COURSE SUBJECTS SUCCESSFULLY', () => {
+      beforeEach(async () => {
+        await Subjects.deleteMany();
+
+        const dbSubjects = [];
+        const dbMainSubjects = [];
+        for (let i = 1; i < 4; i += 1) {
+          dbMainSubjects.push(
+            (async () => {
+              const usr = await MainSubjects.create({ name: `Subject${i}` });
+              return usr;
+            })(),
+          );
+        }
+        const uploadedSubjects = await Promise.all(dbMainSubjects);
+        uploadedSubjects.forEach((sub) => {
+          dbSubjects.push(
+            (async () => {
+              await Subjects.create({
+                mainSubjectId: sub._id,
+                courseId,
+              });
+            })(),
+          );
+        });
+        await Promise.all(dbSubjects);
+      });
+      afterEach(async () => {
+        await Subjects.deleteMany();
+        await MainSubjects.deleteMany();
+      });
+
+      it('should fetch all course subjects for all users', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${courseId}/subjects`)
+          .set('token', staffToken)
+          .end((err, res) => {
+            res.status.should.equals(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have
+              .property('courseSubjects')
+              .to.have.length(3);
+            const checks = res.body.data.courseSubjects.map(
+              (sub) => sub.mainSubjectId.name,
+            );
+            for (let i = 1; i < 4; i += 1) {
+              checks.should.deep.include(`Subject${i}`);
+            }
+            done();
+          });
+      });
+    });
+
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub;
+      before(() => {
+        stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+      });
+      after(() => {
+        stub.restore();
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${courseId}/subjects`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Error fetching course subjects');
+            done();
+          });
+      });
+    });
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${courseId}/subjects`)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${courseId}/subjects`)
+          .set('token', invalidToken)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+
+    describe('PARAM VALIDATION', () => {
+      it('should return 400 error if course id is not valid mongoose id', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/invalidcourseid/subjects`)
+          .set('token', staffToken)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('errors')
+              .to.include('courseId is not a valid mongoose ID');
             done();
           });
       });
