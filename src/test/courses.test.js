@@ -1374,4 +1374,181 @@ describe('COURSES', () => {
       });
     });
   });
+
+  describe(`/DELETE ${baseUrl}/:courseId/subjects/:subjectId`, () => {
+    let courseId, subjectId;
+    beforeEach(() => {
+      courseId = mongoose.Types.ObjectId();
+      subjectId = mongoose.Types.ObjectId();
+    });
+
+    describe('DELETE COURSE SUBJECT SUCCESSFULLY', () => {
+      beforeEach(async () => {
+        await Subjects.deleteMany();
+        await Subjects.create({ courseId, mainSubjectId: subjectId });
+      });
+      afterEach((done) => {
+        Subjects.deleteMany((err) => {
+          if (!err) done();
+        });
+      });
+
+      it('should delete course subject for admin', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/subjects/${subjectId}`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.status.should.equals(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have
+              .property('message')
+              .to.equals('The subject has been deleted successfully');
+            done();
+          });
+      });
+
+      it('should delete course subject for admin', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/subjects/${subjectId}`)
+          .set('token', moderatorToken)
+          .end((err, res) => {
+            res.status.should.equals(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have
+              .property('message')
+              .to.equals('The subject has been deleted successfully');
+            done();
+          });
+      });
+    });
+
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub;
+      beforeEach(async () => {
+        await Subjects.create({ courseId, mainSubjectId: subjectId });
+        stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+      });
+      afterEach((done) => {
+        stub.restore();
+        Subjects.deleteMany((err) => {
+          if (!err) done();
+        });
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/subjects/${subjectId}`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Error deleting course subjects');
+            done();
+          });
+      });
+    });
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/subjects/${subjectId}`)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/subjects/${subjectId}`)
+          .set('token', invalidToken)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+
+    describe('ADMIN ACCESS', () => {
+      it('should return 401 with error if user is not moderator or admin', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/subjects/${subjectId}`)
+          .set('token', staffToken)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+
+    describe('PARAM VALIDATION', () => {
+      it('should return 401 error if course id is not valid mongoose id', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/invalidmongooseid/subjects/${subjectId}`)
+          .set('token', moderatorToken)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('errors')
+              .to.include('courseId is not a valid mongoose ID');
+            done();
+          });
+      });
+      it('should return 400 error if subject id is not valid mongoose id', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/subjects/invalidmongooseid`)
+          .set('token', moderatorToken)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('errors')
+              .to.include('subjectId is not a valid mongoose ID');
+            done();
+          });
+      });
+    });
+
+    describe('COURSE SUBJECT LINKED', () => {
+      before((done) => {
+        Subjects.deleteMany((err) => {
+          if (!err) done();
+        });
+      });
+
+      it('should return 404 error if subject is not linked to course', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/subjects/${subjectId}`)
+          .set('token', moderatorToken)
+          .end((err, res) => {
+            res.should.have.status(404);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Related subject does not exist');
+            done();
+          });
+      });
+    });
+  });
 });
