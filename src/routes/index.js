@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authRouter from './auth.route';
-import pqCategoryRouter from './pastquestion_category.route';
+import pqCategoryRouter from './pastQuestionCategory.route';
 import userRouter from './users.route';
 import coursesRouter from './courses.route';
 import mainSubjectsRouter from './mainSubjects.route';
@@ -11,7 +11,7 @@ import courseCategoryRouter from './courseCategories.route';
 const router = Router();
 
 router.use('/auth', authRouter);
-router.use('', pqCategoryRouter);
+router.use('/pqcategory', pqCategoryRouter);
 router.use('/users', userRouter);
 router.use('/courses', coursesRouter);
 router.use('/majorsubject', mainSubjectsRouter);

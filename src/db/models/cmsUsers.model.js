@@ -10,46 +10,6 @@ const UserSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
-      password: {
-        type: String,
-      },
-      email: {
-        type: String,
-        required: true,
-        unique: true,
-      },
-      role: {
-        type: String,
-        ref: 'role',
-      },
-      isActivated: {
-        type: Boolean,
-        default: true,
-      },
-    },
-    {
-      toJSON: { virtuals: true },
-      toObject: { virtuals: true },
-    },
-<<<<<<< HEAD
-    { timestamps: true },
-  );
-  UserSchema.virtual('recentActivities', {
-    ref: 'recentActivity',
-    localField: '_id',
-    foreignField: 'userId',
-    justOne: false,
-  });
-  UserSchema.methods.toJSON = function RemovePassword() {
-    const obj = this.toObject();
-    delete obj.password;
-    return obj;
-  };
-  
-  const CmsUser = mongoose.model('cmsUser', UserSchema);
-  
-  export default CmsUser;
-=======
     password: {
       type: String,
     },
@@ -96,4 +56,3 @@ UserSchema.methods.toJSON = function RemovePassword() {
 const CmsUser = mongoose.model('cmsUser', UserSchema);
 
 export default CmsUser;
->>>>>>> develop

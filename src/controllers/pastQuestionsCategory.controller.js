@@ -22,7 +22,9 @@ export default class PastQuestionsCategoryController {
       return pqCategory
         ? Response.Success(res, pqCategory)
         : Response.NotFoundError(res, 'past questions category not found');
-    } catch (error) { next(error); }
+    } catch (error) { 
+      return Response.InternalServerError(res, 'Could not get category'); 
+    }
   }
 
   /**
@@ -96,8 +98,6 @@ static async deleteCategory(req, res) {
   static async getAllCategories(req, res) {
     try {
       const pqCategories = await PQCategory.find({});
-      if (pqCategories.length < 1) 
-        return Response.NotFoundError(res, 'No past question category has been added');
       return Response.Success(res, pqCategories, 200);
     } catch (error) {
       return Response.InternalServerError(res, 'Could not return past question categories.');

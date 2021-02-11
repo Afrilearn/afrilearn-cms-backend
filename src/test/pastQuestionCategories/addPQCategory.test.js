@@ -1,13 +1,12 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import bcrypt from 'bcrypt';
 import sinon from 'sinon';
 import Sinonchai from 'sinon-chai';
+import mongoose from 'mongoose';
 import app from '../../index';
-import CmsUser from '../../db/models/cmsUsers.model';
+import userUtils from '../../utils/user.utils';
 import PQCategory from '../../db/models/pastQuestionTypes.model';
-import Helper from '../../utils/user.utils';
-import PQCategoryController from '../../controllers/pastquestions_category.controller';
+import Response from '../../utils/response.utils';
 
 chai.use(chaiHttp);
 chai.should();
@@ -15,51 +14,34 @@ chai.use(Sinonchai);
 
 const { expect } = chai;
 
-const testAdminUser = {
-  firstName: 'Lois',
-  lastName: 'Adegbohungbe',
-  role: 'admin',
-  email: 'loisdex@test.com',
-  password: bcrypt.hashSync('password123', 10)
-};
+const invalidToken = 'invalid.jwt.token';
+const staffToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209ab2792e63fc841de3c',
+  'Staff User',
+);
+const moderatorToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209c32792e63fc841de3d',
+  'Moderator User',
+);
+const adminToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209d72792e63fc841de3e',
+  'Administrator User',
+);
 
-const testStaffUser = {
-  firstName: 'Louis',
-  lastName: 'Doe',
-  role: 'staff',
-  email: 'loisdoe@example.com',
-  password: bcrypt.hashSync('password123', 10)
-};
-
-const testPQCategroy = {
+const testPQCategory = {
   name : 'TestPQ',
   categoryId : 1
 }
-let adminUser;
-let staffUser;
-let adminToken;
-let staffToken;
 const route = '/api/v1/pqcategory';
 
-before(async () => {
-  await CmsUser.deleteOne({ email: testAdminUser.email });
-  await CmsUser.deleteOne({ email: testStaffUser.email });
-  adminUser = await CmsUser.create(testAdminUser);
-  adminToken = Helper.generateToken({
-    id: adminUser._id, role: adminUser.role, firstName: adminUser.firstName,
-  });
-  staffUser = await CmsUser.create(testStaffUser);
-  staffToken = Helper.generateToken({
-    id: staffUser._id, role: staffUser.role, firstName: staffUser.firstName,
-  });
-});
-after(async () => {
-  await CmsUser.deleteMany({ _id: adminUser._id });
-  await CmsUser.deleteMany({ _id: staffUser._id });
-  await PQCategory.deleteMany({ name: testPQCategroy.name });
-});
-
 describe('ADD PAST QUESTION CATEGORY', () => {
+  after(async () => {
+    await PQCategory.deleteMany({ name: testPQCategory.name });
+  });
+  
   describe(`/POST ${route}`, () => {
     it('it should return unauthorized if user is not logged in', (done) => {
       chai.request(app)
@@ -68,7 +50,7 @@ describe('ADD PAST QUESTION CATEGORY', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('No token provided!');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -81,7 +63,7 @@ describe('ADD PAST QUESTION CATEGORY', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('You are not permitted to perform this action');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -94,7 +76,7 @@ describe('ADD PAST QUESTION CATEGORY', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('Invalid authentication token.');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -104,24 +86,50 @@ describe('ADD PAST QUESTION CATEGORY', () => {
         .post(route)
         .set('x-access-token', adminToken)
         .send({
-          name: testPQCategroy.name,
-          categoryId: testPQCategroy.categoryId,
+          name: testPQCategory.name,
+          categoryId: testPQCategory.categoryId,
         })
         .end((error, res) => {
           res.should.have.status(200);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('success');
           res.body.should.have.property('data').to.be.an('object');
-          res.body.data.should.have.property('name').eql(testPQCategroy.name);
+          res.body.data.should.have.property('name').eql(testPQCategory.name);
           done();
         });
+    });
+
+    describe('CATEGORY ALREADY EXISTS', () => {
+      beforeEach((done) => {
+        PQCategory.create(testPQCategory, (err) => {
+          if (!err) done();
+        });
+      });
+      it('should send back 409 status with error if catgeory exists', (done) => {
+        chai
+          .request(app)
+          .post(route)
+          .set('token', adminToken)
+          .send({
+            name: testPQCategory.name,
+            categoryId: testPQCategory.categoryId,
+          })
+          .end((err, res) => {
+            res.status.should.equals(409);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('category already exists');
+            done();
+          });
+      });
     });
 
     it('should fail to add past question category with no name field in request', async () => {
       const res = await chai.request(app)
         .post(route)
         .set('x-access-token', adminToken)
-        .send({ categoryId: testPQCategroy.categoryId });
+        .send({ categoryId: testPQCategory.categoryId });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.be.an('object');
@@ -138,7 +146,7 @@ describe('ADD PAST QUESTION CATEGORY', () => {
       const res = await chai.request(app)
         .post(route)
         .set('x-access-token', adminToken)
-        .send({ name: testPQCategroy.name });
+        .send({ name: testPQCategory.name });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.be.an('object');
@@ -155,7 +163,7 @@ describe('ADD PAST QUESTION CATEGORY', () => {
       const res = await chai.request(app)
         .post(route)
         .set('x-access-token', adminToken)
-        .send({ name: '', categoryId: testPQCategroy.categoryId });
+        .send({ name: '', categoryId: testPQCategory.categoryId });
 
       expect(res.status).to.equal(400);
       expect(res.body).to.be.an('object');
@@ -169,16 +177,28 @@ describe('ADD PAST QUESTION CATEGORY', () => {
       expect(res.body.errors).to.include.members(['Category Name cannot be empty']);
     });
 
-    it('fakes server error', (done) => {
-      const req = { body: {} };
-      const res = {
-        status() { },
-        send() { },
-      };
-      sinon.stub(res, 'status').returnsThis();
-      PQCategoryController.addCategory(req, res);
-      res.status.should.have.callCount(0);
-      done();
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub;
+      before(() => {
+        stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+      });
+      after(() => {
+        stub.restore();
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .post(route)
+          .set('token', adminToken)
+          .send({ name: 'A test category', categoryId: 5})
+          .end((err, res) => {
+            // res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Could not add category');
+            done();
+          });
+      });
     });
   });
 });

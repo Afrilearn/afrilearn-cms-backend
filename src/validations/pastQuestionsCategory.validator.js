@@ -21,7 +21,7 @@ class AddPQCategory {
         .not()
         .isEmpty()
         .withMessage('Category Name cannot be empty')
-        .isAlphanumeric()
+        .isString()
         .withMessage('Category Name should be a valid name'),
       check('categoryId')
         .exists()
