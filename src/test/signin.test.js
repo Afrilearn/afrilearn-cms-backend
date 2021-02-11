@@ -28,7 +28,7 @@ describe(`POST ${signinUrl}`, () => {
     await CmsUser.create(testUserDetails);
   });
   afterEach(async () => {
-    await CmsUser.deleteOne({ email: testUserDetails.email });
+    await CmsUser.deleteMany({ email: testUserDetails.email });
   });
   describe('SUCCESS', () => {
     it('should sign in a user successfully', async () => {
