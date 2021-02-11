@@ -10,6 +10,14 @@ const relatedpastQuestionSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'pastQuestionType',
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     toJSON: { virtuals: true },

@@ -31,6 +31,7 @@ const UserSchema = new mongoose.Schema(
       toJSON: { virtuals: true },
       toObject: { virtuals: true },
     },
+<<<<<<< HEAD
     { timestamps: true },
   );
   UserSchema.virtual('recentActivities', {
@@ -48,3 +49,51 @@ const UserSchema = new mongoose.Schema(
   const CmsUser = mongoose.model('cmsUser', UserSchema);
   
   export default CmsUser;
+=======
+    password: {
+      type: String,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    role: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'cmsRoles',
+    },
+    isActivated: {
+      type: Boolean,
+      default: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
+  { timestamps: true },
+);
+UserSchema.virtual('recentActivities', {
+  ref: 'recentActivity',
+  localField: '_id',
+  foreignField: 'userId',
+  justOne: false,
+});
+UserSchema.methods.toJSON = function RemovePassword() {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
+
+const CmsUser = mongoose.model('cmsUser', UserSchema);
+
+export default CmsUser;
+>>>>>>> develop

@@ -1,57 +1,62 @@
 import jwt from 'jsonwebtoken';
-import CmsUser from '../db/models/cmsUsers.model';
 import Response from '../utils/response.utils';
 
-const auth = {
-  verifyToken(token) {
-    let decoded = {};
-    try {
-      decoded.payload = jwt.verify(token, process.env.SECRET);
-    } catch (error) {
-      decoded = { error: error.message };
+/**
+ *Contains Auth Middlewares
+ *
+ *
+ * @class AuthMiddleware
+ */
+class AuthMiddleware {
+  /**
+   * @memberof AuthMiddleware
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @param {*} next - Passes control to next function
+   * @returns {JSON} Error response if no token provided or token is invalid
+   * @returns {JSON} passes control to the next function
+   */
+  static validateToken(req, res, next) {
+    const { token: headerToken = null } = req.headers;
+    const { token: queryToken = null } = req.query;
+
+    const token = queryToken || headerToken || req.headers['x-access-token'];
+
+    if (!token) {
+      return Response.UnauthorizedError(res, 'Not authorized to access data');
     }
-    return decoded;
-  },
-
-  async verifyUserToken(req, res, next) {
-    try {
-      let token = req.headers.token
-        || req.body.token
-        || req.headers.authorization
-        || req.body.authorization
-        || req.headers['x-access-token'];
-
-      if (!token) 
-        return Response.UnauthorizedError(res, 'No token provided!');
-
-      if (token.startsWith('Bearer')) token = token.slice(7);
-      const decoded = auth.verifyToken(token);
-
-      if (decoded.error) 
-        return Response.UnauthorizedError(res, 'Invalid authentication token.');
-
-      const user = await CmsUser.findOne({ id: decoded.payload._id});
-      if (!user) return Response.UnauthorizedError(res, 'Failed to authenticate token', 401);
-      req.currentUser = user;
-      const { payload } = decoded;
-      req.body.user = user;
-      req.tokenData = payload;
+    jwt.verify(token, process.env.SECRET, (error, result) => {
+      if (error) {
+        return Response.UnauthorizedError(res, 'Not authorized to access data');
+      }
+      req.data = result.data;
       return next();
-    } catch (error) {
-        return Response.InternalServerError(res, 'Internal Server Error.');
-    }
-  },
+    });
+  }
 
-  async verifyManager(req, res, next) {
-    try {
-      if (!((req.tokenData.role === 'moderator') || (req.tokenData.role === 'admin'))) 
-        return Response.UnauthorizedError(res, 'You are not permitted to perform this action');
+  /**
+   * @memberof AuthMiddleware
+   * @param {*} role - The minimum level permitted to access  data
+   * @returns {JSON} Error response if user is not up to level
+   * @returns {JSON} passes control to the next function
+   */
+  static grantAccess(role = '602209d72792e63fc841de3e') {
+    const roles = [
+      '602209ab2792e63fc841de3c',
+      '602209c32792e63fc841de3d',
+      '602209d72792e63fc841de3e',
+    ];
+    const roleIndex = roles.findIndex((val) => val === role);
+    return (req, res, next) => {
+      if (
+        roleIndex < 0
+        || roles.findIndex((val) => val === req.data.role) < roleIndex
+      ) {
+        return Response.UnauthorizedError(res, 'Not authorized to access data');
+      }
       return next();
-    } catch (error) {
-        return Response.InternalServerError(res, 'Error Accessing Route');
-    }
-  },
+    };
+  }
+}
 
-};
-
-export default auth;
+export default AuthMiddleware;
