@@ -38,4 +38,11 @@ router.delete(
   CourseCategoriesController.deleteCourseCategory,
 );
 
+router.get(
+  '/',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  CourseCategoriesController.fetchCourseCategories,
+);
+
 export default router;
