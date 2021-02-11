@@ -1,4 +1,5 @@
 import { check, validationResult } from 'express-validator';
+import Response from '../utils/response.utils'
 
 /**
  *Contains Major Subject Validator
@@ -22,13 +23,7 @@ class AddMajorSubject {
         .isEmpty()
         .withMessage('Subject Name cannot be empty')
         .isAlphanumeric()
-        .withMessage('Subject Name should be a valid name'),
-      // check('introText')
-      //   .isAlphanumeric()
-      //   .withMessage('introText is invalid'),
-      // check('classification')
-      //   .isAlphanumeric()
-      //   .withMessage('classification is invalid'),
+        .withMessage('Subject Name should be a valid name')
     ];
   }
 
@@ -44,13 +39,10 @@ class AddMajorSubject {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
-      return res.status(400).json({
-        status: '400 Invalid Request',
-        error: 'Your request contains invalid parameters',
-        errors: errArr,
-      });
+      return Response.InvalidRequestParamsError(res, errArr);
     }
     return next();
   }
 }
+
 export default AddMajorSubject;

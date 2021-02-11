@@ -114,7 +114,7 @@ describe('ADD A MAJOR SUBJECT', () => {
       expect(res.status).to.equal(400);
       expect(res.body).to.be.an('object');
       expect(res.body).to.have.property('status');
-      expect(res.body.status).to.contain('Invalid Request');
+      expect(res.body.status).to.equal('error');
       expect(res.body).to.have.property('error');
       expect(res.body).to.have.property('errors');
       expect(res.body).to.be.an('object');
@@ -131,7 +131,7 @@ describe('ADD A MAJOR SUBJECT', () => {
       expect(res.status).to.equal(400);
       expect(res.body).to.be.an('object');
       expect(res.body).to.have.property('status');
-      expect(res.body.status).to.contain('Invalid Request');
+      expect(res.body.status).to.eql('error');
       expect(res.body).to.have.property('error');
       expect(res.body).to.have.property('errors');
       expect(res.body).to.be.an('object');
