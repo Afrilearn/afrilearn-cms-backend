@@ -1,4 +1,3 @@
-// random comment
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import Sinonchai from 'sinon-chai';

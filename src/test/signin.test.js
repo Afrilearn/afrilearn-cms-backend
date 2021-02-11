@@ -17,14 +17,14 @@ const signinUrl = '/api/v1/auth/signin';
 const testUserDetails = {
   _id: new mongoose.mongo.ObjectId(),
   firstName: 'John',
-  lastName: 'Doe',
-  email: 'john_doe@email.com',
+  lastName: 'Doewee',
+  email: 'john_doewee@email.com',
   password: bcrypt.hashSync('blessing', 10),
 };
 
 describe(`POST ${signinUrl}`, () => {
   beforeEach(async () => {
-    await CmsUser.deleteOne({ email: testUserDetails.email });
+    await CmsUser.deleteMany({ email: testUserDetails.email });
     await CmsUser.create(testUserDetails);
   });
   afterEach(async () => {
@@ -49,6 +49,29 @@ describe(`POST ${signinUrl}`, () => {
       expect(res.body.data.token).to.be.a('string');
       expect(res.body.data.user.fullName).to.equal(testUserDetails.fullName);
       expect(res.body.data.user.email).to.equal(testUserDetails.email);
+    });
+  });
+
+  describe('FAKE INTERNAL SERVER ERROR', () => {
+    let stub;
+    before(() => {
+      stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+    });
+    after(() => {
+      stub.restore();
+    });
+    it('returns status of 500', (done) => {
+      chai
+        .request(app)
+        .post(signinUrl)
+        .send({ email: testUserDetails.email, password: 'blessing' })
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.should.have
+            .property('error')
+            .to.equals('Error Logging in User');
+          done();
+        });
     });
   });
 
