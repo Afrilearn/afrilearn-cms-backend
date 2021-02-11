@@ -23,21 +23,12 @@ const testUserDetails = {
 };
 
 describe(`POST ${signinUrl}`, () => {
-  before((done) => {
-    CmsUser.deleteMany({ email: testUserDetails.email }, (err) => {
-      if (!err) {
-        done();
-      }
-    });
-    const user = new CmsUser(testUserDetails);
-    user.save();
+  beforeEach(async () => {
+    await CmsUser.deleteOne({ email: testUserDetails.email });
+    await CmsUser.create(testUserDetails);
   });
-  after((done) => {
-    CmsUser.deleteMany({ email: testUserDetails.email }, (err) => {
-      if (!err) {
-        done();
-      }
-    });
+  afterEach(async () => {
+    await CmsUser.deleteMany({ email: testUserDetails.email });
   });
   describe('SUCCESS', () => {
     it('should sign in a user successfully', async () => {
@@ -245,5 +236,28 @@ describe(`POST ${signinUrl}`, () => {
     expect(res.body.error).to.be.an('object');
     expect(res.body.error).to.have.property('message');
     expect(res.body.error.message).to.equal('Incorrect email or password');
+  });
+
+  describe('FAKE INTERNAL SERVER ERROR', () => {
+    let stub;
+    before(() => {
+      stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+    });
+    after(() => {
+      stub.restore();
+    });
+    it('returns status of 500', (done) => {
+      chai
+        .request(app)
+        .post(signinUrl)
+        .send({ email: testUserDetails.email, password: 'blessing' })
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.should.have
+            .property('error')
+            .to.equals('Error Logging in User');
+          done();
+        });
+    });
   });
 });

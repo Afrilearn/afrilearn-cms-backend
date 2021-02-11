@@ -31,10 +31,11 @@ export default class {
   }
 
   /**
-   * @param {Object} res
-   * @param {Object|string} error
-   * @returns {Object} response
-   */
+     * Defines the specification for internal server error
+     * @param {Object} res
+     * @param {Object|string} error
+     * @returns {Object} response
+     */
   static InternalServerError(res, error) {
     return res.status(500).json({
       status: 'error',
@@ -58,7 +59,7 @@ export default class {
   /**
    * Defines the specification for a resource not found error
    * @param {object} res (ServerResponse)
-   * @param {string} error (Error message)
+   * @param {string} error
    * @returns {object} ServerResponse
    */
   static NotFoundError(res, error) {

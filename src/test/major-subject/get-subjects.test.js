@@ -3,11 +3,11 @@ import chaiHttp from 'chai-http';
 import Sinonchai from 'sinon-chai';
 import sinon from 'sinon';
 import mongoose from 'mongoose';
-import MainSubjects from '../db/models/mainSubjects.model';
-import userUtils from '../utils/user.utils';
-import Response from '../utils/response.utils';
+import MainSubjects from '../../db/models/mainSubjects.model';
+import userUtils from '../../utils/user.utils';
+import Response from '../../utils/response.utils';
 
-import app from '../index';
+import app from '../../index';
 
 chai.should();
 chai.use(Sinonchai);
@@ -36,7 +36,7 @@ const adminToken = userUtils.generateToken(
   'Administrator User',
 );
 
-const baseUrl = '/api/v1/subjects';
+const baseUrl = '/api/v1/majorsubject';
 
 describe(`/GET ${baseUrl}`, () => {
   describe('Successful fetch', () => {
