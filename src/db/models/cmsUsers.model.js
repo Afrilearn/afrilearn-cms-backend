@@ -19,12 +19,20 @@ const UserSchema = new mongoose.Schema(
       unique: true,
     },
     role: {
-      type: String,
-      ref: 'role',
+      type: mongoose.Schema.ObjectId,
+      ref: 'cmsRoles',
     },
     isActivated: {
       type: Boolean,
       default: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   {

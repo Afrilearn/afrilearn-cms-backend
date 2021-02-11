@@ -3,12 +3,12 @@
  */
 export default class {
   /**
-     * Defines the specification for the "unauthorized error" response cases
-     * @param {Object} res
-     * @param {Object} error
-     * @param {number} code
-     * @returns {Object} response
-     */
+   * Defines the specification for the "unauthorized error" response cases
+   * @param {Object} res
+   * @param {Object} error
+   * @param {number} code
+   * @returns {Object} response
+   */
   static UnauthorizedError(res, error, code) {
     return res.status(code || 401).json({
       status: 'error',
@@ -17,12 +17,12 @@ export default class {
   }
 
   /**
-     * Defines the specification for the "success" response cases
-     * @param {Object} res
-     * @param {Object} data
-     * @param {number} code
-     * @returns {ServerResponse} response
-     */
+   * Defines the specification for the "success" response cases
+   * @param {Object} res
+   * @param {Object} data
+   * @param {number} code
+   * @returns {ServerResponse} response
+   */
   static Success(res, data, code = 200) {
     return res.status(code).json({
       status: 'success',
@@ -80,6 +80,21 @@ export default class {
     return res.status(code).json({
       status: 'error',
       error,
+    });
+  }
+
+  /**
+   * Defines the specification for invalid request params error cases
+   * @param {*} res (ServerResponse object)
+   * @param {*} errors
+   * @param {*} error
+   * @returns {json} (Error details)
+   */
+  static InvalidRequestParamsError(res, errors, error = 'Your request contains invalid parameters') {
+    return res.status(400).json({
+      status: 'error',
+      error,
+      errors,
     });
   }
 }

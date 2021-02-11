@@ -6,6 +6,16 @@ import jwt from 'jsonwebtoken';
  */
 export default class UserUtils {
   /**
+     * Encrypts plain text password
+     * @param {*} password
+     * @returns {string} hashed password
+     */
+  static async encryptPassword(password) {
+    const pass = await bcrypt.hash(password, 8);
+    return pass;
+  }
+
+  /**
    * Generates a new token for a particular user
    * @param {string} id
    * @param {string} role
@@ -13,11 +23,14 @@ export default class UserUtils {
    * @param {string} lastName
    * @returns {string} token
    */
-  static generateToken({ id, role, firstName }) {
-    return jwt.sign({
-      id, role, firstName,
-    },
-    process.env.SECRET, { expiresIn: '30d' });
+  static generateToken(id, role, firstName) {
+    return jwt.sign(
+      {
+        data: { id, role, firstName },
+      },
+      process.env.SECRET,
+      { expiresIn: '30d' },
+    );
   }
 
   /**
@@ -37,9 +50,20 @@ export default class UserUtils {
    */
   static setCookie(res, userToken) {
     res.cookie('token', userToken, {
-      expires: new Date(Date.now() + (604800 * 1000)),
+      expires: new Date(Date.now() + 604800 * 1000),
       httpOnly: true,
       secure: true,
     });
+  }
+
+  /**
+   * Verifies that the passwords are the same
+   * @param {*} plainText
+   * @param {*} hashedText
+   * @returns {Boolean} returns true if passwords match
+   */
+  static async verifyPassword(plainText, hashedText) {
+    const isMatch = await bcrypt.compare(plainText, hashedText);
+    return isMatch;
   }
 }
