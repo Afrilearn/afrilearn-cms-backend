@@ -11,6 +11,7 @@ import app from '../index';
 import RelatedPastQuestions from '../db/models/relatedPastQuestions.model';
 import Subjects from '../db/models/subjects.model';
 import MainSubjects from '../db/models/mainSubjects.model';
+import PastQuestionTypes from '../db/models/pastQuestionTypes.model';
 
 chai.should();
 chai.use(Sinonchai);
@@ -1546,6 +1547,306 @@ describe('COURSES', () => {
             res.body.should.have
               .property('error')
               .to.equals('Related subject does not exist');
+            done();
+          });
+      });
+    });
+  });
+
+  describe(`GET/ ${baseUrl}/:courseId/pastquestions`, () => {
+    const courseId = mongoose.Types.ObjectId();
+    describe('FETCH COURSE PAST QUESTIONS SUCCESSFULLY', () => {
+      beforeEach(async () => {
+        await RelatedPastQuestions.deleteMany();
+
+        const dbQuestions = [];
+        const dbQuestionType = [];
+        for (let i = 1; i < 4; i += 1) {
+          dbQuestionType.push(
+            (async () => {
+              const usr = await PastQuestionTypes.create({ name: `Type${i}` });
+              return usr;
+            })(),
+          );
+        }
+        const uploadedPastQuestions = await Promise.all(dbQuestionType);
+        uploadedPastQuestions.forEach((sub) => {
+          dbQuestions.push(
+            (async () => {
+              await RelatedPastQuestions.create({
+                pastQuestionTypeId: sub._id,
+                courseId,
+              });
+            })(),
+          );
+        });
+        await Promise.all(dbQuestions);
+      });
+      afterEach(async () => {
+        await RelatedPastQuestions.deleteMany();
+        await PastQuestionTypes.deleteMany();
+      });
+
+      it('should fetch all course past questions for all users', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${courseId}/pastquestions`)
+          .set('token', staffToken)
+          .end((err, res) => {
+            res.status.should.equals(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have
+              .property('pastQuestions')
+              .to.have.length(3);
+            const checks = res.body.data.pastQuestions.map(
+              (sub) => sub.pastQuestionTypeId.name,
+            );
+            for (let i = 1; i < 4; i += 1) {
+              checks.should.deep.include(`Type${i}`);
+            }
+            done();
+          });
+      });
+    });
+
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub;
+      before(() => {
+        stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+      });
+      after(() => {
+        stub.restore();
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${courseId}/pastquestions`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Error fetching course past questions');
+            done();
+          });
+      });
+    });
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${courseId}/pastquestions`)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${courseId}/pastquestions`)
+          .set('token', invalidToken)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+
+    describe('PARAM VALIDATION', () => {
+      it('should return 400 error if course id is not valid mongoose id', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/invalidcourseid/pastquestions`)
+          .set('token', staffToken)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('errors')
+              .to.include('courseId is not a valid mongoose ID');
+            done();
+          });
+      });
+    });
+  });
+
+  describe(`/DELETE ${baseUrl}/:courseId/pastquestions/:pastquestionId`, () => {
+    let courseId, typeId, pastQuestion;
+    beforeEach(async () => {
+      courseId = mongoose.Types.ObjectId();
+      typeId = mongoose.Types.ObjectId();
+      await RelatedPastQuestions.deleteMany();
+      pastQuestion = await RelatedPastQuestions.create({
+        courseId, pastQuestionTypeId: typeId,
+      });
+    });
+    afterEach(async () => {
+      await RelatedPastQuestions.deleteMany();
+    });
+
+    describe('DELETE COURSE PAST QUESTION SUCCESSFULLY', () => {
+      it('should delete course past question for admin', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.status.should.equals(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have
+              .property('message')
+              .to.equals('The past question has been deleted successfully');
+            done();
+          });
+      });
+
+      it('should delete course past question for moderator', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .set('token', moderatorToken)
+          .end((err, res) => {
+            res.status.should.equals(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have
+              .property('message')
+              .to.equals('The past question has been deleted successfully');
+            done();
+          });
+      });
+    });
+
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub, pastQuestion;
+      beforeEach(async () => {
+        pastQuestion = await RelatedPastQuestions.create({ courseId, pastQuestionTypeId: typeId });
+        stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+      });
+      afterEach((done) => {
+        stub.restore();
+        Subjects.deleteMany((err) => {
+          if (!err) done();
+        });
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Error deleting past question');
+            done();
+          });
+      });
+    });
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .set('token', invalidToken)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+
+    describe('ADMIN ACCESS', () => {
+      it('should return 401 with error if user is not moderator or admin', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .set('token', staffToken)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+
+    describe('PARAM VALIDATION', () => {
+      it('should return 401 error if course id is not valid mongoose id', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/invalidmongooseid/pastquestions/${pastQuestion._id}`)
+          .set('token', moderatorToken)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('errors')
+              .to.include('courseId is not a valid mongoose ID');
+            done();
+          });
+      });
+      it('should return 400 error if past question id is not valid mongoose id', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/pastquestions/invalidmongooseid`)
+          .set('token', moderatorToken)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('errors')
+              .to.include('pastQuestionId is not a valid mongoose ID');
+            done();
+          });
+      });
+    });
+
+    describe('COURSE PAST QUESTION LINKED', () => {
+      let pastQuestionTwo;
+      before(async () => {
+        await RelatedPastQuestions.deleteMany();
+        pastQuestionTwo = await RelatedPastQuestions.create({ pastQuestionTypeId: typeId });
+      });
+
+      it('should return 404 error if past question is not linked to course', (done) => {
+        chai
+          .request(app)
+          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestionTwo._id}`)
+          .set('token', moderatorToken)
+          .end((err, res) => {
+            res.should.have.status(404);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Related past question does not exist');
             done();
           });
       });
