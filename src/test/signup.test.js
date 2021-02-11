@@ -16,7 +16,7 @@ chai.use(chaiHttp);
 const user = {
   firstName: 'John',
   lastName: 'Doe',
-  email: 'johndoe@gmail.com',
+  email: 'johndoee@gmail.com',
   password: '12345678',
   role: '5fc8f4b99d1e3023e4942152',
 };
