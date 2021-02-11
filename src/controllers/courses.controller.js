@@ -78,10 +78,7 @@ export default class CoursesController {
 
       Response.Success(res, { course }, 201);
     } catch (err) {
-      return Response.InternalServerError(
-        res,
-        'Error linking past question',
-      );
+      return Response.InternalServerError(res, 'Error linking past question');
     }
   }
 
@@ -102,10 +99,26 @@ export default class CoursesController {
 
       Response.Success(res, { course }, 201);
     } catch (err) {
-      return Response.InternalServerError(
-        res,
-        'Error linking subject',
-      );
+      return Response.InternalServerError(res, 'Error linking subject');
+    }
+  }
+
+  /**
+   * @memberof CoursesController
+   * @param {*} req - Request Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} returns array of populated course subject
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async fetchCourseSubjects(req, res) {
+    try {
+      const courseSubjects = await Subjects.find({
+        courseId: req.params.courseId,
+      }).populate('mainSubjectId');
+
+      Response.Success(res, { courseSubjects });
+    } catch (err) {
+      Response.InternalServerError(res, 'Error fetching course subjects');
     }
   }
 }

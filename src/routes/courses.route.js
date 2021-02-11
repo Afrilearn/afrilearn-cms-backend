@@ -59,4 +59,13 @@ router.post(
   CoursesController.linkSubject,
 );
 
+router.get(
+  '/:courseId/subjects',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  ParamsValidator.validateMongooseId('courseId'),
+  ParamsValidator.mongooseIdValidationResult,
+  CoursesController.fetchCourseSubjects,
+);
+
 export default router;
