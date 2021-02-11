@@ -29,23 +29,23 @@ export default class LessonValidator {
         .isString()
         .withMessage('Content must be a string'),
       check('termId')
-        .optional()      
+        .optional()
         .custom(HelperUtils.validateMongooseId('Term id'))
         .not()
         .isEmpty()
         .withMessage('Term Id cannot be empty'),
       check('courseId')
-        .optional()      
+        .optional()
         .custom(HelperUtils.validateMongooseId('Course id'))
         .not()
         .isEmpty()
         .withMessage('Course Id cannot be empty'),
       check('subjectId')
-        .optional()      
+        .optional()
         .custom(HelperUtils.validateMongooseId('Subject id'))
         .not()
         .isEmpty()
-        .withMessage('Subject Id cannot be empty')       
+        .withMessage('Subject Id cannot be empty'),
     ];
   }
 

@@ -23,14 +23,14 @@ const lesson = {
   courseId: validCourseId,
   subjectId: validSubjectId,
   termId: validTermId,
-  content: "Lesson One is important"
+  content: 'Lesson One is important',
 };
 const lessonUpdate = {
-    title: 'Lesson Two',
-    courseId: validCourseId,
-    subjectId: validSubjectId,
-    termId: validTermId,
-    content: "Lesson Two is important"
+  title: 'Lesson Two',
+  courseId: validCourseId,
+  subjectId: validSubjectId,
+  termId: validTermId,
+  content: 'Lesson Two is important',
 };
 const invalidToken = 'invalid.jwt.token';
 const staffToken = userUtils.generateToken(
@@ -385,46 +385,68 @@ describe('LESSONS', () => {
       it('should not edit lesson if courseId is not a valid mongoose id', (done) => {
         dynamicLesson.courseId = 'invalidmongooseid';
         request.send(dynamicLesson).end((err, res) => {
-            res.should.have.status(400);
-            res.body.should.have.property('status').to.equals('error');
-            res.body.should.have
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
             .property('errors')
             .to.include('Course id is not a valid mongoose ID');
-            done();
+          done();
         });
-      });   
+      });
       it('should not edit lesson if subjectId is not a valid mongoose id', (done) => {
         dynamicLesson.subjectId = 'invalidmongooseid';
         request.send(dynamicLesson).end((err, res) => {
-            res.should.have.status(400);
-            res.body.should.have.property('status').to.equals('error');
-            res.body.should.have
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
             .property('errors')
             .to.include('Subject id is not a valid mongoose ID');
-            done();
+          done();
         });
-      });   
+      });
       it('should not edit lesson if termId is not a valid mongoose id', (done) => {
         dynamicLesson.termId = 'invalidmongooseid';
         request.send(dynamicLesson).end((err, res) => {
-            res.should.have.status(400);
-            res.body.should.have.property('status').to.equals('error');
-            res.body.should.have
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
             .property('errors')
             .to.include('Term id is not a valid mongoose ID');
-            done();
+          done();
         });
-      });       
+      });
       it('should not edit course if creatorId is provided', (done) => {
-       dynamicLesson.creatorId = '';
-       request.send(dynamicLesson).end((err, res) => {
-            res.should.have.status(400);
-            res.body.should.have.property('status').to.equals('error');
-            res.body.should.have
+        dynamicLesson.creatorId = '';
+        request.send(dynamicLesson).end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
             .property('errors')
             .to.include('Cannot change lesson creator');
-        done();
-       });
+          done();
+        });
+      });
+    });
+
+    describe('Lesson EXISTENCE', () => {
+      beforeEach((done) => {
+        Lesson.deleteMany((err) => {
+          if (!err) done();
+        });
+      });
+      it('should send back 404 status with error if Lesson does not exist', (done) => {
+        chai
+          .request(app)
+          .put(`${baseUrl}/${lessonId}`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.status.should.equals(404);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Lesson does not exist');
+            done();
+          });
       });
     });
   });

@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import Response from '../utils/response.utils';
 import Lesson from '../db/models/lessons.model';
 
@@ -30,9 +29,6 @@ export default class LessonController {
  */
   static async updateLesson(req, res) {
     const lessonId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(lessonId)) {
-      return Response.BadRequestError(res, 'lesson Id is invalid');
-    }
     try {
       const lesson = await Lesson.findOne({ _id: lessonId });
       if (!lesson) return Response.NotFoundError(res, 'Lesson does not exist');
@@ -52,8 +48,6 @@ export default class LessonController {
  */
   static async deleteLesson(req, res) {
     const lessonId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(lessonId)) 
-        return Response.BadRequestError(res, 'lessonId is invalid');
     try {
       const lesson = await Lesson.findOne({ _id: lessonId });
       if (!lesson) { return Response.NotFoundError(res, 'lesson not found'); }
