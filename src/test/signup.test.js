@@ -71,7 +71,7 @@ describe(`/POST ${baseUrl}`, () => {
           res.body.data.user.should.have
             .property('email')
             .to.equals(user.email);
-          res.body.data.user.should.have.property('role').to.equals(user.role);
+          res.body.data.user.should.have.property('role');
           res.body.data.user.should.have.property('createdAt');
           res.body.data.user.should.have.property('updatedAt');
           done();
