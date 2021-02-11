@@ -24,7 +24,7 @@ const testUserDetails = {
 
 describe(`POST ${signinUrl}`, () => {
   beforeEach(async () => {
-    await CmsUser.deleteOne({ email: testUserDetails.email });
+    await CmsUser.deleteMany({ email: testUserDetails.email });
     await CmsUser.create(testUserDetails);
   });
   afterEach(async () => {
