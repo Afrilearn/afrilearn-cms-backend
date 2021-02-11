@@ -5,10 +5,11 @@ import bcrypt from 'bcryptjs';
 import '../db';
 import mongoose from 'mongoose';
 import app from '../index';
-import AuthController from '../controllers/auth.controller';
+import Response from '../utils/response.utils';
 import CmsUser from '../db/models/cmsUsers.model';
 
 chai.use(chaiHttp);
+chai.should();
 
 const { expect } = chai;
 const signinUrl = '/api/v1/auth/signin';
@@ -57,6 +58,29 @@ describe(`POST ${signinUrl}`, () => {
       expect(res.body.data.token).to.be.a('string');
       expect(res.body.data.user.fullName).to.equal(testUserDetails.fullName);
       expect(res.body.data.user.email).to.equal(testUserDetails.email);
+    });
+  });
+
+  describe('FAKE INTERNAL SERVER ERROR', () => {
+    let stub;
+    before(() => {
+      stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+    });
+    after(() => {
+      stub.restore();
+    });
+    it('returns status of 500', (done) => {
+      chai
+        .request(app)
+        .post(signinUrl)
+        .send({ email: testUserDetails.email, password: 'blessing' })
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.should.have
+            .property('error')
+            .to.equals('Error Logging in User');
+          done();
+        });
     });
   });
 
@@ -221,17 +245,5 @@ describe(`POST ${signinUrl}`, () => {
     expect(res.body.error).to.be.an('object');
     expect(res.body.error).to.have.property('message');
     expect(res.body.error.message).to.equal('Incorrect email or password');
-  });
-
-  it('Should fake server error', (done) => {
-    const req = { body: {} };
-    const res = {
-      status() {},
-      send() {},
-    };
-    sinon.stub(res, 'status').returnsThis();
-    AuthController.signIn(req, res);
-    res.status.should.have.callCount(0);
-    done();
   });
 });

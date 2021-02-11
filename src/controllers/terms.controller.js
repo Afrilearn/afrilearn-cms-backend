@@ -1,5 +1,3 @@
-import mongoose from 'mongoose';
-import RelatedPastQuestions from '../db/models/relatedPastQuestions.model';
 import Term from '../db/models/terms.model';
 import Response from '../utils/response.utils';
 
@@ -20,7 +18,7 @@ export default class TermsController {
     try {
       const result = await Term.create({ ...req.body });
 
-      Response.Success(res, { course: result }, 201);
+      Response.Success(res, { term: result }, 201);
     } catch (err) {
       Response.InternalServerError(res, 'Error creating term');
     }
@@ -35,7 +33,6 @@ export default class TermsController {
    */
   static async editTerm(req, res) {
     const termId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(termId)) { return Response.BadRequestError(res, 'termId is invalid'); }
     try {
       const term = await Term.findOne({ _id: termId });
       if (!term) return Response.NotFoundError(res, 'term does not exist');
@@ -44,8 +41,8 @@ export default class TermsController {
       return Response.Success(res, { message: 'term updated successfully' }, 200);
     } catch (error) {
       return Response.InternalServerError(res, 'Could not update term');
+    }
   }
-}
 
   /**
    * @memberof TermssController
@@ -55,7 +52,10 @@ export default class TermsController {
    * @returns {Response.InternalServerError} if error occurs
    */
   static async deleteTerm(req, res) {
+    const termId = req.params.id;
     try {
+      const term = await Term.findOne({ _id: termId });
+      if (!term) return Response.NotFoundError(res, 'term does not exist');
       await Term.deleteOne({ _id: req.params.id });
       Response.Success(res, { message: 'Term deleted successfully' });
     } catch (err) {
@@ -72,7 +72,7 @@ export default class TermsController {
    */
   static async fetchAllTerms(req, res) {
     try {
-      const terms = await Terms.find();
+      const terms = await Term.find();
 
       return Response.Success(res, { terms });
     } catch (err) {

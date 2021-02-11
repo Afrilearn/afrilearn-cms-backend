@@ -42,9 +42,6 @@ describe(`/GET ${baseUrl}`, () => {
   describe('Successful fetch', () => {
     before(async () => {
       await MainSubjects.deleteMany();
-      //   for (let i = 1; i < 4; i += 1) {
-      //     MainSubjects.create({ ...subject, name: `Maths${i}` });
-      //   }
       const subjects = [];
       for (let i = 1; i < 4; i += 1) {
         subjects.push(

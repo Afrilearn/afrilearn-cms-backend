@@ -1,7 +1,5 @@
 import Term from '../db/models/terms.model';
-import RelatedPastQuestions from '../db/models/relatedPastQuestions.model';
-import Subjects from '../db/models/subjects.model';
-import GeneralServices from '../services/general.services';
+import Response from '../utils/response.utils';
 
 /**
  * Contains Term Middleware
@@ -18,13 +16,10 @@ export default class TermMiddleware {
    * @returns {JSON} passes control to the next function if term exists
    */
   static async checkTermExists(req, res, next) {
-    GeneralServices.checkDocInexistence(
-      req,
-      res,
-      next,
-      Term,
-      { _id: req.params.id },
-      'Term',
-    );
+    const isTermExists = await Term.findOne({ name: req.body.name });
+    if (isTermExists) {
+      return Response.ConflictError(res, 'term already exists');
+    }
+    return next();
   }
 }

@@ -19,7 +19,7 @@ export default class TermValidator {
         .withMessage('Name must be a string')
         .not()
         .isEmpty()
-        .withMessage('Name cannot be empty'),    
+        .withMessage('Name cannot be empty'),
     ];
   }
 
@@ -44,14 +44,14 @@ export default class TermValidator {
    */
   static validateTermEditData() {
     return [
-        check('name')
+      check('name')
         .exists()
         .withMessage('Name is required')
         .isString()
         .withMessage('Name must be a string')
         .not()
         .isEmpty()
-        .withMessage('Name cannot be empty')
+        .withMessage('Name cannot be empty'),
     ];
   }
 
