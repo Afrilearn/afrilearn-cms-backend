@@ -2,7 +2,7 @@ import Term from '../db/models/terms.model';
 import Response from '../utils/response.utils';
 
 /**
- * Contains Terms controller
+ * Contains Terms Controller
  *
  * @class TermsController
  */
