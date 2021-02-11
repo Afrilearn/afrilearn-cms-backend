@@ -28,4 +28,14 @@ router.patch(
   CourseCategoriesController.editCourseCategory,
 );
 
+router.delete(
+  '/:courseCategoryId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  ParamsValidator.validateMongooseId('courseCategoryId'),
+  ParamsValidator.mongooseIdValidationResult,
+  CourseCategoriesMiddleware.checkCourseCategoryExistence,
+  CourseCategoriesController.deleteCourseCategory,
+);
+
 export default router;
