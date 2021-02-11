@@ -43,7 +43,7 @@ const adminToken = userUtils.generateToken(
 
 const baseUrl = '/api/v1/course_categories';
 const name = 'Course category';
-const name2 = 'Course category2';
+const name2 = 'Course category Two';
 
 describe('POST/ course_categories', () => {
   beforeEach((done) => {
@@ -91,7 +91,7 @@ describe('POST/ course_categories', () => {
           res.status.should.equals(201);
           res.body.data.courseCategory.should.have
             .property('name')
-            .to.equals('Course category2');
+            .to.equals('Course category Two');
           done();
         });
     });
