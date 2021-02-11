@@ -28,6 +28,22 @@ export default class MajorSubjectController {
   }
 
   /**
+ * Handles fetching of mjor subjects
+ * @param {ServerRequest} req
+ * @param {ServerResponse} res
+ * @returns {ServerResponse} response
+ */
+  static async fetchAllSubjects(req, res) {
+    try {
+      const result = await MajorSubject.find();
+
+      return Response.Success(res, { subjects: result });
+    } catch (err) {
+      Response.InternalServerError(res, 'Error fetching subjects');
+    }
+  }
+
+  /**
  * Handles major subject editing
  * @param {ServerRequest} req
  * @param {ServerResponse} res
@@ -35,7 +51,9 @@ export default class MajorSubjectController {
  */
   static async updateMajorSubject(req, res) {
     const mainSubjectId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(mainSubjectId)) { return Response.BadRequestError(res, 'mainSubjectId is invalid'); }
+    if (!mongoose.Types.ObjectId.isValid(mainSubjectId)) {
+      return Response.BadRequestError(res, 'mainSubjectId is invalid');
+    }
     try {
       const mainSubject = await MajorSubject.findOne({ _id: mainSubjectId });
       if (!mainSubject) return Response.NotFoundError(res, 'subject does not exist');

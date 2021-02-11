@@ -1,13 +1,12 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 import sinon from 'sinon';
 import Sinonchai from 'sinon-chai';
 import app from '../../index';
 import MajorSubject from '../../db/models/mainSubjects.model';
 import Helper from '../../utils/user.utils';
 import Response from '../../utils/response.utils';
-import CmsUser from '../../db/models/cmsUsers.model';
 
 chai.use(chaiHttp);
 chai.should();
@@ -15,57 +14,35 @@ chai.use(Sinonchai);
 
 const { expect } = chai;
 
-const testAdminUser = {
-  firstName: 'Adams',
-  lastName: 'Joseph',
-  role: 'admin',
-  email: 'adamsjoseph@test.com',
-  password: bcrypt.hashSync('password123', 10),
-};
-
-const testStaffUser = {
-  firstName: 'Janet',
-  lastName: 'Bush',
-  role: 'staff',
-  email: 'janetbush@example.com',
-  password: bcrypt.hashSync('password123', 10),
-};
+const staffToken = Helper.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209ab2792e63fc841de3c',
+  'Staff User',
+);
+const adminToken = Helper.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209d72792e63fc841de3e',
+  'Administrator User',
+);
 
 const testSubject = {
-  name: 'TestSubject3',
+  name: 'TestSubjectAnother',
   imageUrl: 'testimage@url.com',
   introText: 'This is test subject',
   classification: 'Classification',
 };
 
-let adminUser;
-let staffUser;
-let adminToken;
-let staffToken;
 let subject;
 
 const route = '/api/v1/majorsubject';
 
-before(async () => {
-  await CmsUser.deleteOne({ email: testAdminUser.email });
-  await CmsUser.deleteOne({ email: testStaffUser.email });
-  adminUser = await CmsUser.create(testAdminUser);
-  adminToken = Helper.generateToken({
-    id: adminUser._id, role: adminUser.role, firstName: adminUser.firstName,
-  });
-  staffUser = await CmsUser.create(testStaffUser);
-  staffToken = Helper.generateToken({
-    id: staffUser._id, role: staffUser.role, firstName: staffUser.firstName,
-  });
-  subject = await MajorSubject.create(testSubject);
-});
-after(async () => {
-  await CmsUser.deleteMany({ _id: adminUser._id });
-  await CmsUser.deleteMany({ _id: staffUser._id });
-  await MajorSubject.deleteMany({ name: testSubject.name });
-});
-
 describe('UPDATE A MAJOR SUBJECT', () => {
+  before(async () => {
+    subject = await MajorSubject.create(testSubject);
+  });
+  after(async () => {
+    await MajorSubject.deleteMany({ name: testSubject.name });
+  });
   describe(`/PUT ${route}`, () => {
     it('it should return unauthorized if user is not logged in', (done) => {
       chai.request(app)
@@ -74,7 +51,7 @@ describe('UPDATE A MAJOR SUBJECT', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('No token provided!');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -87,7 +64,7 @@ describe('UPDATE A MAJOR SUBJECT', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('You are not permitted to perform this action');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -100,7 +77,7 @@ describe('UPDATE A MAJOR SUBJECT', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('Invalid authentication token.');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -119,23 +96,9 @@ describe('UPDATE A MAJOR SUBJECT', () => {
         });
     });
 
-    it('should update a major subject successfully with bearer token', (done) => {
-      chai.request(app)
-        .put(`${route}/${subject._id}`)
-        .set('x-access-token', `Bearer ${adminToken}`)
-        .send(testSubject)
-        .end((error, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('object');
-          res.body.should.have.property('status').eql('success');
-          res.body.data.should.have.property('message').eql('subject updated successfully');
-          done();
-        });
-    });
-
     it('should fail to update a major subject that is not existing', async () => {
       const res = await chai.request(app)
-        .put(`${route}/${staffUser._id}`)
+        .put(`${route}/602209d72792e63fc841de3e`)
         .set('x-access-token', adminToken)
         .send({ categoryId: 12 });
 
@@ -143,9 +106,8 @@ describe('UPDATE A MAJOR SUBJECT', () => {
       expect(res.body).to.be.an('object');
       expect(res.body).to.have.property('status');
       expect(res.body).to.have.property('error');
-      expect(res.body.error).to.have.property('message');
       expect(res.body.status).to.equal('error');
-      expect(res.body.error.message).to.eql('subject does not exist');
+      expect(res.body.error).to.eql('subject does not exist');
     });
 
     it('should fail to update a major subject with invalid Id', async () => {

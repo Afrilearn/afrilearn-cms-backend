@@ -1,11 +1,9 @@
 import chai from 'chai';
-import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import chaiHttp from 'chai-http';
-import bcrypt from 'bcryptjs';
 import sinon from 'sinon';
 import Sinonchai from 'sinon-chai';
 import app from '../../index';
-import CmsUser from '../../db/models/cmsUsers.model';
 import MajorSubject from '../../db/models/mainSubjects.model';
 import Helper from '../../utils/user.utils';
 import Response from '../../utils/response.utils';
@@ -16,21 +14,16 @@ chai.use(Sinonchai);
 
 const { expect } = chai;
 
-const testAdminUser = {
-  firstName: 'Katee',
-  lastName: 'Adegbohungbe',
-  role: 'admin',
-  email: 'kateedex@test.com',
-  password: bcrypt.hashSync('password123', 10),
-};
-
-const testStaffUser = {
-  firstName: 'Lola',
-  lastName: 'Doe',
-  role: 'staff',
-  email: 'loladoe@example.com',
-  password: bcrypt.hashSync('password123', 10),
-};
+const staffToken = Helper.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209ab2792e63fc841de3c',
+  'Staff User',
+);
+const adminToken = Helper.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209d72792e63fc841de3e',
+  'Administrator User',
+);
 
 const testSubject = {
   name: 'TestSubject',
@@ -46,31 +39,9 @@ const testSubject2 = {
   classification: 'Classification',
 };
 
-let adminUser;
-let staffUser;
-let adminToken;
-let staffToken;
 const route = '/api/v1/majorsubject';
-const invalidUserToken = jwt.sign({
-  _id: 676567, role: 'admin', firstName: 'testUser',
-},
-process.env.SECRET, { expiresIn: '30d' });
 
-before(async () => {
-  await CmsUser.deleteMany({ email: testAdminUser.email });
-  await CmsUser.deleteMany({ email: testStaffUser.email });
-  adminUser = await CmsUser.create(testAdminUser);
-  adminToken = Helper.generateToken({
-    id: adminUser._id, role: adminUser.role, firstName: adminUser.firstName,
-  });
-  staffUser = await CmsUser.create(testStaffUser);
-  staffToken = Helper.generateToken({
-    id: staffUser._id, role: staffUser.role, firstName: staffUser.firstName,
-  });
-});
 after(async () => {
-  await CmsUser.deleteMany({ email: adminUser.email });
-  await CmsUser.deleteMany({ email: staffUser.email });
   await MajorSubject.deleteMany({ name: testSubject.name });
   await MajorSubject.deleteMany({ name: testSubject2.name });
 });
@@ -84,7 +55,7 @@ describe('ADD A MAJOR SUBJECT', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('No token provided!');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -97,7 +68,7 @@ describe('ADD A MAJOR SUBJECT', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('You are not permitted to perform this action');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -110,20 +81,7 @@ describe('ADD A MAJOR SUBJECT', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('Invalid authentication token.');
-          done();
-        });
-    });
-
-    it('it should return a token error if user is not valid', (done) => {
-      chai.request(app)
-        .post(route)
-        .set('x-access-token', invalidUserToken)
-        .end((error, res) => {
-          res.should.have.status(401);
-          res.body.should.be.an('object');
-          res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('Failed to authenticate token');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });

@@ -2,8 +2,6 @@ import chai from 'chai';
 import sinon from 'sinon';
 import chaiHttp from 'chai-http';
 import Sinonchai from 'sinon-chai';
-import AuthMiddleware from '../middlewares/auth.middleware';
-import sinon from 'sinon';
 import mongoose from 'mongoose';
 import Users from '../db/models/cmsUsers.model';
 import userUtils from '../utils/user.utils';

@@ -20,7 +20,7 @@ class AuthMiddleware {
     const { token: headerToken = null } = req.headers;
     const { token: queryToken = null } = req.query;
 
-    const token = queryToken || headerToken;
+    const token = queryToken || headerToken || req.headers['x-access-token'];
 
     if (!token) {
       return Response.UnauthorizedError(res, 'Not authorized to access data');

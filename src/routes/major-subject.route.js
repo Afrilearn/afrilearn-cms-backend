@@ -6,10 +6,17 @@ import AddMajorSubjectValidator from '../validations/add-major-subject.validator
 
 const router = Router();
 
+router.get(
+  '/',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  MajorSubjectController.fetchAllSubjects,
+);
+
 router.post(
-  '/majorsubject',
-  AuthMiddleware.verifyUserToken,
-  AuthMiddleware.verifyManager,
+  '/',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
   AddMajorSubjectValidator.validateData(),
   AddMajorSubjectValidator.myValidationResult,
   MajorSubjectMiddleware.CheckSubjectExists,
@@ -17,16 +24,16 @@ router.post(
 );
 
 router.put(
-  '/majorsubject/:id',
-  AuthMiddleware.verifyUserToken,
-  AuthMiddleware.verifyManager,
+  '/:id',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
   MajorSubjectController.updateMajorSubject,
 );
 
 router.delete(
-  '/majorsubject/:id',
-  AuthMiddleware.verifyUserToken,
-  AuthMiddleware.verifyManager,
+  '/:id',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
   MajorSubjectController.deleteMajorSubject,
 );
 

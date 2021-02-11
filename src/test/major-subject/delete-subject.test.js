@@ -1,13 +1,12 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 import sinon from 'sinon';
 import Sinonchai from 'sinon-chai';
 import app from '../../index';
 import MajorSubject from '../../db/models/mainSubjects.model';
 import Helper from '../../utils/user.utils';
 import Response from '../../utils/response.utils';
-import CmsUser from '../../db/models/cmsUsers.model';
 
 chai.use(chaiHttp);
 chai.should();
@@ -15,21 +14,16 @@ chai.use(Sinonchai);
 
 const { expect } = chai;
 
-const testAdminUser = {
-  firstName: 'Loisa',
-  lastName: 'Kater',
-  role: 'moderator',
-  email: 'loiskaterine@test.com',
-  password: bcrypt.hashSync('password123', 10),
-};
-
-const testStaffUser = {
-  firstName: 'Jany',
-  lastName: 'Doe-Man',
-  role: 'staff',
-  email: 'janedoeman@example.com',
-  password: bcrypt.hashSync('password123', 10),
-};
+const staffToken = Helper.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209ab2792e63fc841de3c',
+  'Staff User',
+);
+const adminToken = Helper.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209d72792e63fc841de3e',
+  'Administrator User',
+);
 
 const testSubject = {
   name: 'TestSubject2',
@@ -45,32 +39,16 @@ const testSubject2 = {
   classification: 'Classification',
 };
 
-let adminUser;
-let staffUser;
-let adminToken;
-let staffToken;
 let subject;
 let subject2;
 
 const route = '/api/v1/majorsubject';
 
 before(async () => {
-  await CmsUser.deleteOne({ email: testAdminUser.email });
-  await CmsUser.deleteOne({ email: testStaffUser.email });
-  adminUser = await CmsUser.create(testAdminUser);
-  adminToken = Helper.generateToken({
-    id: adminUser._id, role: adminUser.role, firstName: adminUser.firstName,
-  });
-  staffUser = await CmsUser.create(testStaffUser);
-  staffToken = Helper.generateToken({
-    id: staffUser._id, role: staffUser.role, firstName: staffUser.firstName,
-  });
   subject = await MajorSubject.create(testSubject);
   subject2 = await MajorSubject.create(testSubject2);
 });
 after(async () => {
-  await CmsUser.deleteMany({ _id: adminUser._id });
-  await CmsUser.deleteMany({ _id: staffUser._id });
   await MajorSubject.deleteMany({ name: testSubject.name });
   await MajorSubject.deleteMany({ name: testSubject2.name });
 });
@@ -84,7 +62,7 @@ describe('DELETE A MAJOR SUBJECT', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('No token provided!');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -97,7 +75,7 @@ describe('DELETE A MAJOR SUBJECT', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('You are not permitted to perform this action');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -110,7 +88,7 @@ describe('DELETE A MAJOR SUBJECT', () => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('Invalid authentication token.');
+          res.body.should.have.property('error').eql('Not authorized to access data');
           done();
         });
     });
@@ -130,16 +108,15 @@ describe('DELETE A MAJOR SUBJECT', () => {
 
     it('should fail to delete a major subject that is not existing', async () => {
       const res = await chai.request(app)
-        .delete(`${route}/${adminUser._id}`)
+        .delete(`${route}/602209d72792e63fc841de3e`)
         .set('x-access-token', adminToken);
 
       expect(res.status).to.equal(404);
       expect(res.body).to.be.an('object');
       expect(res.body).to.have.property('status');
       expect(res.body).to.have.property('error');
-      expect(res.body.error).to.have.property('message');
       expect(res.body.status).to.equal('error');
-      expect(res.body.error.message).to.eql('major subject does not exist');
+      expect(res.body.error).to.eql('major subject does not exist');
     });
 
     it('should fail to delete a major subject with invalid Id', async () => {

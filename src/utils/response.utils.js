@@ -59,13 +59,13 @@ export default class {
   /**
    * Defines the specification for a resource not found error
    * @param {object} res (ServerResponse)
-   * @param {string} message
+   * @param {string} error
    * @returns {object} ServerResponse
    */
-  static NotFoundError(res, message) {
+  static NotFoundError(res, error) {
     return res.status(404).json({
       status: 'error',
-      error: { message },
+      error,
     });
   }
 
