@@ -121,4 +121,26 @@ export default class CoursesController {
       Response.InternalServerError(res, 'Error fetching course subjects');
     }
   }
+
+  /**
+   * @memberof CoursesController
+   * @param {*} req - Request Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} if successful course object is deleted succesfully
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async deleteCourseSubject(req, res) {
+    try {
+      await Subjects.deleteOne({
+        courseId: req.params.courseId,
+        mainSubjectId: req.params.subjectId,
+      });
+
+      Response.Success(res, {
+        message: 'The subject has been deleted successfully',
+      });
+    } catch (err) {
+      Response.InternalServerError(res, 'Error deleting course subjects');
+    }
+  }
 }
