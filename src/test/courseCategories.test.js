@@ -616,7 +616,7 @@ describe(`GET/ ${baseUrl}/`, () => {
       for (let i = 1; i < 4; i += 1) {
         users.push(
           (async () => {
-            const usr = await CourseCategories.create({name: `name${i}`});
+            const usr = await CourseCategories.create({ name: `name${i}` });
             return usr;
           })(),
         );
@@ -638,10 +638,7 @@ describe(`GET/ ${baseUrl}/`, () => {
           res.body.should.have.property('status').to.equals('success');
           res.body.data.should.have.property('courseCategories');
           res.body.data.courseCategories.length.should.equals(3);
-          const checks = res.body.data.courseCategories.map((cat) => {
-            return cat.name;
-          }
-          );
+          const checks = res.body.data.courseCategories.map((cat) => cat.name);
           for (let i = 1; i < 4; i += 1) {
             checks.should.deep.include(`name${i}`);
           }
@@ -704,4 +701,4 @@ describe(`GET/ ${baseUrl}/`, () => {
         });
     });
   });
-})
+});
