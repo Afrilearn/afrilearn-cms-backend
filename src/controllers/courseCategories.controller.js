@@ -34,7 +34,9 @@ export default class CourseCategoriesController {
     try {
       await CourseCategories.deleteOne({ _id: req.params.courseCategoryId });
 
-      Response.Success(res, { message: 'Course category deleted successfully' });
+      Response.Success(res, {
+        message: 'Course category deleted successfully',
+      });
     } catch (err) {
       Response.InternalServerError(res, 'Error deleting course category');
     }
@@ -56,6 +58,23 @@ export default class CourseCategoriesController {
       Response.Success(res, { courseCategory });
     } catch (err) {
       Response.InternalServerError(res, 'Error editing course category');
+    }
+  }
+
+  /**
+   * Fetches all course categories from the database
+   * @param {*} req Request
+   * @param {*} res Response object
+   * @returns {JSON} All course categories if successful
+   * @returns {JSON} Error message if unsuccessful
+   */
+  static async fetchCourseCategories(req, res) {
+    try {
+      const courseCategories = await CourseCategories.find();
+
+      Response.Success(res, { courseCategories });
+    } catch (err) {
+      Response.InternalServerError(res, 'Error fetching course categories');
     }
   }
 }
