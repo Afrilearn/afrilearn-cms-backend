@@ -30,6 +30,23 @@ export default class CourseCategoriesController {
    * @returns {JSON} Edited course category if successful
    * @returns {JSON} Error message if unsuccessful
    */
+  static async deleteCourseCategory(req, res) {
+    try {
+      await CourseCategories.deleteOne({ _id: req.params.courseCategoryId });
+
+      Response.Success(res, { message: 'Course category deleted successfully' });
+    } catch (err) {
+      Response.InternalServerError(res, 'Error deleting course category');
+    }
+  }
+
+  /**
+   * Edits a course category on the database
+   * @param {*} req Request
+   * @param {*} res Response object
+   * @returns {JSON} Edited course category if successful
+   * @returns {JSON} Error message if unsuccessful
+   */
   static async editCourseCategory(req, res) {
     try {
       const { dbResult } = req;

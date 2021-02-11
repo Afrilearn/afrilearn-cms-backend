@@ -399,7 +399,7 @@ describe(`PATCH/ ${baseUrl}/:courseCategoryId`, () => {
         done();
       });
     });
-    it('should not create course if course category id is not a valid mongoose id', (done) => {
+    it('should not edit course if course category id is not a valid mongoose id', (done) => {
       chai
         .request(app)
         .patch(`${baseUrl}/invalidmongooseid`)
@@ -429,6 +429,172 @@ describe(`PATCH/ ${baseUrl}/:courseCategoryId`, () => {
       chai
         .request(app)
         .patch(`${baseUrl}/${id}`)
+        .set('token', adminToken)
+        .send({ name })
+        .end((err, res) => {
+          res.status.should.equals(404);
+          res.body.status.should.equals('error');
+          res.body.should.have
+            .property('error')
+            .to.equals('This course category does not exist');
+          done();
+        });
+    });
+  });
+});
+
+describe(`DELETE/ ${baseUrl}/:courseCategoryId`, () => {
+  let id;
+  beforeEach(async () => {
+    await CourseCategories.deleteMany();
+    const dbCat = await CourseCategories.create({ name });
+    id = dbCat._id;
+  });
+  afterEach(async () => {
+    await CourseCategories.deleteMany();
+  });
+
+  describe('SUCCESSFULLY DELETE COURSE CATEGORY', () => {
+    beforeEach(async () => {
+      await CourseCategories.deleteMany();
+      const dbCat = await CourseCategories.create({ name });
+      id = dbCat._id;
+    });
+    afterEach(async () => {
+      await CourseCategories.deleteMany();
+    });
+    it('should delete course category successfully for admin', (done) => {
+      chai
+        .request(app)
+        .delete(`${baseUrl}/${id}`)
+        .set('token', adminToken)
+        .end((err, res) => {
+          res.status.should.equals(200);
+          res.body.should.have.property('status').to.equals('success');
+          res.body.data.should.have
+            .property('message');
+          done();
+        });
+    });
+    it('should delete course category successfully for moderator', (done) => {
+      chai
+        .request(app)
+        .delete(`${baseUrl}/${id}`)
+        .set('token', moderatorToken)
+        .end((err, res) => {
+          res.status.should.equals(200);
+          res.body.should.have.property('status').to.equals('success');
+          res.body.data.should.have
+            .property('message');
+          done();
+        });
+    });
+  });
+
+  describe('FAKE INTERNAL SERVER ERROR', () => {
+    let stub;
+    before(() => {
+      stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+    });
+    after(() => {
+      stub.restore();
+    });
+    it('should return 500 status', (done) => {
+      chai
+        .request(app)
+        .delete(`${baseUrl}/${id}`)
+        .set('token', adminToken)
+        .send({ name })
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.should.have
+            .property('error')
+            .to.equals('Error deleting course category');
+          done();
+        });
+    });
+  });
+
+  describe('TOKEN VALIDATION', () => {
+    it('should return 401 with error message if no token is provided', (done) => {
+      chai
+        .request(app)
+        .delete(`${baseUrl}/${id}`)
+        .send({ name })
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('error')
+            .to.equals('Not authorized to access data');
+          done();
+        });
+    });
+    it('should return 401 status with error message if an invalid token is provided', (done) => {
+      chai
+        .request(app)
+        .delete(`${baseUrl}/${id}`)
+        .set('token', invalidToken)
+        .send({ name })
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('error')
+            .to.equals('Not authorized to access data');
+          done();
+        });
+    });
+  });
+
+  describe('ADMIN ACCESS', () => {
+    it('should return 401 with error if user is not moderator or admin', (done) => {
+      chai
+        .request(app)
+        .delete(`${baseUrl}/${id}`)
+        .set('token', staffToken)
+        .send({ name })
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('error')
+            .to.equals('Not authorized to access data');
+          done();
+        });
+    });
+  });
+
+  describe('INPUT VALIDATION', () => {
+    it('should not delete course if course category id is not a valid mongoose id', (done) => {
+      chai
+        .request(app)
+        .delete(`${baseUrl}/invalidmongooseid`)
+        .set('token', adminToken)
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('errors')
+            .to.include('courseCategoryId is not a valid mongoose ID');
+          done();
+        });
+    });
+  });
+
+  describe('COURSE CATEGORY EXISTENCE', () => {
+    beforeEach(async () => {
+      await CourseCategories.deleteMany();
+    });
+    afterEach((done) => {
+      CourseCategories.deleteMany((err) => {
+        if (!err) done();
+      });
+    });
+    it("should return 404 if course category doesn't exist", (done) => {
+      chai
+        .request(app)
+        .delete(`${baseUrl}/${id}`)
         .set('token', adminToken)
         .send({ name })
         .end((err, res) => {
