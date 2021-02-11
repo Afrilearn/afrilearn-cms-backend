@@ -86,7 +86,7 @@ describe('POST/ course_categories', () => {
         .request(app)
         .post(baseUrl)
         .set('token', moderatorToken)
-        .send({ name2 })
+        .send({ name: name2 })
         .end((err, res) => {
           res.status.should.equals(201);
           res.body.data.courseCategory.should.have
