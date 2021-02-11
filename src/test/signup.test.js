@@ -14,11 +14,11 @@ chai.use(Sinonchai);
 chai.use(chaiHttp);
 
 const user = {
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'johndoee@gmail.com',
+  firstName: 'Bush',
+  lastName: 'Gates',
+  email: 'bushgates@gmail.com',
   password: '12345678',
-  role: '5fc8f4b99d1e3023e4942152',
+  role: mongoose.Types.ObjectId(),
 };
 
 const invalidToken = 'invalid.jwt.token';

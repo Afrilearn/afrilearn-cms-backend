@@ -23,9 +23,9 @@ const user = {
 };
 
 const userTwo = {
-  firstName: 'John',
+  firstName: 'Kate',
   lastName: 'Doe',
-  email: 'johndoe@gmail.com',
+  email: 'katedoe@gmail.com',
   password: '12345678',
   role: mongoose.Types.ObjectId(),
 };
