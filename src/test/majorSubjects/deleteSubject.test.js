@@ -44,16 +44,15 @@ let subject2;
 
 const route = '/api/v1/majorsubject';
 
-before(async () => {
-  subject = await MajorSubject.create(testSubject);
-  subject2 = await MajorSubject.create(testSubject2);
-});
-after(async () => {
-  await MajorSubject.deleteMany({ name: testSubject.name });
-  await MajorSubject.deleteMany({ name: testSubject2.name });
-});
-
 describe('DELETE A MAJOR SUBJECT', () => {
+  before(async () => {
+    subject = await MajorSubject.create(testSubject);
+    subject2 = await MajorSubject.create(testSubject2);
+  });
+  after(async () => {
+    await MajorSubject.deleteMany({ name: testSubject.name });
+    await MajorSubject.deleteMany({ name: testSubject2.name });
+  });
   describe(`/DELETE ${route}`, () => {
     it('it should return unauthorized if user is not logged in', (done) => {
       chai.request(app)

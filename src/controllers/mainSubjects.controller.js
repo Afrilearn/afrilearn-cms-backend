@@ -28,7 +28,7 @@ export default class MajorSubjectController {
   }
 
   /**
- * Handles fetching of mjor subjects
+ * Handles fetching of major subjects
  * @param {ServerRequest} req
  * @param {ServerResponse} res
  * @returns {ServerResponse} response

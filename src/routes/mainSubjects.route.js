@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import AuthMiddleware from '../middlewares/auth.middleware';
-import MajorSubjectController from '../controllers/major-subjects.controller';
-import MajorSubjectMiddleware from '../middlewares/major-subject.middleware';
-import AddMajorSubjectValidator from '../validations/add-major-subject.validator';
+import MajorSubjectController from '../controllers/mainSubjects.controller';
+import MajorSubjectMiddleware from '../middlewares/majorSubject.middleware';
+import AddMajorSubjectValidator from '../validations/majorSubject.validator';
 
 const router = Router();
 

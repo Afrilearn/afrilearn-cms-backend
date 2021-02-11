@@ -1,5 +1,5 @@
 import { check, validationResult } from 'express-validator';
-import Response from '../utils/response.utils'
+import Response from '../utils/response.utils';
 
 /**
  *Contains Major Subject Validator
@@ -23,7 +23,7 @@ class AddMajorSubject {
         .isEmpty()
         .withMessage('Subject Name cannot be empty')
         .isAlphanumeric()
-        .withMessage('Subject Name should be a valid name')
+        .withMessage('Subject Name should be a valid name'),
     ];
   }
 

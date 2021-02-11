@@ -4,6 +4,7 @@ import userRouter from './users.route';
 import coursesRouter from './courses.route';
 import mainSubjectsRouter from './mainSubjects.route';
 import termRouter from './terms.route';
+import lessonRouter from './lessons.route';
 import courseCategoryRouter from './courseCategories.route';
 
 const router = Router();
@@ -14,5 +15,6 @@ router.use('/courses', coursesRouter);
 router.use('/majorsubject', mainSubjectsRouter);
 router.use('/term', termRouter);
 router.use('/course_categories', courseCategoryRouter);
+router.use('/lesson', lessonRouter);
 
 export default router;
