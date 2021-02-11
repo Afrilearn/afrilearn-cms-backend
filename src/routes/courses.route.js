@@ -68,4 +68,15 @@ router.get(
   CoursesController.fetchCourseSubjects,
 );
 
+router.delete(
+  '/:courseId/subjects/:subjectId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  ParamsValidator.validateMongooseId('courseId'),
+  ParamsValidator.validateMongooseId('subjectId'),
+  ParamsValidator.mongooseIdValidationResult,
+  CoursesMiddleware.checkCourseSubjectLinked,
+  CoursesController.deleteCourseSubject,
+);
+
 export default router;
