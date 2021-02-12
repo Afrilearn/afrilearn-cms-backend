@@ -19,6 +19,7 @@ const QuestionSchema = new mongoose.Schema(
     },
     question_position: {
       type: String,
+      default: 'above'
     },
     options: { type: Array },
     images: { type: Array },

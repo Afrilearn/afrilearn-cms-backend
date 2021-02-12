@@ -23,8 +23,6 @@ router.use('/term', termRouter);
 router.use('/course_categories', courseCategoryRouter);
 router.use('/lesson', lessonRouter);
 
-router.use('/lesson', lessonRoute);
-
 router.use('/plan', paymentRoute);
 
 router.use('/admin', adminRoute);
