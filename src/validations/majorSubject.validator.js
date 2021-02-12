@@ -22,7 +22,7 @@ class AddMajorSubject {
         .not()
         .isEmpty()
         .withMessage('Subject Name cannot be empty')
-        .isAlphanumeric()
+        .isString()
         .withMessage('Subject Name should be a valid name'),
     ];
   }

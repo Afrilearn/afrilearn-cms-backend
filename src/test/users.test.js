@@ -21,6 +21,15 @@ const user = {
   password: '12345678',
   role: mongoose.Types.ObjectId(),
 };
+
+const userTwo = {
+  firstName: 'Kate',
+  lastName: 'Doe',
+  email: 'katedoe@gmail.com',
+  password: '12345678',
+  role: mongoose.Types.ObjectId(),
+};
+
 const userUpdate = {
   firstName: 'Janet',
   lastName: 'Dame',
@@ -377,7 +386,7 @@ describe('USERS', () => {
     let userId;
     beforeEach(async () => {
       await Users.deleteMany();
-      const createdUser = await Users.create(user);
+      const createdUser = await Users.create(userTwo);
       userId = createdUser._id;
     });
     afterEach((done) => {
