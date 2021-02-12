@@ -105,11 +105,11 @@ class LessonController {
     }
   }
 
-  static async remove(req, res) {
-    const { _id } = req.params;
+  static async removeQuiz(req, res) {
+    const { quizId } = req.params;
 
     try {
-      const result = await Question.findByIdAndRemove(_id);
+      const result = await Question.findByIdAndRemove(quizId);
       res.status(202).json({
         status: 'success',
         data: result,
@@ -122,8 +122,8 @@ class LessonController {
     }
   }
 
-  static async modify(req, res) {
-    const { _id } = req.params;
+  static async modifyQuiz(req, res) {
+    const { quizId } = req.params;
     const {
       question,
       question_image,
@@ -145,7 +145,7 @@ class LessonController {
     };
 
     try {
-      const updatedDoc = Question.findByIdAndUpdate(_id, newDoc, { new: true });
+      const updatedDoc = Question.findByIdAndUpdate(quizId, newDoc, { new: true });
       res.status(201).json({
         status: 'success',
         data: updatedDoc,

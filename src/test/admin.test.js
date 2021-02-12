@@ -1,6 +1,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import Sinonchai from 'sinon-chai';
+import EnrolledCourses from '../db/models/enrolledCourses.model';
 
 import app from '../index';
 
@@ -15,18 +16,25 @@ const userCredentials = {
   email: 'david@yahoo.com',
   password: 'garyTheSnail',
 };
-// now let's login the user and get a token before we run any tests
-before((done) => {
-  chai
-    .request(app)
-    .post('/login')
-    .send(userCredentials)
-    .end((err, res) => {
-      res.should.have.status(200);
-      token = res.body.token;
-      done();
-    });
-});
+
+const invalidToken = 'invalid.jwt.token';
+const staffToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209ab2792e63fc841de3c',
+  'Staff User',
+);
+const moderatorToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209c32792e63fc841de3d',
+  'Moderator User',
+);
+const adminToken = userUtils.generateToken(
+  mongoose.Types.ObjectId(),
+  '602209d72792e63fc841de3e',
+  'Administrator User',
+);
+
+const baseUrl = '/api/v1/admin/';
 
 describe('ADMIN Endpoint', () => {
   describe('GET/api/v1/admin/', () => {
