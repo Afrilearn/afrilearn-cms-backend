@@ -1,7 +1,7 @@
 import chai from 'chai';
+import sinon from 'sinon';
 import chaiHttp from 'chai-http';
 import Sinonchai from 'sinon-chai';
-import sinon from 'sinon';
 import mongoose from 'mongoose';
 import Users from '../db/models/cmsUsers.model';
 import userUtils from '../utils/user.utils';
@@ -49,7 +49,7 @@ describe('No Matching Endpoint', () => {
     it('should throw 404 error when endpoint is not found', (done) => {
       chai
         .request(app)
-        .post('/api/v1/auth/none')
+        .post('/api/v1/AuthMiddleware/none')
         .end((err, res) => {
           res.should.have.status(404);
           done();

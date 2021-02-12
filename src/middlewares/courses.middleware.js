@@ -89,4 +89,49 @@ export default class CoursesMiddleware {
       'Related subject',
     );
   }
+
+  /**
+   * @memberof CategoryMiddleware
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @param {*} next - Passes control to next function
+   * @returns {JSON} Error response if related subject doesn't exist
+   * @returns {Function} passes control to the next function if related
+   * subject exists
+   */
+  static async checkCourseSubjectLinked(req, res, next) {
+    GeneralServices.checkDocExistence(
+      req,
+      res,
+      next,
+      Subjects,
+      {
+        courseId: req.params.courseId,
+        mainSubjectId: req.params.subjectId,
+      },
+      'Related subject',
+    );
+  }
+
+  /**
+   * @memberof CoursesMiddleware
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @param {*} next - Passes control to next function
+   * @returns {JSON} Error response if related past question doesn't exist
+   * @returns {Function} passes control to the next function if related
+   * past question exists
+   */
+  static async checkCoursePastQuestionLinked(req, res, next) {
+    GeneralServices.checkDocExistence(
+      req,
+      res,
+      next,
+      RelatedPastQuestions,
+      {
+        _id: req.params.pastQuestionId,
+      },
+      'Related past question',
+    );
+  }
 }

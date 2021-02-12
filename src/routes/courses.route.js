@@ -17,6 +17,13 @@ router.post(
   CoursesController.createCourse,
 );
 
+router.get(
+  '/',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  CoursesController.fetchCourses,
+);
+
 router.patch(
   '/:courseId',
   AuthMiddleware.validateToken,
@@ -57,6 +64,46 @@ router.post(
   CourseValidator.subjectValidationResult,
   CoursesMiddleware.checkSubjectUnlinked,
   CoursesController.linkSubject,
+);
+
+router.get(
+  '/:courseId/subjects',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  ParamsValidator.validateMongooseId('courseId'),
+  ParamsValidator.mongooseIdValidationResult,
+  CoursesController.fetchCourseSubjects,
+);
+
+router.delete(
+  '/:courseId/subjects/:subjectId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  ParamsValidator.validateMongooseId('courseId'),
+  ParamsValidator.validateMongooseId('subjectId'),
+  ParamsValidator.mongooseIdValidationResult,
+  CoursesMiddleware.checkCourseSubjectLinked,
+  CoursesController.deleteCourseSubject,
+);
+
+router.get(
+  '/:courseId/pastquestions',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  ParamsValidator.validateMongooseId('courseId'),
+  ParamsValidator.mongooseIdValidationResult,
+  CoursesController.fetchCoursePastQuestions,
+);
+
+router.delete(
+  '/:courseId/pastquestions/:pastQuestionId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  ParamsValidator.validateMongooseId('courseId'),
+  ParamsValidator.validateMongooseId('pastQuestionId'),
+  ParamsValidator.mongooseIdValidationResult,
+  CoursesMiddleware.checkCoursePastQuestionLinked,
+  CoursesController.deleteCoursePastQuestion,
 );
 
 export default router;
