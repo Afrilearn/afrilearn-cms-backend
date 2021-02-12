@@ -86,4 +86,24 @@ router.delete(
   CoursesController.deleteCourseSubject,
 );
 
+router.get(
+  '/:courseId/pastquestions',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  ParamsValidator.validateMongooseId('courseId'),
+  ParamsValidator.mongooseIdValidationResult,
+  CoursesController.fetchCoursePastQuestions,
+);
+
+router.delete(
+  '/:courseId/pastquestions/:pastQuestionId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  ParamsValidator.validateMongooseId('courseId'),
+  ParamsValidator.validateMongooseId('pastQuestionId'),
+  ParamsValidator.mongooseIdValidationResult,
+  CoursesMiddleware.checkCoursePastQuestionLinked,
+  CoursesController.deleteCoursePastQuestion,
+);
+
 export default router;

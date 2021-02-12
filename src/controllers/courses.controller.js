@@ -143,7 +143,7 @@ export default class CoursesController {
    * @memberof CoursesController
    * @param {*} req - Request Payload
    * @param {*} res - Response object
-   * @returns {Response.Success} if successful course object is deleted succesfully
+   * @returns {Response.Success} if successful course subject is deleted succesfully
    * @returns {Response.InternalServerError} if error occurs
    */
   static async deleteCourseSubject(req, res) {
@@ -158,6 +158,46 @@ export default class CoursesController {
       });
     } catch (err) {
       Response.InternalServerError(res, 'Error deleting course subjects');
+    }
+  }
+
+  /**
+   * @memberof CoursesController
+   * @param {*} req - Request Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} returns array of populated past questions
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async fetchCoursePastQuestions(req, res) {
+    try {
+      const pastQuestions = await RelatedPastQuestions.find({
+        courseId: req.params.courseId,
+      }).populate('pastQuestionTypeId');
+
+      Response.Success(res, { pastQuestions });
+    } catch (err) {
+      Response.InternalServerError(res, 'Error fetching course past questions');
+    }
+  }
+
+  /**
+   * @memberof CoursesController
+   * @param {*} req - Request Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} if successful, past question is deleted succesfully
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async deleteCoursePastQuestion(req, res) {
+    try {
+      await RelatedPastQuestions.deleteOne({
+        _id: req.params.pastQuestionId,
+      });
+
+      Response.Success(res, {
+        message: 'The past question has been deleted successfully',
+      });
+    } catch (err) {
+      Response.InternalServerError(res, 'Error deleting past question');
     }
   }
 }

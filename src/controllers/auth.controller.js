@@ -61,7 +61,6 @@ export default class AuthController {
         user._id,
         user.role,
         user.firstName,
-        user.lastName,
       );
       Helper.setCookie(res, token);
       const data = { token, user };
