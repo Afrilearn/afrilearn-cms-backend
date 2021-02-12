@@ -658,6 +658,103 @@ describe('COURSES', () => {
     });
   });
 
+  describe(`/GET ${baseUrl}`, () => {
+    describe('FETCH COURSES SUCCESSFULLY', () => {
+      beforeEach(async () => {
+        await Courses.deleteMany();
+        const dbCourses = [];
+        for (let i = 1; i < 4; i += 1) {
+          dbCourses.push(
+            (async () => {
+              await Courses.create({ ...course, name: `course${i}` });
+            })(),
+          );
+        }
+
+        await Promise.all(dbCourses);
+      });
+      afterEach((done) => {
+        Courses.deleteMany((err) => {
+          if (!err) done();
+        });
+      });
+
+      it('should fetch course categories for all users', (done) => {
+        chai
+          .request(app)
+          .get(baseUrl)
+          .set('token', staffToken)
+          .end((err, res) => {
+            res.status.should.equals(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have.property('courses').to.have.length(3);
+            const checks = res.body.data.courses.map((course) => course.name);
+
+            for (let i = 1; i < 4; i += 1) {
+              checks.should.include(`course${i}`);
+            }
+            done();
+          });
+      });
+    });
+
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub;
+      before(() => {
+        stub = sinon.stub(Courses, 'find').throws(new Error('error'));
+      });
+      after(() => {
+        stub.restore();
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .get(baseUrl)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Error fetching courses');
+            done();
+          });
+      });
+    });
+
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .get(baseUrl)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have
+              .property('status')
+              .to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .get(baseUrl)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have
+              .property('status')
+              .to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+  });
+
   describe(`/DELETE ${baseUrl}/:courseId`, () => {
     let courseId;
     beforeEach(async () => {

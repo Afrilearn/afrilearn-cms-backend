@@ -30,6 +30,23 @@ export default class CoursesController {
    * @memberof CoursesController
    * @param {*} req - Payload
    * @param {*} res - Response object
+   * @returns {Response.Success} on success, returns all courses
+   * @returns {Response.internalServerError} on error, returns json error object
+   */
+  static async fetchCourses(req, res) {
+    try {
+      const courses = await Courses.find();
+
+      Response.Success(res, { courses });
+    } catch (err) {
+      Response.InternalServerError(res, 'Error fetching courses');
+    }
+  }
+
+  /**
+   * @memberof CoursesController
+   * @param {*} req - Payload
+   * @param {*} res - Response object
    * @returns {Response.Success} if no error occurs
    * @returns {Response.internalServerError} if error occurs
    */

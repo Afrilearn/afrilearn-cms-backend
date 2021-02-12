@@ -17,6 +17,13 @@ router.post(
   CoursesController.createCourse,
 );
 
+router.get(
+  '/',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  CoursesController.fetchCourses,
+);
+
 router.patch(
   '/:courseId',
   AuthMiddleware.validateToken,
