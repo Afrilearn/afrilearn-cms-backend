@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import authRouter from './auth.route';
-import lessonRoute from './lesson.route';
 import paymentRoute from './payment.route';
-import adminRoute from './admin.route';
+// import adminRoute from './admin.route';
 import pqCategoryRouter from './pastQuestionCategory.route';
 import userRouter from './users.route';
 import coursesRouter from './courses.route';
@@ -10,7 +9,6 @@ import mainSubjectsRouter from './mainSubjects.route';
 import termRouter from './terms.route';
 import lessonRouter from './lessons.route';
 import courseCategoryRouter from './courseCategories.route';
-
 
 const router = Router();
 
@@ -23,8 +21,8 @@ router.use('/term', termRouter);
 router.use('/course_categories', courseCategoryRouter);
 router.use('/lesson', lessonRouter);
 
-router.use('/plan', paymentRoute);
+router.use('/payments', paymentRoute);
 
-router.use('/admin', adminRoute);
+// router.use('/admin', adminRoute);
 
 export default router;

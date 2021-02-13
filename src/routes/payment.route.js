@@ -1,42 +1,54 @@
 import { Router } from 'express';
 import PaymentController from '../controllers/payment.controller';
-import Validator from '../middlewares/auth.middleware';
-import checkIsAdminStatus from '../middlewares/isAdmin.middleware';
+import PaymentValidator from '../validations/payment.validator';
+import AuthMiddleware from '../middlewares/auth.middleware';
+import ParamsValidator from '../validations/params.validator';
+import PaymentMiddleware from '../middlewares/payments.middleware';
 
 const router = Router();
 
 router.get(
-  '/payment-plan',
-  Validator,
-  checkIsAdminStatus,
-  PaymentController.getAllPaymentPlan,
+  '/plans',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess(),
+  PaymentController.fetchAllPaymentPlans,
 );
 router.get(
-  '/payment-transactions',
-  Validator,
-  checkIsAdminStatus,
-  PaymentController.getAllTransactions,
+  '/transactions',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess(),
+  PaymentController.fetchAllPaymentTransactions,
 );
 
 router.post(
-  '/add-payment-plan',
-  Validator,
-  checkIsAdminStatus,
+  '/plans',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess(),
+  PaymentValidator.validatePaymentPlanData(),
+  PaymentValidator.paymentPlanValidationResult,
+  PaymentMiddleware.checkPaymentPlanInexistence,
   PaymentController.addPaymentPlan,
 );
 
-router.put(
-  '/edit-payment-plan/:id',
-  Validator,
-  checkIsAdminStatus,
-  PaymentController.modifyPaymentPlan,
+router.patch(
+  '/plans/:paymentPlanId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess(),
+  ParamsValidator.validateMongooseId('paymentPlanId'),
+  PaymentValidator.validatePaymentPlanUpdateData(),
+  PaymentValidator.paymentPlanUpdateValidationResult,
+  PaymentMiddleware.checkPaymentPlanExistence,
+  PaymentController.editPaymentPlan,
 );
 
 router.delete(
-  '/remove-payment-plan/:id',
-  Validator,
-  checkIsAdminStatus,
-  PaymentController.removePlan,
+  '/plans/:paymentPlanId',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess(),
+  ParamsValidator.validateMongooseId('paymentPlanId'),
+  ParamsValidator.mongooseIdValidationResult,
+  PaymentMiddleware.checkPaymentPlanExistence,
+  PaymentController.deletePaymentPlan,
 );
 
 export default router;

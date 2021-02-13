@@ -42,7 +42,7 @@ class AddPQCategory {
    * @memberof Login
    * @returns {JSON} - A JSON success response.
    */
-  static async myValidationResult(req, res, next) {
+  static myValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);

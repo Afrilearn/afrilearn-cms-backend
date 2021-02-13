@@ -1,107 +1,66 @@
 /* eslint-disable require-jsdoc */
-import PaymentPlan from '../db/models/paymentPlans.model';
-import CourseCategory from '../db/models/courseCategories.model';
+import PaymentPlans from '../db/models/paymentPlans.model';
 import Payment from '../db/models/payments.model';
+import Response from '../utils/response.utils';
 
 class PaymentController {
-  static async getAllPaymentPlan(req, res) {
+  static async fetchAllPaymentPlans(req, res) {
     try {
-      const plans = PaymentPlan.find();
-      res.status(200).json({
-        status: 'success',
-        data: plans,
-      });
+      const paymentPlans = await PaymentPlans.find();
+      Response.Success(res, { paymentPlans });
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        data: error.message,
-      });
+      Response.InternalServerError(res, 'Error fetching payment plans');
     }
   }
 
-  static async getAllTransactions(req, res) {
+  static async fetchAllPaymentTransactions(req, res) {
     try {
-      const plans = Payment.find();
-      res.status(200).json({
-        status: 'success',
-        data: plans,
-      });
+      const paymentTransactions = await Payment.find();
+      Response.Success(res, { paymentTransactions });
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        data: error.message,
-      });
+      Response.InternalServerError(res, 'Error fetching payment transactions');
     }
   }
 
   static async addPaymentPlan(req, res) {
-    const {
-      name, amount, duration, category,
-    } = req.body;
     try {
-      const isCategory = CourseCategory.findOne(category);
-      let catId;
-      if (isCategory) {
-        catId = isCategory._id;
-      }
-      const newCategory = new PaymentPlan({
+      const {
+        name, amount, duration, category,
+      } = req.body;
+      const paymentPlan = await PaymentPlans.create({
+        name, amount, duration, category,
+      });
+      Response.Success(res, { paymentPlan }, 201);
+    } catch (error) {
+      Response.InternalServerError(res, 'Error creating payment plan');
+    }
+  }
+
+  static async editPaymentPlan(req, res) {
+    try {
+      const { name, amount, duration } = req.body;
+      const { dbResult } = req;
+      dbResult.set({
         name,
         amount,
         duration,
-        category: catId,
       });
-      const plans = await newCategory.save();
-      res.status(201).json({
-        status: 'success',
-        data: plans,
-      });
+      const paymentPlan = await dbResult.save();
+
+      Response.Success(res, { paymentPlan });
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        data: error.message,
-      });
+      Response.InternalServerError(res, 'Error editing payment plan');
     }
   }
 
-  static async modifyPaymentPlan(req, res) {
-    const { name, amount, duration } = req.body;
-    const { id } = req.params;
+  static async deletePaymentPlan(req, res) {
     try {
-      const editedPlan = await PaymentPlan.findOneAndUpdate(
-        { id },
-        {
-          name,
-          amount,
-          duration,
-        },
-      );
+      const { id } = req.params;
+      await PaymentPlans.findByIdAndRemove(id);
 
-      res.status(201).json({
-        status: 'success',
-        data: editedPlan,
-      });
+      Response.Success(res, { message: 'Payment plan deleted successfully' });
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        data: error.message,
-      });
-    }
-  }
-
-  static async removePlan(req, res) {
-    const { id } = req.params;
-    try {
-      const removed = PaymentPlan.findByIdAndRemove(id);
-
-      res.status(204).json({
-        status: 'success',
-        data: removed,
-      });
-    } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        data: error.message,
-      });
+      Response.InternalServerError(res, 'Error deleting payment plan');
     }
   }
 }

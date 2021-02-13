@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
-import EnrolledCourse from "../db/models/enrolledCourses.model";
-import Response from "../utils/response.utils";
+import EnrolledCourse from '../db/models/enrolledCourses.model';
+import Response from '../utils/response.utils';
 
 class AdminController {
   static async allEnrolledCourse(req, res) {
@@ -9,7 +9,7 @@ class AdminController {
       const courses = EnrolledCourse.find({ id });
       Response.Success(res, { courses });
     } catch (error) {
-      Response.InternalServerError(res, "Error fetching enrolled courses");
+      Response.InternalServerError(res, 'Error fetching enrolled courses');
     }
   }
 }

@@ -15,7 +15,7 @@ export default class PQCategoryMiddleware {
     const isCategoryExists = await PQCategory.findOne({ name: req.body.name });
     if (isCategoryExists) {
       return Response.ConflictError(res, 'category already exists');
-      }    
-    return next();
     }
+    return next();
+  }
 }

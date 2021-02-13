@@ -50,7 +50,6 @@ router.get(
   AuthMiddleware.grantAccess(),
   ParamsValidator.validateMongooseId('userId'),
   ParamsValidator.mongooseIdValidationResult,
-  UserController.fetchEnrolledCourses,
 );
 
 export default router;

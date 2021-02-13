@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 const LessonSchema = new mongoose.Schema(
   {
     subjectId: {
