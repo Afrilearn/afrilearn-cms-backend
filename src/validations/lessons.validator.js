@@ -8,7 +8,7 @@ import HelperUtils from '../utils/helpers.utils';
  * @class LessonValidator
  */
 export default class LessonValidator {
-/**
+  /**
    * @returns {Object} error object with errors arrays if lesson data is invalid
    */
   static validateLessonEditData() {
@@ -56,7 +56,7 @@ export default class LessonValidator {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static async lessonEditValidationResult(req, res, next) {
+  static lessonEditValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);

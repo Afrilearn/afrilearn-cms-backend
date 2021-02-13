@@ -57,7 +57,7 @@ export default class CourseValidator {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static async courseCreationValidationResult(req, res, next) {
+  static courseCreationValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
@@ -107,7 +107,7 @@ export default class CourseValidator {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static async courseEditValidationResult(req, res, next) {
+  static courseEditValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
@@ -139,7 +139,7 @@ export default class CourseValidator {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static async pastQuestionValidationResult(req, res, next) {
+  static pastQuestionValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
@@ -171,7 +171,7 @@ export default class CourseValidator {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static async subjectValidationResult(req, res, next) {
+  static subjectValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);

@@ -11,35 +11,30 @@ export default class UserValidators {
   /**
    * @returns {Object} error object with errors arrays if user data is invalid
    */
-  static validateEditUserData() {
+  static validatePaymentPlanData() {
     return [
-      check('firstName')
-        .optional()
-        .isString()
-        .withMessage('First name must be a string')
-        .not()
-        .isEmpty()
-        .withMessage('First name cannot be empty'),
-      check('lastName')
-        .optional()
-        .isString()
-        .withMessage('Last name must be a string')
-        .not()
-        .isEmpty()
-        .withMessage('Last name cannot be empty'),
-      check('email').optional().isEmail().withMessage('Invalid email address'),
-      check('password')
-        .not()
+      check('name')
         .exists()
-        .withMessage('Cannot change password through this endpoint'),
-      check('role')
-        .optional()
+        .withMessage('Plan name is required')
         .isString()
-        .withMessage('Role must be a string')
+        .withMessage('Plan name must be a string')
         .not()
         .isEmpty()
-        .withMessage('Role cannot be empty')
-        .custom(HelperUtils.validateMongooseId('Role')),
+        .withMessage('Plan name cannot be empty'),
+      check('amount')
+        .exists()
+        .withMessage('Plan amount is required')
+        .isNumeric()
+        .withMessage('Plan amount must be a number'),
+      check('duration')
+        .exists()
+        .withMessage('Plan duration is required')
+        .isNumeric()
+        .withMessage('Plan duration must be a number'),
+      check('category')
+        .exists()
+        .withMessage('Plan category is required')
+        .custom(HelperUtils.validateMongooseId('Plan category')),
     ];
   }
 
@@ -50,7 +45,7 @@ export default class UserValidators {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static editUserValidationResult(req, res, next) {
+  static paymentPlanValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
@@ -62,26 +57,26 @@ export default class UserValidators {
   /**
    * @returns {Object} error object with errors arrays if password change data is invalid
    */
-  static validateChangePasswordData() {
+  static validatePaymentPlanUpdateData() {
     return [
-      check('userId')
-        .exists()
-        .withMessage('User id is required')
+      check('name')
+        .optional()
         .isString()
-        .withMessage('User id must be a string')
+        .withMessage('Plan name must be a string')
         .not()
         .isEmpty()
-        .withMessage('User id cannot be empty')
-        .custom(HelperUtils.validateMongooseId('User id')),
-      check('password')
-        .exists()
-        .withMessage('Password is required')
-        .isString()
-        .withMessage('Password must be a string')
-        .isLength({ min: 8 })
-        .withMessage('Password length must be at least 8 characters')
-        .trim()
-        .escape(),
+        .withMessage('Plan name cannot be empty'),
+      check('amount')
+        .optional()
+        .isNumeric()
+        .withMessage('Plan amount must be a number'),
+      check('duration')
+        .optional()
+        .isNumeric()
+        .withMessage('Plan duration must be a number'),
+      check('category')
+        .optional()
+        .custom(HelperUtils.validateMongooseId('Plan category')),
     ];
   }
 
@@ -92,7 +87,7 @@ export default class UserValidators {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static changePasswordValidationResult(req, res, next) {
+  static paymentPlanUpdateValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);

@@ -27,7 +27,7 @@ export default class ParamsValidator {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static async mongooseIdValidationResult(req, res, next) {
+  static mongooseIdValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);

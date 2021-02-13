@@ -30,7 +30,7 @@ export default class TermValidator {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static async termCreationValidationResult(req, res, next) {
+  static termCreationValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
@@ -62,7 +62,7 @@ export default class TermValidator {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static async termEditValidationResult(req, res, next) {
+  static termEditValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);

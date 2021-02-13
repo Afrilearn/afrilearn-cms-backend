@@ -44,4 +44,12 @@ router.get(
   AfrilearnUserController.fetchAllAfrilearnUsers,
 );
 
+router.get(
+  '/:userId/enrolled-courses',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess(),
+  ParamsValidator.validateMongooseId('userId'),
+  ParamsValidator.mongooseIdValidationResult,
+);
+
 export default router;
