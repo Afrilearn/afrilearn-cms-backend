@@ -1,74 +1,79 @@
-import { Router } from "express";
-import AuthMiddleware from "../middlewares/auth.middleware";
-import LessonController from "../controllers/lessons.controller";
-import LessonValidator from "../validations/lessons.validator";
-import ParamsValidator from "../validations/params.validator";
+import { Router } from 'express';
+import AuthMiddleware from '../middlewares/auth.middleware';
+import LessonMiddleware from '../middlewares/lesson.middleware';
+import LessonController from '../controllers/lessons.controller';
+import LessonValidator from '../validations/lessons.validator';
+import ParamsValidator from '../validations/params.validator';
 
 const router = Router();
 
-router.get(
-  "/",
+router.post(
+  '/',
   AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess("602209ab2792e63fc841de3c"),
-  LessonController.fetchAllLessons
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  LessonValidator.validateLessonCreationData(),
+  LessonValidator.lessonCreationValidationResult,
+  LessonController.createLesson,
+);
+
+router.get(
+  '/',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  LessonController.fetchAllLessons,
 );
 
 router.put(
-  "/:id",
+  '/:id',
   AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess("602209ab2792e63fc841de3c"),
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   LessonValidator.validateLessonEditData(),
   LessonValidator.lessonEditValidationResult,
-  LessonController.updateLesson
+  LessonController.updateLesson,
 );
 
 router.delete(
-  "/:id",
+  '/:id',
   AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess("602209ab2792e63fc841de3c"),
-  LessonController.deleteLesson
-);
-
-router.put(
-  "/video",
-  AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess("602209ab2792e63fc841de3c"),
-  LessonController.addVideo
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  LessonController.deleteLesson,
 );
 
 router.get(
-  "/quiz",
+  '/:lessonId/quiz',
   AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess("602209ab2792e63fc841de3c"),
-  LessonController.viewQuiz
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
+  LessonController.viewLessonQuiz,
 );
 
 router.post(
-  "/quiz",
+  '/quiz',
   AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess("602209ab2792e63fc841de3c"),
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   LessonValidator.validateQuiz(),
   LessonValidator.quizValidationResult,
-  LessonController.createQuiz
+  LessonMiddleware.checkQuestionExists,
+  LessonController.createQuiz,
 );
 
 router.put(
-  "/quiz/:quizId",
+  '/quiz/:quizId',
   AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess("602209ab2792e63fc841de3c"),
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   ParamsValidator.validateMongooseId('quizId'),
+  ParamsValidator.mongooseIdValidationResult,
   LessonValidator.validateQuizUpdate(),
   LessonValidator.quizUpdateValidationResult,
-  LessonController.modifyQuiz
+  LessonController.modifyQuiz,
 );
 
 router.delete(
-  "/quiz/:quizId",
+  '/quiz/:quizId',
   AuthMiddleware.validateToken,
-  AuthMiddleware.grantAccess("602209ab2792e63fc841de3c"),
+  AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   ParamsValidator.validateMongooseId('quizId'),
   ParamsValidator.mongooseIdValidationResult,
-  LessonController.removeQuiz
+  LessonController.removeQuiz,
 );
 
 export default router;

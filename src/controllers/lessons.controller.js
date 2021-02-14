@@ -1,5 +1,6 @@
 import Response from '../utils/response.utils';
 import Lesson from '../db/models/lessons.model';
+import Question from '../db/models/questions.model';
 
 /**
  * This class creates the lesson controller
@@ -18,6 +19,22 @@ export default class LessonController {
       return Response.Success(res, { lessons: result });
     } catch (err) {
       Response.InternalServerError(res, 'Error fetching lessons');
+    }
+  }
+
+  /**
+ * Handles lesson creation
+ * @param {ServerRequest} req
+ * @param {ServerResponse} res
+ * @returns {ServerResponse} response
+ */
+  static async createLesson(req, res) {
+    try {
+      const result = await Lesson.create({ ...req.body });
+
+      return Response.Success(res, { lesson: result }, 201);
+    } catch (error) {
+      return Response.InternalServerError(res, 'Could not create lesson');
     }
   }
 
@@ -59,153 +76,75 @@ export default class LessonController {
       return Response.InternalServerError(res, 'Could not delete lesson');
     }
   }
-  
+
   /**
-   * Create account for a user.
+   * View lesson quiz questions
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
    * @memberof LessonController
    * @returns {JSON} - A JSON success response.
    */
-
-  static async addVideo(req, res) {
-    const { _id, videoUrl } = req.body;
+  static async viewLessonQuiz(req, res) {
     try {
-      const result = await Lesson.updateOne(
-        { _id },
-        { $addToSet: { videoUrls: [...videoUrl] } },
-      );
-      res.status(200).json({
-        status: 'success',
-        data: result,
-      });
+      const quiz = await Question.find({ lessonId: req.params.lessonId });
+      return Response.Success(res, { questions: quiz });
     } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        error: error.message,
-      });
+      return Response.InternalServerError('Error fetching questions');
     }
   }
 
   /**
-   * Create account for a user.
+   * Add questions to a lesson
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
    * @memberof LessonController
    * @returns {JSON} - A JSON success response.
    */
-
-  static async viewQuiz(req, res) {
-    try {
-      const quiz = await Question.find();
-      res.status(200).json({
-        status: 'success',
-        data: quiz,
-      });
-    } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        error: error.message,
-      });
-    }
-  }
-
-  /**
-   * Create account for a user.
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof LessonController
-   * @returns {JSON} - A JSON success response.
-   */
-
   static async createQuiz(req, res) {
-    const { _id } = req.data;
-    const {
-      lessonId,
-      question,
-      question_image,
-      question_position,
-      options,
-      images,
-      correct_option,
-      explanation,
-    } = req.body;
-
     try {
-      const newQuiz = await Question.create({
-        lessonId,
-        creator_Id: _id,
-        question,
-        question_image,
-        question_position,
-        options,
-        images,
-        correct_option,
-        explanation,
-      });
-      newQuiz.save();
-      res.status(201).json({
-        status: 'success',
-        data: newQuiz,
-      });
+      const result = await Question.create({ ...req.body });
+      return Response.Success(res, { question: result }, 201);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        error: error.message,
-      });
+      return Response.InternalServerError(res, 'could not add quiz');
     }
   }
 
+  /**
+   * Remove question from a lesson
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   */
   static async removeQuiz(req, res) {
-    const { quizId } = req.params;
-
     try {
-      const result = await Question.findByIdAndRemove(quizId);
-      res.status(202).json({
-        status: 'success',
-        data: result,
-      });
+      const { quizId } = req.params;
+      const quiz = await Question.findOne({ _id: quizId });
+      if (!quiz) return Response.NotFoundError(res, 'Question does not exist');
+      await Question.findByIdAndRemove(quizId);
+      return Response.Success(res, { message: 'question removed successfully' });
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        error: error.message,
-      });
+      return Response.InternalServerError(res, 'error removing question');
     }
   }
 
+  /**
+   * Update question
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   */
   static async modifyQuiz(req, res) {
-    const { quizId } = req.params;
-    const {
-      question,
-      question_image,
-      question_position,
-      options,
-      images,
-      correct_option,
-      explanation,
-    } = req.body;
-
-    const newDoc = {
-      question,
-      question_image,
-      question_position,
-      options,
-      images,
-      correct_option,
-      explanation,
-    };
-
     try {
-      const updatedDoc = Question.findByIdAndUpdate(quizId, newDoc, { new: true });
-      res.status(201).json({
-        status: 'success',
-        data: updatedDoc,
-      });
+      const { quizId } = req.params;
+      const quiz = await Question.findOne({ _id: quizId });
+      if (!quiz) return Response.NotFoundError(res, 'Question does not exist');
+      const quizValues = { $set: req.body };
+      await Question.updateOne({ _id: quizId }, quizValues);
+      return Response.Success(res, { message: 'Question updated successfully' }, 200);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        error: error.message,
-      });
+      return Response.InternalServerError(res, 'Could not update question');
     }
   }
 }

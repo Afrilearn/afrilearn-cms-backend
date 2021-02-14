@@ -28,14 +28,11 @@ const EnrolledCourseSchema = new mongoose.Schema(
     },
   },
   { timestamps: true },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
-
-EnrolledCourseSchema.methods.toJSON = () => {
-  const enrolledCourse = this;
-  const enrolledCourseObject = enrolledCourse.toObject();
-  enrolledCourseObject.paymentIsActive = enrolledCourseObject.endDate > Date.now();
-  return enrolledCourseObject;
-};
 
 const EnrolledCourse = mongoose.model('enrolledCourse', EnrolledCourseSchema);
 

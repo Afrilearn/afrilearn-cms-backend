@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 const LessonSchema = new mongoose.Schema(
   {
     subjectId: {
@@ -34,6 +35,14 @@ const LessonSchema = new mongoose.Schema(
         },
       },
     ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     toJSON: { virtuals: true },
