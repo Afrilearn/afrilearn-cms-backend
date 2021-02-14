@@ -10,12 +10,13 @@ export default class PastQuestionsCategoryController {
      * Retrieves one past question category
      * @param {Object} req
      * @param {Object} res
-     * @param {Callback} next
      * @returns {JSON} past question category
      */
   static async getOneCategory(req, res) {
     const pqCategoryId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) { return Response.BadRequestError(res, 'CategoryId is invalid'); }
+    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) { 
+      return Response.BadRequestError(res, 'CategoryId is invalid'); 
+    }
     try {
       const pqCategory = await PQCategory.findById(pqCategoryId);
       return pqCategory

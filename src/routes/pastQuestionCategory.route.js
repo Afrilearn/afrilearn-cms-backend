@@ -7,7 +7,7 @@ import AddPQCategoryValidator from '../validations/pastQuestionsCategory.validat
 const router = Router();
 
 router.post(
-  '',
+  '/',
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
   AddPQCategoryValidator.validateData(),
@@ -17,7 +17,7 @@ router.post(
 );
 
 router.get(
-  '',
+  '/',
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   PQCategoryController.getAllCategories,

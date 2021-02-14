@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRouter from './auth.route';
 import lessonRouter from './lessons.route';
+import paymentRoute from './payment.route';
 import pqCategoryRouter from './pastQuestionCategory.route';
 import userRouter from './users.route';
 import coursesRouter from './courses.route';
@@ -18,5 +19,6 @@ router.use('/majorsubject', mainSubjectsRouter);
 router.use('/term', termRouter);
 router.use('/course_categories', courseCategoryRouter);
 router.use('/lesson', lessonRouter);
+router.use('/payments', paymentRoute);
 
 export default router;

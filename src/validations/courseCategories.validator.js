@@ -31,7 +31,7 @@ export default class courseCategoryValidator {
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
    */
-  static async courseCategoryValidationResult(req, res, next) {
+  static courseCategoryValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);

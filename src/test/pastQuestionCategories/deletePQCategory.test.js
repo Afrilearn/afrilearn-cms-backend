@@ -20,7 +20,6 @@ const staffToken = userUtils.generateToken(
   '602209ab2792e63fc841de3c',
   'Staff User',
 );
-
 const adminToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
   '602209d72792e63fc841de3e',
