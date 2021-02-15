@@ -45,7 +45,7 @@ router.delete(
 );
 
 router.post(
-  '/past-question/:courseId',
+  '/:courseId/past-questions',
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
   ParamsValidator.validateMongooseId('courseId'),
@@ -56,7 +56,7 @@ router.post(
 );
 
 router.post(
-  '/subject/:courseId',
+  '/:courseId/subjects',
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
   ParamsValidator.validateMongooseId('courseId'),

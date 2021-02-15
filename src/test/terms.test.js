@@ -133,7 +133,9 @@ describe('TERMS', () => {
           });
       });
     });
+  });
 
+  describe(`/POST ${baseUrl}`, () => {
     describe('SUCCESSFUL TERM CREATION', () => {
       beforeEach((done) => {
         Term.deleteMany((err) => {

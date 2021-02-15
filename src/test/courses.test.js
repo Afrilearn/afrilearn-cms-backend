@@ -742,6 +742,7 @@ describe('COURSES', () => {
         chai
           .request(app)
           .get(baseUrl)
+          .set('token', invalidToken)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have
@@ -886,7 +887,7 @@ describe('COURSES', () => {
     });
   });
 
-  describe(`/POST ${baseUrl}/past-question/:courseId`, () => {
+  describe(`/POST ${baseUrl}/:courseId/past-question`, () => {
     let courseId, pastQuestionId;
     beforeEach(() => {
       pastQuestionId = mongoose.Types.ObjectId();
@@ -908,7 +909,7 @@ describe('COURSES', () => {
       it('should create a new related past question if user is admin', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/past-question/${courseId}`)
+          .post(`${baseUrl}/${courseId}/past-questions`)
           .set('token', adminToken)
           .send({ pastQuestionId })
           .end((err, res) => {
@@ -934,7 +935,7 @@ describe('COURSES', () => {
         it('should create a new related past question if user is moderator', (done) => {
           chai
             .request(app)
-            .post(`${baseUrl}/past-question/${courseId}`)
+            .post(`${baseUrl}/${courseId}/past-questions`)
             .set('token', moderatorToken)
             .send({ pastQuestionId })
             .end((err, res) => {
@@ -972,7 +973,7 @@ describe('COURSES', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/past-question/${courseId}`)
+          .post(`${baseUrl}/${courseId}/past-questions`)
           .set('token', adminToken)
           .send({ pastQuestionId })
           .end((err, res) => {
@@ -989,7 +990,7 @@ describe('COURSES', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/past-question/${courseId}`)
+          .post(`${baseUrl}/${courseId}/past-questions`)
           .send({ pastQuestionId })
           .end((err, res) => {
             res.should.have.status(401);
@@ -1003,7 +1004,7 @@ describe('COURSES', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/past-question/${courseId}`)
+          .post(`${baseUrl}/${courseId}/past-questions`)
           .set('token', invalidToken)
           .send({ pastQuestionId })
           .end((err, res) => {
@@ -1021,7 +1022,7 @@ describe('COURSES', () => {
       it('should return 401 with error if user is not moderator or admin', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/past-question/${courseId}`)
+          .post(`${baseUrl}/${courseId}/past-questions`)
           .set('token', staffToken)
           .send({ pastQuestionId })
           .end((err, res) => {
@@ -1040,7 +1041,7 @@ describe('COURSES', () => {
       beforeEach(() => {
         request = chai
           .request(app)
-          .post(`${baseUrl}/past-question/${courseId}`)
+          .post(`${baseUrl}/${courseId}/past-questions`)
           .set('token', moderatorToken);
       });
       it('should not link past question if past question id is not provided', (done) => {
@@ -1104,7 +1105,7 @@ describe('COURSES', () => {
       it("should not link past question to course if it's already linked", (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/past-question/${courseId}`)
+          .post(`${baseUrl}/${courseId}/past-questions`)
           .set('token', moderatorToken)
           .send({ courseId, pastQuestionId })
           .end((err, res) => {
@@ -1119,7 +1120,7 @@ describe('COURSES', () => {
     });
   });
 
-  describe(`/POST ${baseUrl}/subject/:courseId`, () => {
+  describe(`/POST ${baseUrl}/:courseId/subject`, () => {
     let courseId, mainSubjectId;
     beforeEach(() => {
       mainSubjectId = mongoose.Types.ObjectId();
@@ -1141,7 +1142,7 @@ describe('COURSES', () => {
       it('should create a new related subject if user is admin', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/subject/${courseId}`)
+          .post(`${baseUrl}/${courseId}/subjects`)
           .set('token', adminToken)
           .send({ mainSubjectId })
           .end((err, res) => {
@@ -1167,7 +1168,7 @@ describe('COURSES', () => {
         it('should create a new related subject if user is moderator', (done) => {
           chai
             .request(app)
-            .post(`${baseUrl}/subject/${courseId}`)
+            .post(`${baseUrl}/${courseId}/subjects`)
             .set('token', moderatorToken)
             .send({ mainSubjectId })
             .end((err, res) => {
@@ -1205,7 +1206,7 @@ describe('COURSES', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/subject/${courseId}`)
+          .post(`${baseUrl}/${courseId}/subjects`)
           .set('token', adminToken)
           .send({ mainSubjectId })
           .end((err, res) => {
@@ -1222,7 +1223,7 @@ describe('COURSES', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/subject/${courseId}`)
+          .post(`${baseUrl}/${courseId}/subjects`)
           .send({ mainSubjectId })
           .end((err, res) => {
             res.should.have.status(401);
@@ -1236,7 +1237,7 @@ describe('COURSES', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/subject/${courseId}`)
+          .post(`${baseUrl}/${courseId}/subjects`)
           .set('token', invalidToken)
           .send({ mainSubjectId })
           .end((err, res) => {
@@ -1254,7 +1255,7 @@ describe('COURSES', () => {
       it('should return 401 with error if user is not moderator or admin', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/subject/${courseId}`)
+          .post(`${baseUrl}/${courseId}/subjects`)
           .set('token', staffToken)
           .send({ mainSubjectId })
           .end((err, res) => {
@@ -1273,7 +1274,7 @@ describe('COURSES', () => {
       beforeEach(() => {
         request = chai
           .request(app)
-          .post(`${baseUrl}/subject/${courseId}`)
+          .post(`${baseUrl}/${courseId}/subjects`)
           .set('token', moderatorToken);
       });
       it('should not link subject if subject id is not provided', (done) => {
@@ -1332,7 +1333,7 @@ describe('COURSES', () => {
       it("should not link subject to course if it's already linked", (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}/subject/${courseId}`)
+          .post(`${baseUrl}/${courseId}/subjects`)
           .set('token', moderatorToken)
           .send({ courseId, mainSubjectId })
           .end((err, res) => {

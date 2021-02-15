@@ -14,16 +14,10 @@ chai.use(Sinonchai);
 
 const { expect } = chai;
 
-const invalidToken = 'invalid.jwt.token';
 const staffToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
   '602209ab2792e63fc841de3c',
   'Staff User',
-);
-const moderatorToken = userUtils.generateToken(
-  mongoose.Types.ObjectId(),
-  '602209c32792e63fc841de3d',
-  'Moderator User',
 );
 const adminToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
@@ -32,16 +26,16 @@ const adminToken = userUtils.generateToken(
 );
 
 const testPQCategory = {
-  name : 'TestPQ',
-  categoryId : 1
-}
+  name: 'TestPQ',
+  categoryId: 1,
+};
 const route = '/api/v1/pqcategory';
 
 describe('ADD PAST QUESTION CATEGORY', () => {
   after(async () => {
     await PQCategory.deleteMany({ name: testPQCategory.name });
   });
-  
+
   describe(`/POST ${route}`, () => {
     it('it should return unauthorized if user is not logged in', (done) => {
       chai.request(app)
@@ -190,9 +184,9 @@ describe('ADD PAST QUESTION CATEGORY', () => {
           .request(app)
           .post(route)
           .set('token', adminToken)
-          .send({ name: 'A test category', categoryId: 5})
+          .send({ name: 'A test category', categoryId: 5 })
           .end((err, res) => {
-            // res.should.have.status(500);
+            res.should.have.status(500);
             res.body.should.have
               .property('error')
               .to.equals('Could not add category');

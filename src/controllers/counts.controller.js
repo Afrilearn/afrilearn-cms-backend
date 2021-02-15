@@ -21,13 +21,13 @@ export default class CountsController {
     try {
       const courses = await Courses.countDocuments();
       const students = await AfrilearnUsers.countDocuments({
-        role: "5fd08fba50964811309722d5",
+        role: '5fd08fba50964811309722d5',
       });
       const teachers = await AfrilearnUsers.countDocuments({
-        role: "5fc8cc978e28fa50986ecac9",
+        role: '5fc8cc978e28fa50986ecac9',
       });
       const admins = await AfrilearnUsers.countDocuments({
-        role: "6014126a3636dc4398df7cc4",
+        role: '6014126a3636dc4398df7cc4',
       });
       const subjects = await Subjects.countDocuments();
       const quizzes = await Questions.countDocuments();
@@ -54,7 +54,7 @@ export default class CountsController {
         },
       });
     } catch (err) {
-      Response.InternalServerError(res, "Error fetching database counts");
+      Response.InternalServerError(res, 'Error fetching database counts');
     }
   }
 }

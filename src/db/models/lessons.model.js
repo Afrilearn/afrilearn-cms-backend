@@ -30,8 +30,19 @@ const LessonSchema = new mongoose.Schema(
         videoUrl: {
           type: String,
         },
+        transcript: {
+          type: String,
+        },
       },
     ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -39,14 +50,11 @@ const LessonSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
 LessonSchema.virtual('questions', {
   ref: 'question',
   localField: '_id',
   foreignField: 'lessonId',
   justOne: false,
 });
-
 const Lesson = mongoose.model('lesson', LessonSchema);
-
 export default Lesson;

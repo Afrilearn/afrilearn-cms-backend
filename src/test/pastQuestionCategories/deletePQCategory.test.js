@@ -2,8 +2,8 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import sinon from 'sinon';
 import Sinonchai from 'sinon-chai';
-import app from '../../index';
 import mongoose from 'mongoose';
+import app from '../../index';
 import userUtils from '../../utils/user.utils';
 import PQCategory from '../../db/models/pastQuestionTypes.model';
 import Response from '../../utils/response.utils';
@@ -14,17 +14,11 @@ chai.use(Sinonchai);
 
 const { expect } = chai;
 
-const invalidToken = 'invalid.jwt.token';
 const invalidId = '602209c32792e63fc841de3d';
 const staffToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
   '602209ab2792e63fc841de3c',
   'Staff User',
-);
-const moderatorToken = userUtils.generateToken(
-  mongoose.Types.ObjectId(),
-  '602209c32792e63fc841de3d',
-  'Moderator User',
 );
 const adminToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
