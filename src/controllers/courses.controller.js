@@ -91,7 +91,7 @@ export default class CoursesController {
         courseId: req.params.courseId,
         pastQuestionTypeId: req.body.pastQuestionId,
       });
-      const course = await Courses.findOne({ _id: req.params.courseId });
+      const course = await Courses.findOne({ _id: req.params.courseId }).populate("relatedPastQuestions");
 
       Response.Success(res, { course }, 201);
     } catch (err) {
@@ -112,7 +112,7 @@ export default class CoursesController {
         courseId: req.params.courseId,
         mainSubjectId: req.body.mainSubjectId,
       });
-      const course = await Courses.findOne({ _id: req.params.courseId });
+      const course = await Courses.findOne({ _id: req.params.courseId }).populate("relatedSubjects");
 
       Response.Success(res, { course }, 201);
     } catch (err) {
