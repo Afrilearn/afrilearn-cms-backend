@@ -14,7 +14,7 @@ chai.use(Sinonchai);
 chai.use(chaiHttp);
 
 const unhashedPassword = '12345678';
-let user, userTwo;
+let user;
 userUtils.encryptPassword(unhashedPassword).then((password) => {
   user = {
     firstName: 'John',
@@ -25,16 +25,6 @@ userUtils.encryptPassword(unhashedPassword).then((password) => {
   };
 });
 
-
-userUtils.encryptPassword(unhashedPassword).then((password) => {
-  user = {
-    firstName: 'John',
-    lastName: 'Malkie',
-    email: 'johnmalkie@gmail.com',
-    password,
-    role: '5fc8f4b99d1e3023e4942152',
-  };
-});
 const invalidToken = 'invalid.jwt.token';
 const staffToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
@@ -83,7 +73,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
   describe('SUCCESSFUL PASSWORD CHANGE', () => {
     beforeEach(async () => {
       await Users.deleteMany();
-      const createdUser = await Users.create(userTwo);
+      const createdUser = await Users.create(user);
       userId = createdUser._id;
     });
     afterEach((done) => {
