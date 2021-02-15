@@ -7,6 +7,7 @@ import Users from '../db/models/cmsUsers.model';
 import AfrilearnUsers from '../db/models/users.model';
 import userUtils from '../utils/user.utils';
 import Response from '../utils/response.utils';
+import EnrolledCourses from '../db/models/enrolledCourses.model';
 
 import app from '../index';
 
@@ -744,6 +745,148 @@ describe('USERS', () => {
             res.body.should.have
               .property('error')
               .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+  });
+
+  // GET USERS ENROLLED COURSES
+  describe(`/GET ${baseUrl}/:userId/enrolled-courses`, () => {
+    let userId;
+    beforeEach(async () => {
+      await AfrilearnUsers.deleteMany();
+      await EnrolledCourses.deleteMany();
+      const createdUser = await AfrilearnUsers.create({
+        fullName: 'Test User', email: 'testuser@exmple.com',
+      });
+      userId = createdUser._id;
+      const courses = [];
+      for (let i = 1; i < 4; i += 1) {
+        courses.push(
+          (async () => {
+            const course = await EnrolledCourses.create({
+              userId,
+              courseId: mongoose.Types.ObjectId(),
+            });
+            return course;
+          })(),
+        );
+      }
+      await Promise.all(courses);
+    });
+    afterEach(async () => {
+      await AfrilearnUsers.deleteMany();
+      await EnrolledCourses.deleteMany();
+    });
+    describe('Successful fetch of enrolled courses', () => {
+      it('should fetch all user courses for an admin', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have.property('courses');
+            res.body.data.courses.length.should.equals(3);
+            const courses = res.body.data.courses.map(
+              (course) => course.userId,
+            );
+            for (let i = 1; i < 4; i += 1) {
+              courses.should.include(`${userId}`);
+            }
+            done();
+          });
+      });
+      it('should fetch all user courses for a moderator', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have.property('courses');
+            res.body.data.courses.length.should.equals(3);
+            const courses = res.body.data.courses.map(
+              (course) => course.userId,
+            );
+            for (let i = 1; i < 4; i += 1) {
+              courses.should.include(`${userId}`);
+            }
+            done();
+          });
+      });
+      it('should fetch all user courses for a staff', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have.property('courses');
+            res.body.data.courses.length.should.equals(3);
+            const courses = res.body.data.courses.map(
+              (course) => course.userId,
+            );
+            for (let i = 1; i < 4; i += 1) {
+              courses.should.include(`${userId}`);
+            }
+            done();
+          });
+      });
+    });
+
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .set('token', invalidToken)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+    });
+
+    describe('FAKE INTERNAL SERVER ERROR', () => {
+      let stub;
+      before(() => {
+        stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+      });
+      after(() => {
+        stub.restore();
+      });
+      it('returns status of 500', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .set('token', adminToken)
+          .end((err, res) => {
+            res.should.have.status(500);
+            res.body.should.have
+              .property('error')
+              .to.equals('Error fetching enrolled courses');
             done();
           });
       });

@@ -70,7 +70,7 @@ const subjects = () => {
     };
     subjects.push(
       (async () => {
-        MainSubjects.create(subject);
+        await MainSubjects.create(subject);
       })(),
     );
   }

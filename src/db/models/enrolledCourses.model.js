@@ -28,7 +28,12 @@ const EnrolledCourseSchema = new mongoose.Schema(
     },
   },
   { timestamps: true },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
+
 EnrolledCourseSchema.methods.toJSON = function () {
   const enrolledCourse = this;
   const enrolledCourseObject = enrolledCourse.toObject();

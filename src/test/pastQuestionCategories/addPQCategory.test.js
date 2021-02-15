@@ -14,16 +14,10 @@ chai.use(Sinonchai);
 
 const { expect } = chai;
 
-// const invalidToken = 'invalid.jwt.token';
 const staffToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
   '602209ab2792e63fc841de3c',
   'Staff User',
-);
-const moderatorToken = userUtils.generateToken(
-  mongoose.Types.ObjectId(),
-  '602209c32792e63fc841de3d',
-  'Moderator User',
 );
 const adminToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
@@ -81,7 +75,7 @@ describe('ADD PAST QUESTION CATEGORY', () => {
         });
     });
 
-    it('should add a past question category successfully if user is admin', (done) => {
+    it('should add a past question category successfully', (done) => {
       chai.request(app)
         .post(route)
         .set('x-access-token', adminToken)
@@ -97,23 +91,6 @@ describe('ADD PAST QUESTION CATEGORY', () => {
           res.body.data.should.have.property('name').eql(testPQCategory.name);
           done();
         });
-    });
-
-    it('should add a past question category successfully if user is moderator', async () => {
-      await PQCategory.deleteMany({ name: testPQCategory.name });
-      const res = await chai.request(app)
-        .post(route)
-        .set('x-access-token', moderatorToken)
-        .send({
-          name: testPQCategory.name,
-          categoryId: testPQCategory.categoryId,
-        });
-
-      res.should.have.status(200);
-      res.body.should.be.an('object');
-      res.body.should.have.property('status').eql('success');
-      res.body.should.have.property('data').to.be.an('object');
-      res.body.data.should.have.property('name').eql(testPQCategory.name);
     });
 
     describe('CATEGORY ALREADY EXISTS', () => {
@@ -209,7 +186,7 @@ describe('ADD PAST QUESTION CATEGORY', () => {
           .set('token', adminToken)
           .send({ name: 'A test category', categoryId: 5 })
           .end((err, res) => {
-            // res.should.have.status(500);
+            res.should.have.status(500);
             res.body.should.have
               .property('error')
               .to.equals('Could not add category');

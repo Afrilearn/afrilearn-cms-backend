@@ -1,6 +1,7 @@
 import Response from '../utils/response.utils';
 import CmsUsers from '../db/models/cmsUsers.model';
 import UsersUtils from '../utils/user.utils';
+import EnrolledCourse from '../db/models/enrolledCourses.model';
 
 /**
  *Contains Users Controller
@@ -82,6 +83,22 @@ export default class UserController {
       return Response.Success(res, { users });
     } catch (err) {
       return Response.InternalServerError(res, 'Error fetching cms users');
+    }
+  }
+
+  /**
+   * @memberof UserController
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} if no error occurs
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async fetchEnrolledCourses(req, res) {
+    try {
+      const result = await EnrolledCourse.find({ userId: req.params.userId });
+      return Response.Success(res, { courses: result });
+    } catch (error) {
+      return Response.InternalServerError(res, 'Error fetching enrolled courses');
     }
   }
 }

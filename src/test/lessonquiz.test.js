@@ -8,15 +8,18 @@ import userUtils from '../utils/user.utils';
 import Response from '../utils/response.utils';
 
 import app from '../index';
+import Question from '../db/models/questions.model';
 
 chai.should();
 chai.use(Sinonchai);
 chai.use(chaiHttp);
 
+const validLessonId = mongoose.Types.ObjectId();
 const validCreatorId = mongoose.Types.ObjectId();
 const validSubjectId = mongoose.Types.ObjectId();
 const validCourseId = mongoose.Types.ObjectId();
 const validTermId = mongoose.Types.ObjectId();
+
 const lesson = {
   title: 'Lesson One',
   creatorId: validCreatorId,
@@ -25,12 +28,19 @@ const lesson = {
   termId: validTermId,
   content: 'Lesson One is important',
 };
-const lessonUpdate = {
-  title: 'Lesson Two',
-  courseId: validCourseId,
-  subjectId: validSubjectId,
-  termId: validTermId,
-  content: 'Lesson Two is important',
+
+const question = {
+  lessonId: validLessonId,
+  creator_Id: validCreatorId,
+  question: 'What is your name?',
+  options: ['Taye', 'Taiwo', 'ELizabeth'],
+  correct_option: '1',
+  explanation: 'random explanation',
+};
+const questionUpdate = {
+  options: ['Taye', 'Taiwo', 'ELizabeth'],
+  correct_option: '2',
+  explanation: 'another random explanation',
 };
 const invalidToken = 'invalid.jwt.token';
 const staffToken = userUtils.generateToken(
@@ -50,71 +60,71 @@ const adminToken = userUtils.generateToken(
 );
 
 const baseUrl = '/api/v1/lesson';
-describe('LESSONS', () => {
-  describe(`/POST ${baseUrl}`, () => {
-    describe('SUCCESSFUL LESSON CREATION', () => {
+describe('LESSON QUIZ', () => {
+  describe(`/POST ${baseUrl}/quiz`, () => {
+    describe('SUCCESSFUL QUIZ CREATION', () => {
       beforeEach((done) => {
-        Lesson.deleteMany((err) => {
+        Question.deleteMany((err) => {
           if (!err) done();
         });
       });
       afterEach((done) => {
-        Lesson.deleteMany((err) => {
+        Question.deleteMany((err) => {
           if (!err) done();
         });
       });
-      it('should create lesson if request is valid and user is admin', (done) => {
+      it('should create question if request is valid and user is admin', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}`)
+          .post(`${baseUrl}/quiz`)
           .set('token', adminToken)
-          .send(lesson)
+          .send(question)
           .end((err, res) => {
             res.should.have.status(201);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have.property('lesson');
-            res.body.data.lesson.should.have
-              .property('title')
-              .to.equals(lesson.title);
-            res.body.data.lesson.should.have.property('createdAt');
-            res.body.data.lesson.should.have.property('updatedAt');
+            res.body.data.should.have.property('question');
+            res.body.data.question.should.have
+              .property('question')
+              .to.equals(question.question);
+            res.body.data.question.should.have.property('createdAt');
+            res.body.data.question.should.have.property('updatedAt');
             done();
           });
       });
-      it('should create lesson if request is valid and user is moderator', (done) => {
+      it('should create question if request is valid and user is moderator', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}`)
+          .post(`${baseUrl}/quiz`)
           .set('token', adminToken)
-          .send(lesson)
+          .send(question)
           .end((err, res) => {
             res.should.have.status(201);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have.property('lesson');
-            res.body.data.lesson.should.have
-              .property('title')
-              .to.equals(lesson.title);
-            res.body.data.lesson.should.have.property('createdAt');
-            res.body.data.lesson.should.have.property('updatedAt');
+            res.body.data.should.have.property('question');
+            res.body.data.question.should.have
+              .property('question')
+              .to.equals(question.question);
+            res.body.data.question.should.have.property('createdAt');
+            res.body.data.question.should.have.property('updatedAt');
             done();
           });
       });
     });
-    it('should create lesson if request is valid and user is staff', (done) => {
+    it('should create question if request is valid and user is staff', (done) => {
       chai
         .request(app)
-        .post(`${baseUrl}`)
+        .post(`${baseUrl}/quiz`)
         .set('token', staffToken)
-        .send(lesson)
+        .send(question)
         .end((err, res) => {
           res.should.have.status(201);
           res.body.should.have.property('status').to.equals('success');
-          res.body.data.should.have.property('lesson');
-          res.body.data.lesson.should.have
-            .property('title')
-            .to.equals(lesson.title);
-          res.body.data.lesson.should.have.property('createdAt');
-          res.body.data.lesson.should.have.property('updatedAt');
+          res.body.data.should.have.property('question');
+          res.body.data.question.should.have
+            .property('question')
+            .to.equals(question.question);
+          res.body.data.question.should.have.property('createdAt');
+          res.body.data.question.should.have.property('updatedAt');
           done();
         });
     });
@@ -129,14 +139,14 @@ describe('LESSONS', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}`)
+          .post(`${baseUrl}/quiz`)
           .set('token', adminToken)
-          .send(lesson)
+          .send(question)
           .end((err, res) => {
             res.should.have.status(500);
             res.body.should.have
               .property('error')
-              .to.equals('Could not create lesson');
+              .to.equals('could not add quiz');
             done();
           });
       });
@@ -145,8 +155,8 @@ describe('LESSONS', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}`)
-          .send(lesson)
+          .post(`${baseUrl}/quiz`)
+          .send(question)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have.property('status').to.equals('error');
@@ -159,9 +169,9 @@ describe('LESSONS', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .post(`${baseUrl}`)
+          .post(`${baseUrl}/quiz`)
           .set('token', invalidToken)
-          .send(lesson)
+          .send(question)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have.property('status').to.equals('error');
@@ -175,104 +185,104 @@ describe('LESSONS', () => {
 
     describe('INPUT VALIDATION', () => {
       let request;
-      let dynamicLesson;
+      let dynamicQuestion;
       beforeEach(() => {
-        request = chai.request(app).post(`${baseUrl}`).set('token', adminToken);
-        dynamicLesson = {
-          tiltle: 'Test Lesson',
+        request = chai.request(app).post(`${baseUrl}/quiz`).set('token', adminToken);
+        dynamicQuestion = {
+          question: 'Test Question',
+          options: ['Wemimi', 'Astol'],
         };
       });
 
-      it('should not create lesson if lesson VideoUrls is not an array', (done) => {
-        dynamicLesson.videoUrls = 'vidoe@url.com';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create question if question is not provided', (done) => {
+        delete dynamicQuestion.question;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
-          res.body.should.have.property('errors').to.include('VideoUrls must be an array');
+          res.body.should.have.property('errors').to.include('Question is required');
           done();
         });
       });
-      it('should not create lesson if lesson title is not provided', (done) => {
-        delete dynamicLesson.title;
-        request.send(dynamicLesson).end((err, res) => {
-          res.should.have.status(400);
-          res.body.should.have.property('status').to.equals('error');
-          res.body.should.have.property('errors').to.include('Title is required');
-          done();
-        });
-      });
-      it('should not create lesson if lesson title is empty', (done) => {
-        dynamicLesson.title = '';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create question if question is empty', (done) => {
+        dynamicQuestion.question = '';
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Title cannot be empty');
+            .to.include('Question cannot be empty');
           done();
         });
       });
-      it('should not create lesson if lesson title is not string', (done) => {
-        dynamicLesson.title = 2;
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create question if question is not string', (done) => {
+        dynamicQuestion.question = 2;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Title must be a string');
+            .to.include('Question must be a string');
           done();
         });
       });
-      it('should not create lesson if content is not string', (done) => {
-        dynamicLesson.content = 2;
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create question if explanation is empty', (done) => {
+        dynamicQuestion.explanation = '';
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Content must be a string');
+            .to.include('Explanation cannot be empty');
           done();
         });
       });
-      it('should not create lesson if courseId is empty', (done) => {
-        dynamicLesson.courseId = '';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create question if explanation is not string', (done) => {
+        dynamicQuestion.explnation = 2;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Course Id cannot be empty');
+            .to.include('Explanation must be a string');
           done();
         });
       });
-
-      it('should not create lesson if creatorId is not provided', (done) => {
-        delete dynamicLesson.creatorId;
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create question if lessonId is not provided', (done) => {
+        delete dynamicQuestion.question;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Creator Id is required');
+            .to.include('Lesson id is required');
           done();
         });
       });
-
-      it('should not create lesson if creatorId is empty', (done) => {
-        dynamicLesson.creatorId = '';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create question if lessonId is not a valid mongoose id', (done) => {
+        dynamicQuestion.lessonId = 'invalidmongooseid';
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Creator Id cannot be empty');
+            .to.include('Lesson id is not a valid mongoose ID');
           done();
         });
       });
-
-      it('should not create lesson if creatorId is not a valid mongoose id', (done) => {
-        dynamicLesson.creatorId = 'invalidmongooseid';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create question if creatorId is not provided', (done) => {
+        delete dynamicQuestion.creator_Id;
+        request.send(dynamicQuestion).end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('errors')
+            .to.include('Creator id is required');
+          done();
+        });
+      });
+      it('should not create question if creatorId is not a valid mongoose id', (done) => {
+        dynamicQuestion.creator_Id = 'invalidmongooseid';
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
@@ -281,132 +291,193 @@ describe('LESSONS', () => {
           done();
         });
       });
-
-      it('should not create lesson if termId is empty', (done) => {
-        dynamicLesson.termId = '';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create quiz if images is not an array', (done) => {
+        dynamicQuestion.images = 2;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Term Id cannot be empty');
+            .to.include('Images must be an array');
           done();
         });
       });
-      it('should not create lesson if subjectId is empty', (done) => {
-        dynamicLesson.subjectId = '';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create quiz if options are not provided', (done) => {
+        delete dynamicQuestion.options;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Subject Id cannot be empty');
+            .to.include('Options are required');
           done();
         });
       });
-      it('should not create lesson if courseId is not a valid mongoose id', (done) => {
-        dynamicLesson.courseId = 'invalidmongooseid';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create quiz if options is not an array', (done) => {
+        dynamicQuestion.options = 2;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Course id is not a valid mongoose ID');
+            .to.include('Options must be an array');
           done();
         });
       });
-      it('should not create lesson if subjectId is not a valid mongoose id', (done) => {
-        dynamicLesson.subjectId = 'invalidmongooseid';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create quiz if correct option is not provided', (done) => {
+        delete dynamicQuestion.correct_option;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Subject id is not a valid mongoose ID');
+            .to.include('Correct option is required');
           done();
         });
       });
-      it('should not create lesson if termId is not a valid mongoose id', (done) => {
-        dynamicLesson.termId = 'invalidmongooseid';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not create quiz if correct option is not a number', (done) => {
+        dynamicQuestion.correct_option = [];
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Term id is not a valid mongoose ID');
+            .to.include('Correct option must be a number');
           done();
         });
       });
     });
-  });
-
-  describe(`/GET ${baseUrl}`, () => {
-    describe('Successful fetch', () => {
-      before(async () => {
-        await Lesson.deleteMany();
-        const lessons = [];
-        for (let i = 1; i < 4; i += 1) {
-          lessons.push(
-            (async () => {
-              await Lesson.create({ ...lesson, title: `LessonTest${i}` });
-            })(),
-          );
-        }
-        await Promise.all(lessons);
-      });
-      after((done) => {
-        Lesson.deleteMany((err) => {
+    describe('QUIZ INEXISTENCE', () => {
+      beforeEach((done) => {
+        Question.create(question, (err) => {
           if (!err) done();
         });
       });
-      it('should fetch all lessons for an admin', (done) => {
+      it('should send back 409 status with error if question exists', (done) => {
         chai
           .request(app)
-          .get(baseUrl)
+          .post(`${baseUrl}/quiz`)
+          .set('token', adminToken)
+          .send(question)
+          .end((err, res) => {
+            res.status.should.equals(409);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('question already exists');
+            done();
+          });
+      });
+    });
+  });
+
+  describe(`/GET ${baseUrl}/:lessonId/quiz`, () => {
+    let lessonId;
+    beforeEach(async () => {
+      await Question.deleteMany();
+      await Lesson.deleteMany();
+      const createdLesson = await Lesson.create(lesson);
+      lessonId = createdLesson._id;
+      const questions = [];
+      for (let i = 1; i < 4; i += 1) {
+        questions.push(
+          (async () => {
+            await Question.create({ ...question, lessonId, question: `QuizTest${i}` });
+          })(),
+        );
+      }
+      await Promise.all(questions);
+    });
+    afterEach(async () => {
+      await Question.deleteMany();
+      await Lesson.deleteMany();
+    });
+    describe('Successful fetch of lesson questions', () => {
+      it('should fetch all questions for an admin', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${lessonId}/quiz`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have.property('lessons');
-            res.body.data.lessons.length.should.equals(3);
-            const titles = res.body.data.lessons.map((lesson) => lesson.title);
+            res.body.data.should.have.property('questions');
+            res.body.data.questions.length.should.equals(3);
+            const questions = res.body.data.questions.map(
+              (questionInstance) => questionInstance.question,
+            );
             for (let i = 1; i < 4; i += 1) {
-              titles.should.include(`LessonTest${i}`);
+              questions.should.include(`QuizTest${i}`);
             }
             done();
           });
       });
-      it('should fetch all lessons for a moderator', (done) => {
+      it('should fetch all questions for a moderator', (done) => {
         chai
           .request(app)
-          .get(baseUrl)
+          .get(`${baseUrl}/${lessonId}/quiz`)
           .set('token', moderatorToken)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have.property('lessons');
-            res.body.data.lessons.length.should.equals(3);
-            const titles = res.body.data.lessons.map((lesson) => lesson.title);
+            res.body.data.should.have.property('questions');
+            res.body.data.questions.length.should.equals(3);
+            const questions = res.body.data.questions.map(
+              (questionInstance) => questionInstance.question,
+            );
             for (let i = 1; i < 4; i += 1) {
-              titles.should.include(`LessonTest${i}`);
+              questions.should.include(`QuizTest${i}`);
             }
             done();
           });
       });
-      it('should fetch all lessons for a staff', (done) => {
+      it('should fetch all questions for a staff', (done) => {
         chai
           .request(app)
-          .get(baseUrl)
+          .get(`${baseUrl}/${lessonId}/quiz`)
           .set('token', staffToken)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have.property('lessons');
-            res.body.data.lessons.length.should.equals(3);
-            const titles = res.body.data.lessons.map((lesson) => lesson.title);
+            res.body.data.should.have.property('questions');
+            res.body.data.questions.length.should.equals(3);
+            const questions = res.body.data.questions.map(
+              (questionInstance) => questionInstance.question,
+            );
             for (let i = 1; i < 4; i += 1) {
-              titles.should.include(`LessonTest${i}`);
+              questions.should.include(`QuizTest${i}`);
             }
+            done();
+          });
+      });
+    });
+
+    describe('TOKEN VALIDATION', () => {
+      it('should return 401 with error message if no token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${lessonId}/quiz`)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
+            done();
+          });
+      });
+      it('should return 401 status with error message if an invalid token is provided', (done) => {
+        chai
+          .request(app)
+          .get(`${baseUrl}/${lessonId}/quiz`)
+          .set('token', invalidToken)
+          .send(lesson)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.have.property('status').to.equals('error');
+            res.body.should.have
+              .property('error')
+              .to.equals('Not authorized to access data');
             done();
           });
       });
@@ -420,120 +491,87 @@ describe('LESSONS', () => {
       after(() => {
         stub.restore();
       });
-      it('returns status of 500', (done) => {
+      it('returns status of 500', async () => {
         chai
           .request(app)
-          .get(baseUrl)
+          .get(`${baseUrl}/602209ab2792e63fc841de3c/quiz`)
           .set('token', adminToken)
-          .send(lesson)
           .end((err, res) => {
             res.should.have.status(500);
             res.body.should.have
               .property('error')
-              .to.equals('Error fetching lessons');
-            done();
-          });
-      });
-    });
-
-    describe('TOKEN VALIDATION', () => {
-      it('should return 401 with error message if no token is provided', (done) => {
-        chai
-          .request(app)
-          .get(baseUrl)
-          .end((err, res) => {
-            res.should.have.status(401);
-            res.body.should.have.property('status').to.equals('error');
-            res.body.should.have
-              .property('error')
-              .to.equals('Not authorized to access data');
-            done();
-          });
-      });
-      it('should return 401 status with error message if an invalid token is provided', (done) => {
-        chai
-          .request(app)
-          .get(baseUrl)
-          .set('token', invalidToken)
-          .send(lesson)
-          .end((err, res) => {
-            res.should.have.status(401);
-            res.body.should.have.property('status').to.equals('error');
-            res.body.should.have
-              .property('error')
-              .to.equals('Not authorized to access data');
-            done();
+              .to.equals('Error fetching questions');
           });
       });
     });
   });
 
-  describe(`/PUT ${baseUrl}/:id`, () => {
-    let lessonId;
+  describe(`/PUT ${baseUrl}/quiz/:quizId`, () => {
+    let quizId;
     beforeEach(async () => {
-      await Lesson.deleteMany();
-      const createdLesson = await Lesson.create(lesson);
-      lessonId = createdLesson._id;
+      await Question.deleteMany();
+      const createdQuiz = await Question.create(question);
+      quizId = createdQuiz._id;
     });
     afterEach((done) => {
-      Lesson.deleteMany((err) => {
+      Question.deleteMany((err) => {
         if (!err) done();
       });
     });
     describe('SUCCESS', () => {
       beforeEach(async () => {
-        await Lesson.deleteMany();
-        const createdLesson = await Lesson.create(lesson);
-        lessonId = createdLesson._id;
+        await Question.deleteMany();
+        const createdQuiz = await Question.create(question);
+        quizId = createdQuiz._id;
       });
       afterEach((done) => {
-        Lesson.deleteMany((err) => {
+        Question.deleteMany((err) => {
           if (!err) done();
         });
       });
 
-      it('should edit lesson if request is valid and user is admin', (done) => {
+      it('should edit question if request is valid and user is admin', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/${lessonId}`)
+          .put(`${baseUrl}/quiz/${quizId}`)
           .set('token', adminToken)
-          .send(lessonUpdate)
+          .send(questionUpdate)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
             res.body.data.should.have
               .property('message')
-              .to.equals('Lesson updated successfully');
+              .to.equals('Question updated successfully');
             done();
           });
       });
-      it('should edit lesson if request is valid and user is moderator', (done) => {
+      it('should edit question if request is valid and user is moderator', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/${lessonId}`)
-          .set('token', moderatorToken)
-          .send(lessonUpdate)
+          .put(`${baseUrl}/quiz/${quizId}`)
+          .set('token', adminToken)
+          .send(questionUpdate)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
             res.body.data.should.have
               .property('message')
-              .to.equals('Lesson updated successfully');
+              .to.equals('Question updated successfully');
             done();
           });
       });
-      it('should edit lesson if request is valid and user is staff', (done) => {
+      it('should edit question if request is valid and user is staff', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/${lessonId}`)
-          .set('token', staffToken)
-          .send(lessonUpdate)
+          .put(`${baseUrl}/quiz/${quizId}`)
+          .set('token', adminToken)
+          .send(questionUpdate)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
             res.body.data.should.have
               .property('message')
-              .to.equals('Lesson updated successfully');
+              .to.equals('Question updated successfully');
             done();
           });
       });
@@ -550,14 +588,14 @@ describe('LESSONS', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/${lessonId}`)
+          .put(`${baseUrl}/quiz/${quizId}`)
           .set('token', adminToken)
-          .send(lessonUpdate)
+          .send(questionUpdate)
           .end((err, res) => {
             res.should.have.status(500);
             res.body.should.have
               .property('error')
-              .to.equals('Could not update lesson');
+              .to.equals('Could not update question');
             done();
           });
       });
@@ -567,8 +605,8 @@ describe('LESSONS', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/${lessonId}`)
-          .send(lessonUpdate)
+          .put(`${baseUrl}/quiz/${quizId}`)
+          .send(questionUpdate)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have.property('status').to.equals('error');
@@ -581,9 +619,9 @@ describe('LESSONS', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/${lessonId}`)
+          .put(`${baseUrl}/quiz/${quizId}`)
           .set('token', invalidToken)
-          .send(lessonUpdate)
+          .send(questionUpdate)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have.property('status').to.equals('error');
@@ -596,177 +634,122 @@ describe('LESSONS', () => {
     });
 
     describe('INPUT VALIDATION', () => {
-      let dynamicLesson;
+      let dynamicQuestion;
       let request;
       beforeEach(() => {
-        dynamicLesson = {};
+        dynamicQuestion = {};
         request = chai
           .request(app)
-          .put(`${baseUrl}/${lessonId}`)
+          .put(`${baseUrl}/quiz/${quizId}`)
           .set('token', adminToken);
       });
-      it('should not edit lesson if lesson title is empty', (done) => {
-        dynamicLesson.title = '';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not edit quiz if explanation is empty', (done) => {
+        dynamicQuestion.explanation = '';
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Title cannot be empty');
+            .to.include('Explanation cannot be empty');
           done();
         });
       });
-      it('should not edit lesson if lesson title is not string', (done) => {
-        dynamicLesson.title = 2;
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not edit quiz if quiz explnation is not string', (done) => {
+        dynamicQuestion.explanation = 2;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Title must be a string');
+            .to.include('Explanation must be a string');
           done();
         });
       });
-      it('should not edit lesson if content is not string', (done) => {
-        dynamicLesson.content = 2;
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not edit quiz if question is not string', (done) => {
+        dynamicQuestion.question = 2;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Content must be a string');
+            .to.include('Question must be a string');
           done();
         });
       });
-      it('should not edit lesson if courseId is empty', (done) => {
-        dynamicLesson.courseId = '';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not edit quiz if images is not an array', (done) => {
+        dynamicQuestion.images = 2;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Course Id cannot be empty');
+            .to.include('Images must be an array');
           done();
         });
       });
-      it('should not edit lesson if termId is empty', (done) => {
-        dynamicLesson.termId = '';
-        request.send(dynamicLesson).end((err, res) => {
+      it('should not edit quiz if options is not an array', (done) => {
+        dynamicQuestion.options = 2;
+        request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
           res.body.should.have
             .property('errors')
-            .to.include('Term Id cannot be empty');
-          done();
-        });
-      });
-      it('should not edit lesson if subjectId is empty', (done) => {
-        dynamicLesson.subjectId = '';
-        request.send(dynamicLesson).end((err, res) => {
-          res.should.have.status(400);
-          res.body.should.have.property('status').to.equals('error');
-          res.body.should.have
-            .property('errors')
-            .to.include('Subject Id cannot be empty');
-          done();
-        });
-      });
-      it('should not edit lesson if courseId is not a valid mongoose id', (done) => {
-        dynamicLesson.courseId = 'invalidmongooseid';
-        request.send(dynamicLesson).end((err, res) => {
-          res.should.have.status(400);
-          res.body.should.have.property('status').to.equals('error');
-          res.body.should.have
-            .property('errors')
-            .to.include('Course id is not a valid mongoose ID');
-          done();
-        });
-      });
-      it('should not edit lesson if subjectId is not a valid mongoose id', (done) => {
-        dynamicLesson.subjectId = 'invalidmongooseid';
-        request.send(dynamicLesson).end((err, res) => {
-          res.should.have.status(400);
-          res.body.should.have.property('status').to.equals('error');
-          res.body.should.have
-            .property('errors')
-            .to.include('Subject id is not a valid mongoose ID');
-          done();
-        });
-      });
-      it('should not edit lesson if termId is not a valid mongoose id', (done) => {
-        dynamicLesson.termId = 'invalidmongooseid';
-        request.send(dynamicLesson).end((err, res) => {
-          res.should.have.status(400);
-          res.body.should.have.property('status').to.equals('error');
-          res.body.should.have
-            .property('errors')
-            .to.include('Term id is not a valid mongoose ID');
-          done();
-        });
-      });
-      it('should not edit lesson if creatorId is provided', (done) => {
-        dynamicLesson.creatorId = '';
-        request.send(dynamicLesson).end((err, res) => {
-          res.should.have.status(400);
-          res.body.should.have.property('status').to.equals('error');
-          res.body.should.have
-            .property('errors')
-            .to.include('Cannot change lesson creator');
+            .to.include('Options must be an array');
           done();
         });
       });
     });
 
-    describe('Lesson EXISTENCE', () => {
+    describe('QUESTION EXISTENCE', () => {
       beforeEach((done) => {
-        Lesson.deleteMany((err) => {
+        Question.deleteMany((err) => {
           if (!err) done();
         });
       });
-      it('should send back 404 status with error if Lesson does not exist', (done) => {
+      it('should send back 404 status with error if question does not exist', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/${lessonId}`)
+          .put(`${baseUrl}/quiz/${quizId}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.status.should.equals(404);
             res.body.should.have.property('status').to.equals('error');
             res.body.should.have
               .property('error')
-              .to.equals('Lesson does not exist');
+              .to.equals('Question does not exist');
             done();
           });
       });
     });
   });
 
-  describe(`/DELETE ${baseUrl}/:id`, () => {
-    let lessonId;
+  describe(`/DELETE ${baseUrl}/quiz/:quizid`, () => {
+    let quizId;
     beforeEach(async () => {
-      await Lesson.deleteMany();
-      const createdLesson = await Lesson.create(lesson);
-      lessonId = createdLesson._id;
+      await Question.deleteMany();
+      const createdQuiz = await Question.create(question);
+      quizId = createdQuiz._id;
     });
     afterEach((done) => {
-      Lesson.deleteMany((err) => {
+      Question.deleteMany((err) => {
         if (!err) done();
       });
     });
     describe('SUCCESSFUL DELETE', () => {
       beforeEach(async () => {
-        await Lesson.deleteMany();
-        const createdLesson = await Lesson.create(lesson);
-        lessonId = createdLesson._id;
+        await Question.deleteMany();
+        const createdQuiz = await Question.create(question);
+        quizId = createdQuiz._id;
       });
       afterEach((done) => {
-        Lesson.deleteMany((err) => {
+        Question.deleteMany((err) => {
           if (!err) done();
         });
       });
-      it('should delete lesson if data is valid and user is admin', (done) => {
+      it('should delete question if data is valid and user is admin', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${lessonId}`)
+          .delete(`${baseUrl}/quiz/${quizId}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
@@ -774,37 +757,37 @@ describe('LESSONS', () => {
             res.body.should.have.property('data');
             res.body.data.should.have
               .property('message')
-              .to.equals(`${lesson.title} lesson deleted successfully`);
+              .to.equals('question removed successfully');
             done();
           });
       });
       it('should delete lesson if data is valid and user is moderator', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${lessonId}`)
-          .set('token', moderatorToken)
+          .delete(`${baseUrl}/quiz/${quizId}`)
+          .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
             res.body.should.have.property('data');
             res.body.data.should.have
               .property('message')
-              .to.equals(`${lesson.title} lesson deleted successfully`);
+              .to.equals('question removed successfully');
             done();
           });
       });
       it('should delete lesson if data is valid and user is a staff', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${lessonId}`)
-          .set('token', staffToken)
+          .delete(`${baseUrl}/quiz/${quizId}`)
+          .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
             res.body.should.have.property('data');
             res.body.data.should.have
               .property('message')
-              .to.equals(`${lesson.title} lesson deleted successfully`);
+              .to.equals('question removed successfully');
             done();
           });
       });
@@ -820,13 +803,13 @@ describe('LESSONS', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${lessonId}`)
+          .delete(`${baseUrl}/quiz/${quizId}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(500);
             res.body.should.have
               .property('error')
-              .to.equals('Could not delete lesson');
+              .to.equals('error removing question');
             done();
           });
       });
@@ -835,7 +818,7 @@ describe('LESSONS', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${lessonId}`)
+          .delete(`${baseUrl}/quiz/${quizId}`)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have.property('status').to.equals('error');
@@ -848,7 +831,7 @@ describe('LESSONS', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${lessonId}`)
+          .delete(`${baseUrl}/quiz/${quizId}`)
           .set('token', invalidToken)
           .end((err, res) => {
             res.should.have.status(401);
@@ -861,23 +844,23 @@ describe('LESSONS', () => {
       });
     });
 
-    describe('Lesson EXISTENCE', () => {
+    describe('Question EXISTENCE', () => {
       beforeEach((done) => {
-        Lesson.deleteMany((err) => {
+        Question.deleteMany((err) => {
           if (!err) done();
         });
       });
-      it('should send back 404 status with error if Lesson does not exist', (done) => {
+      it('should send back 404 status with error if Question does not exist', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${lessonId}`)
+          .delete(`${baseUrl}/quiz/${quizId}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.status.should.equals(404);
             res.body.should.have.property('status').to.equals('error');
             res.body.should.have
               .property('error')
-              .to.equals('lesson not found');
+              .to.equals('Question does not exist');
             done();
           });
       });

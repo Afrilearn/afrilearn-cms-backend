@@ -16,7 +16,7 @@ const signinUrl = '/api/v1/auth/signin';
 
 const testUserDetails = {
   _id: new mongoose.mongo.ObjectId(),
-  firstName: 'John',
+  firstName: 'John_Max',
   lastName: 'Doewie',
   email: 'john_doewie@email.com',
   password: bcrypt.hashSync('blessing', 10),
