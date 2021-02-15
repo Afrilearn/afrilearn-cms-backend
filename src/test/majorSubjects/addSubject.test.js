@@ -39,7 +39,7 @@ const testSubject2 = {
   classification: 'Classification',
 };
 
-const route = '/api/v1/majorsubject';
+const route = '/api/v1/major-subjects';
 
 after(async () => {
   await MajorSubject.deleteMany({ name: testSubject.name });

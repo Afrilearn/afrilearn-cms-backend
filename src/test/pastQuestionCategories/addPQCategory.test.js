@@ -29,7 +29,7 @@ const testPQCategory = {
   name: 'TestPQ',
   categoryId: 1,
 };
-const route = '/api/v1/pqcategory';
+const route = '/api/v1/past-questions';
 
 describe('ADD PAST QUESTION CATEGORY', () => {
   after(async () => {

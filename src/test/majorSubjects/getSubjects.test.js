@@ -36,7 +36,7 @@ const adminToken = userUtils.generateToken(
   'Administrator User',
 );
 
-const baseUrl = '/api/v1/majorsubject';
+const baseUrl = '/api/v1/major-subjects';
 
 describe(`/GET ${baseUrl}`, () => {
   describe('Successful fetch', () => {

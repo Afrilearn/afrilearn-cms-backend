@@ -1651,7 +1651,7 @@ describe('COURSES', () => {
     });
   });
 
-  describe(`GET/ ${baseUrl}/:courseId/pastquestions`, () => {
+  describe(`GET/ ${baseUrl}/:courseId/past-questions`, () => {
     const courseId = mongoose.Types.ObjectId();
     describe('FETCH COURSE PAST QUESTIONS SUCCESSFULLY', () => {
       beforeEach(async () => {
@@ -1688,7 +1688,7 @@ describe('COURSES', () => {
       it('should fetch all course past questions for all users', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${courseId}/pastquestions`)
+          .get(`${baseUrl}/${courseId}/past-questions`)
           .set('token', staffToken)
           .end((err, res) => {
             res.status.should.equals(200);
@@ -1718,7 +1718,7 @@ describe('COURSES', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${courseId}/pastquestions`)
+          .get(`${baseUrl}/${courseId}/past-questions`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(500);
@@ -1733,7 +1733,7 @@ describe('COURSES', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${courseId}/pastquestions`)
+          .get(`${baseUrl}/${courseId}/past-questions`)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have.property('status').to.equals('error');
@@ -1746,7 +1746,7 @@ describe('COURSES', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${courseId}/pastquestions`)
+          .get(`${baseUrl}/${courseId}/past-questions`)
           .set('token', invalidToken)
           .end((err, res) => {
             res.should.have.status(401);
@@ -1763,7 +1763,7 @@ describe('COURSES', () => {
       it('should return 400 error if course id is not valid mongoose id', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/invalidcourseid/pastquestions`)
+          .get(`${baseUrl}/invalidcourseid/past-questions`)
           .set('token', staffToken)
           .end((err, res) => {
             res.should.have.status(400);
@@ -1777,7 +1777,7 @@ describe('COURSES', () => {
     });
   });
 
-  describe(`/DELETE ${baseUrl}/:courseId/pastquestions/:pastquestionId`, () => {
+  describe(`/DELETE ${baseUrl}/:courseId/past-questions/:pastquestionId`, () => {
     let courseId, typeId, pastQuestion;
     beforeEach(async () => {
       courseId = mongoose.Types.ObjectId();
@@ -1795,7 +1795,7 @@ describe('COURSES', () => {
       it('should delete course past question for admin', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .delete(`${baseUrl}/${courseId}/past-questions/${pastQuestion._id}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.status.should.equals(200);
@@ -1810,7 +1810,7 @@ describe('COURSES', () => {
       it('should delete course past question for moderator', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .delete(`${baseUrl}/${courseId}/past-questions/${pastQuestion._id}`)
           .set('token', moderatorToken)
           .end((err, res) => {
             res.status.should.equals(200);
@@ -1838,7 +1838,7 @@ describe('COURSES', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .delete(`${baseUrl}/${courseId}/past-questions/${pastQuestion._id}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(500);
@@ -1853,7 +1853,7 @@ describe('COURSES', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .delete(`${baseUrl}/${courseId}/past-questions/${pastQuestion._id}`)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have.property('status').to.equals('error');
@@ -1866,7 +1866,7 @@ describe('COURSES', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .delete(`${baseUrl}/${courseId}/past-questions/${pastQuestion._id}`)
           .set('token', invalidToken)
           .end((err, res) => {
             res.should.have.status(401);
@@ -1883,7 +1883,7 @@ describe('COURSES', () => {
       it('should return 401 with error if user is not moderator or admin', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/${courseId}/pastquestions/${pastQuestion._id}`)
+          .delete(`${baseUrl}/${courseId}/past-questions/${pastQuestion._id}`)
           .set('token', staffToken)
           .end((err, res) => {
             res.should.have.status(401);

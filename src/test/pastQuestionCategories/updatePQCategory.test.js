@@ -33,7 +33,7 @@ const testPQCategory = {
 
 let pqCategory;
 
-const route = '/api/v1/pqcategory';
+const route = '/api/v1/past-questions';
 
 describe('UPDATE A PAST QUESTION CATEGORY', () => {
   beforeEach(async () => {

@@ -33,7 +33,7 @@ const testPQCategory = {
 
 let pqCategory;
 
-const route = '/api/v1/pqcategory';
+const route = '/api/v1/past-questions';
 
 describe('GET A PAST QUESTION CATEGORY', () => {
   before(async () => {
