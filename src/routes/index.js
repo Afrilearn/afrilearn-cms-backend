@@ -8,6 +8,7 @@ import coursesRouter from './courses.route';
 import mainSubjectsRouter from './mainSubjects.route';
 import termRouter from './terms.route';
 import courseCategoryRouter from './courseCategories.route';
+import countsRouter from './counts.route';
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.use('/majorsubject', mainSubjectsRouter);
 router.use('/term', termRouter);
 router.use('/course_categories', courseCategoryRouter);
 router.use('/lesson', lessonRouter);
+router.use('/counts', countsRouter);
 router.use('/payments', paymentRoute);
 
 export default router;

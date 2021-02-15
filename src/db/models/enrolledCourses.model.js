@@ -24,7 +24,7 @@ const EnrolledCourseSchema = new mongoose.Schema(
     },
     endDate: {
       type: Date,
-      default: new Date().setHours(48),
+      default: new Date(),
     },
   },
   { timestamps: true },
@@ -34,6 +34,11 @@ const EnrolledCourseSchema = new mongoose.Schema(
   },
 );
 
+EnrolledCourseSchema.methods.toJSON = function () {
+  const enrolledCourse = this;
+  const enrolledCourseObject = enrolledCourse.toObject();
+  enrolledCourseObject.paymentIsActive = enrolledCourseObject.endDate > Date.now();
+  return enrolledCourseObject;
+};
 const EnrolledCourse = mongoose.model('enrolledCourse', EnrolledCourseSchema);
-
 export default EnrolledCourse;
