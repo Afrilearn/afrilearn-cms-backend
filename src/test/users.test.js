@@ -799,7 +799,7 @@ describe('USERS', () => {
             done();
           });
       });
-      it('should fetch all questions for a moderator', (done) => {
+      it('should fetch all user courses for a moderator', (done) => {
         chai
           .request(app)
           .get(`${baseUrl}/${userId}/enrolled-courses`)
@@ -818,7 +818,7 @@ describe('USERS', () => {
             done();
           });
       });
-      it('should fetch all questions for a staff', (done) => {
+      it('should fetch all user courses for a staff', (done) => {
         chai
           .request(app)
           .get(`${baseUrl}/${userId}/enrolled-courses`)
