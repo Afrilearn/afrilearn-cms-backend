@@ -51,4 +51,14 @@ router.delete(
   PaymentController.deletePaymentPlan,
 );
 
+router.post(
+  '/manual_activation',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess(),
+  PaymentValidator.validateManualPaymentData(),
+  PaymentValidator.manualPaymentValidationResult,
+  PaymentMiddleware.fetchEmailUser,
+  PaymentController.payManually,
+);
+
 export default router;

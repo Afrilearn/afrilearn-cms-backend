@@ -18,14 +18,6 @@ const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'cmsuser',
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   {
     toJSON: { virtuals: true },

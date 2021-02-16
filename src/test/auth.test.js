@@ -5,7 +5,6 @@ import Sinonchai from 'sinon-chai';
 import mongoose from 'mongoose';
 import Users from '../db/models/cmsUsers.model';
 import userUtils from '../utils/user.utils';
-import Response from '../utils/response.utils';
 
 import app from '../index';
 
@@ -91,7 +90,7 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
 
   describe('FAKE INTERNAL SERVER ERROR', () => {
     let stub;
-    before(async() => {
+    before(async () => {
       await Users.deleteMany();
       const createdUser = await Users.create(user);
       userId = createdUser._id;

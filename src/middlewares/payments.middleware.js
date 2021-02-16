@@ -1,6 +1,6 @@
 import PaymentPlans from '../db/models/paymentPlans.model';
 import GeneralServices from '../services/general.services';
-
+import Users from '../db/models/users.model';
 /**
  * Contains Courses Middleware
  *
@@ -27,7 +27,7 @@ export default class CoursesMiddleware {
   }
 
   /**
-   * @memberof CategoryMiddleware
+   * @memberof PaymentMiddleware
    * @param {*} req - Payload
    * @param {*} res - Response object
    * @param {*} next - Passes control to next function
@@ -41,6 +41,25 @@ export default class CoursesMiddleware {
       PaymentPlans,
       { name: req.body.name },
       'This payment plan',
+    );
+  }
+
+  /**
+   * @memberof PaymentMiddleware
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @param {*} next - Passes control to next function
+   * @returns {JSON} Error response if user exists
+   * @returns {JSON} passes control to the next function if user doesn't exist
+   */
+  static async fetchEmailUser(req, res, next) {
+    GeneralServices.checkDocExistence(
+      req,
+      res,
+      next,
+      Users,
+      { email: req.body.email },
+      'The user',
     );
   }
 }

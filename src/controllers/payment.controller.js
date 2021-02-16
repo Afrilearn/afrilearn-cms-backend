@@ -1,6 +1,7 @@
 /* eslint-disable require-jsdoc */
 import PaymentPlans from '../db/models/paymentPlans.model';
-import Payment from '../db/models/payments.model';
+import Transactions from '../db/models/transaction.model';
+import EnrolledCourses from '../db/models/enrolledCourses.model';
 import Response from '../utils/response.utils';
 
 class PaymentController {
@@ -15,7 +16,7 @@ class PaymentController {
 
   static async fetchAllPaymentTransactions(req, res) {
     try {
-      const paymentTransactions = await Payment.find();
+      const paymentTransactions = await Transactions.find();
       Response.Success(res, { paymentTransactions });
     } catch (error) {
       Response.InternalServerError(res, 'Error fetching payment transactions');
@@ -28,7 +29,10 @@ class PaymentController {
         name, amount, duration, category,
       } = req.body;
       const paymentPlan = await PaymentPlans.create({
-        name, amount, duration, category,
+        name,
+        amount,
+        duration,
+        category,
       });
       Response.Success(res, { paymentPlan }, 201);
     } catch (error) {
@@ -61,6 +65,40 @@ class PaymentController {
       Response.Success(res, { message: 'Payment plan deleted successfully' });
     } catch (error) {
       Response.InternalServerError(res, 'Error deleting payment plan');
+    }
+  }
+
+  static async payManually(req, res) {
+    try {
+      const userId = req.dbResult._id;
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setDate(startDate.getDate() + req.body.paymentPlan.duration * 30);
+      const enrolledCourse = await EnrolledCourses.create({
+        userId,
+        courseId: req.body.courseId,
+        classId: req.body.classId,
+        startDate,
+        endDate,
+      });
+
+      const transactionUpload = await Transactions.create({
+        tx_ref: req.body.transactionRef,
+        amount: req.body.paymentPlan.amount,
+        status: 'successful',
+        userId,
+        enrolledCourseId: enrolledCourse._id,
+        paymentPlanId: req.body.paymentPlan._id,
+      });
+
+      const transaction = await Transactions.findById(transactionUpload._id).populate(
+        'userId paymentPlanId',
+        'fullName email name duration amount',
+      );
+
+      Response.Success(res, { transaction }, 201);
+    } catch (error) {
+      Response.InternalServerError(res, 'Error activating payment');
     }
   }
 }

@@ -1,9 +1,9 @@
-import Courses from "../db/models/courses.model";
-import Subjects from "../db/models/mainSubjects.model";
-import AfrilearnUsers from "../db/models/users.model";
-import Response from "../utils/response.utils";
-import Questions from "../db/models/questions.model";
-import EnrolledCourses from "../db/models/enrolledCourses.model";
+import Courses from '../db/models/courses.model';
+import Subjects from '../db/models/mainSubjects.model';
+import AfrilearnUsers from '../db/models/users.model';
+import Response from '../utils/response.utils';
+import Questions from '../db/models/questions.model';
+import EnrolledCourses from '../db/models/enrolledCourses.model';
 
 /**
  * CountsController class
