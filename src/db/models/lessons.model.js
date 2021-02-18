@@ -11,7 +11,7 @@ const LessonSchema = new mongoose.Schema(
       ref: 'course',
     },
     creatorId: {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose .Schema.ObjectId,
       ref: 'user',
     },
     termId: {
@@ -35,6 +35,9 @@ const LessonSchema = new mongoose.Schema(
         },
       },
     ],
+    transcripts: {
+      type: Array
+    },
     createdAt: {
       type: Date,
       default: Date.now,

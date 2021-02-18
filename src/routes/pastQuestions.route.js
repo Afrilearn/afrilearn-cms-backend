@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import AuthMiddleware from '../middlewares/auth.middleware';
-import PQCategoryController from '../controllers/pastQuestionsCategory.controller';
+import PQCategoryController from '../controllers/pastQuestions.controller';
 import PQCategoryMiddleware from '../middlewares/pqCategory.middleware';
-import AddPQCategoryValidator from '../validations/pastQuestionsCategory.validator';
+import AddPQCategoryValidator from '../validations/pastQuestions.validator';
 
 const router = Router();
 

@@ -11,24 +11,29 @@ const QuestionSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'user',
     },
-    question: {
-      type: String,
+    questionsArray: [
+    {
+      question: {
+        type: String,
+      },
+      question_image: {
+        type: String,
+      },
+      question_position: {
+        type: String,
+        default: 'above',
+      },
+      options: { type: Array },
+      images: { type: Array },
+      correct_option: {
+        type: Number,
+        required: true
+      },
+      explanation: {
+        type: String,
+      },
     },
-    question_image: {
-      type: String,
-    },
-    question_position: {
-      type: String,
-      default: 'above',
-    },
-    options: { type: Array },
-    images: { type: Array },
-    correct_option: {
-      type: Number,
-    },
-    explanation: {
-      type: String,
-    },
+    ],
   },
   { timestamps: true },
   {

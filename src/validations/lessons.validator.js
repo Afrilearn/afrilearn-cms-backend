@@ -56,9 +56,7 @@ export default class LessonValidator {
         .withMessage('Subject Id is required')
         .notEmpty()
         .withMessage('Subject Id cannot be empty')
-        .custom(HelperUtils.validateMongooseId('Subject id')),
-      check('videoUrls').optional()
-        .isArray().withMessage('VideoUrls must be an array'),
+        .custom(HelperUtils.validateMongooseId('Subject id'))
     ];
   }
 
@@ -156,36 +154,41 @@ export default class LessonValidator {
         .exists()
         .withMessage('Creator id is required')
         .custom(HelperUtils.validateMongooseId('Creator id')),
-      check('question')
+      check('questionsArray')
+        .exists()
+        .withMessage('Questions Array is required')
+        .withMessage('Questions Array cannot be empty'),
+        check("questionsArray.*.question") 
         .exists()
         .withMessage('Question is required')
         .notEmpty()
         .withMessage('Question cannot be empty')
         .isString()
         .withMessage('Question must be a string'),
-      check('options')
+        check("questionsArray.*.options") 
         .isArray()
         .withMessage('Options must be an array')
         .exists()
         .withMessage('Options are required')
         .isLength({ min: 2 })
         .withMessage('Options must be more than one'),
-      check('images').optional()
+        check("questionsArray.*.images") .optional()
         .isArray().withMessage('Images must be an array'),
-      check('correct_option')
+        check("questionsArray.*.correct_option") 
         .exists()
         .withMessage('Correct option is required')
         .isNumeric()
         .withMessage('Correct option must be a number'),
-      check('questionPosition').custom((val) => (
+        check("questionsArray.*.questionPosition") .custom((val) => (
         val === 'above'
           || val === 'below'
           || "Question position has to be either 'above' or 'below'"
       )),
-      check('explanation')
+      check("questionsArray.*.explanation") 
         .isString()
         .withMessage('Explanation must be a string')
-        .notEmpty()
+        .not()
+        .isEmpty()
         .withMessage('Explanation cannot be empty'),
     ];
   }
@@ -218,31 +221,39 @@ export default class LessonValidator {
       check('lessonId')
         .optional()
         .custom(HelperUtils.validateMongooseId('Lesson id')),
-      check('question')
-        .optional()
+        check('questionsArray')
+        .optional()     
+        .isLength({ min: 1 })
+        .withMessage('Questions Array cannot be empty'),
+        check("questionsArray.*.question")
+        .optional() 
+        .notEmpty()
+        .withMessage('Question cannot be empty')
         .isString()
         .withMessage('Question must be a string'),
-      check('options')
+        check("questionsArray.*.options") 
         .optional()
         .isArray()
         .withMessage('Options must be an array')
         .isLength({ min: 2 })
         .withMessage('Options must be more than one'),
-      check('images').optional().isArray().withMessage('Images must be an array'),
-      check('correct_option')
+        check("questionsArray.*.images") .optional()
+        .isArray().withMessage('Images must be an array'),
+        check("questionsArray.*.correct_option") 
         .optional()
         .isNumeric()
         .withMessage('Correct option must be a number'),
-      check('questionPosition').custom((val) => (
+        check("questionsArray.*.questionPosition") .custom((val) => (
         val === 'above'
           || val === 'below'
           || "Question position has to be either 'above' or 'below'"
       )),
-      check('explanation')
+      check("questionsArray.*.explanation") 
         .optional()
         .isString()
         .withMessage('Explanation must be a string')
-        .notEmpty()
+        .not()
+        .isEmpty()
         .withMessage('Explanation cannot be empty'),
     ];
   }

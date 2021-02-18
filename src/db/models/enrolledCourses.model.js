@@ -40,5 +40,12 @@ EnrolledCourseSchema.methods.toJSON = function () {
   enrolledCourseObject.paymentIsActive = enrolledCourseObject.endDate > Date.now();
   return enrolledCourseObject;
 };
+
+EnrolledCourseSchema.virtual('courses', {
+  ref: 'course',
+  localField: 'courseId',
+  foreignField: '_id',
+  justOne: false,
+});
 const EnrolledCourse = mongoose.model('enrolledCourse', EnrolledCourseSchema);
 export default EnrolledCourse;

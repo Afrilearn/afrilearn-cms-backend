@@ -58,8 +58,10 @@ export default class MajorSubjectController {
       const mainSubject = await MajorSubject.findOne({ _id: mainSubjectId });
       if (!mainSubject) return Response.NotFoundError(res, 'subject does not exist');
       const subjectValues = { $set: req.body };
-      await MajorSubject.updateOne({ _id: mainSubjectId }, subjectValues);
-      return Response.Success(res, { message: 'subject updated successfully' }, 200);
+      const subjectUpdate = await MajorSubject.findOneAndUpdate(
+        { _id: mainSubjectId }, subjectValues, { returnOriginal: false }
+      );
+      return Response.Success(res, { mainSubject: subjectUpdate }, 200);
     } catch (error) {
       return Response.InternalServerError(res, 'Could not update subject');
     }
