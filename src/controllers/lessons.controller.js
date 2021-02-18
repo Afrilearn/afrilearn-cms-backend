@@ -2,8 +2,6 @@ import Response from '../utils/response.utils';
 import Lesson from '../db/models/lessons.model';
 import Question from '../db/models/questions.model';
 import FileHelper from '../utils/upload.utils'
-import aws from 'aws-sdk';
-
 
 /**
  * This class creates the lesson controller
@@ -31,7 +29,7 @@ export default class LessonController {
  * @param {ServerResponse} res
  * @returns {ServerResponse} response
  */
-  static async createLesson(req, res) {
+  static async createLesson(req, res) {   
     try {
       let uploads = [];
       req.files.forEach((file) => {

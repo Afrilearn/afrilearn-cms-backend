@@ -1,5 +1,6 @@
 import fs from 'fs';
 import aws from 'aws-sdk';
+import Response from '../utils/response.utils'
 
 /**
  * Defines helper functions for file upload
@@ -24,11 +25,11 @@ export default class FileUpload {
             Bucket: "afrilearn",
             Body: fs.createReadStream(file.path),
             Metadata: { fieldName: file.fieldname },
-            Key: `${Date.now() + file.originalname}`,
+            Key: `test/${Date.now() + file.originalname}`,
           };
           s3.upload(params, (err, data) => {
             if (err) {
-              console.log("An error occured");
+              return Response.InternalServerError(res, 'Images could not be uploaded');
             }
             fs.unlinkSync(file.path);
             resolve(data);
