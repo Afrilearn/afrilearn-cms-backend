@@ -11,6 +11,7 @@ import app from '../index';
 import Question from '../db/models/questions.model';
 
 const aws = require('aws-sdk');
+const s3 = new aws.S3();
 
 chai.should();
 chai.use(Sinonchai);
@@ -223,11 +224,11 @@ describe('LESSON QUIZ', () => {
           });
       });
     });
-    // describe.only('FAKE INTERNAL SERVER ERROR', () => {
+    // describe('FAKE INTERNAL SERVER ERROR', () => {
     //     let stub;
 
     //     before(() => {
-    //         stub = sinon.stub(s3, 'upload').callsArgWith(1, null, { err: new Error('error') });
+    //         stub = sinon.stub(s3, 'upload').throws(new Error('error'));
     //     });
     //     after(() => {
     //         stub.restore();
@@ -242,15 +243,11 @@ describe('LESSON QUIZ', () => {
     //             .field('creator_Id', question.creator_Id)
     //             .field('questionsArray', JSON.stringify(question.questionsArray))
     //             .attach('images', images[0].path)
-    //             .attach('images', images[1].path)
-    //             .attach('images', images[2].path)
-    //             .attach('images', images[3].path)
-    //             .attach('images', images[4].path)
     //             .end((err, res) => {
     //                 res.should.have.status(500);
     //                 res.body.should.have
     //                     .property('error')
-    //                     .to.equals('Images could not be uploaded');
+    //                     .to.equals('could not add quiz');
     //                 done();
     //             });
     //     });

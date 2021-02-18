@@ -15,6 +15,7 @@ chai.should();
 chai.use(Sinonchai);
 chai.use(chaiHttp);
 
+const s3 = new aws.S3();
 const validCreatorId = mongoose.Types.ObjectId();
 const validSubjectId = mongoose.Types.ObjectId();
 const validCourseId = mongoose.Types.ObjectId();
@@ -191,7 +192,7 @@ describe('LESSONS', () => {
       });
     });
 
-    // describe('FAKE INTERNAL SERVER ERROR', () => {
+    // describe.only('FAKE INTERNAL SERVER ERROR', () => {
     //   let stub;
     //   before(() => {
     //     stub = sinon.stub(s3, 'upload').throws(new Error('error'))
@@ -217,7 +218,7 @@ describe('LESSONS', () => {
     //         res.should.have.status(500);
     //         res.body.should.have
     //           .property('error')
-    //           .to.equals('Images could not be uploaded');
+    //           .to.equals('Could not create lesson');
     //         done();
     //       });
     //   });

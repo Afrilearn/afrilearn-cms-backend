@@ -1,6 +1,5 @@
 import fs from 'fs';
 import aws from 'aws-sdk';
-import Response from './response.utils';
 
 /**
  * Defines helper functions for file upload
@@ -29,11 +28,11 @@ export default class FileUpload {
       };
       s3.upload(params, (err, data) => {
         if (err) {
-          return Response.InternalServerError(res, 'Images could not be uploaded');
+          reject (err);
         }
         fs.unlinkSync(file.path);
         resolve(data);
       });
-    });
+    }).catch(err => { throw err });
   }
 }
