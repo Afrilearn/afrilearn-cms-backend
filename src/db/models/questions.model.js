@@ -12,27 +12,27 @@ const QuestionSchema = new mongoose.Schema(
       ref: 'user',
     },
     questionsArray: [
-    {
-      question: {
-        type: String,
+      {
+        question: {
+          type: String,
+        },
+        question_image: {
+          type: String,
+        },
+        question_position: {
+          type: String,
+          default: 'above',
+        },
+        options: { type: Array },
+        images: { type: Array },
+        correct_option: {
+          type: Number,
+          required: true,
+        },
+        explanation: {
+          type: String,
+        },
       },
-      question_image: {
-        type: String,
-      },
-      question_position: {
-        type: String,
-        default: 'above',
-      },
-      options: { type: Array },
-      images: { type: Array },
-      correct_option: {
-        type: Number,
-        required: true
-      },
-      explanation: {
-        type: String,
-      },
-    },
     ],
   },
   { timestamps: true },

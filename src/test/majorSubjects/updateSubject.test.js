@@ -89,12 +89,12 @@ describe('UPDATE A MAJOR SUBJECT', () => {
         .send(testSubject)
         .end((error, res) => {
           res.should.have.status(200);
-            res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have.property('mainSubject');
-            res.body.data.mainSubject.should.have
-              .property('name')
-              .to.equals(testSubject.name);
-            done();
+          res.body.should.have.property('status').to.equals('success');
+          res.body.data.should.have.property('mainSubject');
+          res.body.data.mainSubject.should.have
+            .property('name')
+            .to.equals(testSubject.name);
+          done();
         });
     });
 

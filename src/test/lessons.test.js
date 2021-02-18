@@ -3,20 +3,18 @@ import chaiHttp from 'chai-http';
 import Sinonchai from 'sinon-chai';
 import sinon from 'sinon';
 import mongoose from 'mongoose';
+import aws from 'aws-sdk';
+import fs from 'fs';
 import Lesson from '../db/models/lessons.model';
 import userUtils from '../utils/user.utils';
 import Response from '../utils/response.utils';
-import aws from 'aws-sdk';
-import fs from 'fs';
 
 import app from '../index';
-import FileUpload from '../utils/upload.utils';
 
 chai.should();
 chai.use(Sinonchai);
 chai.use(chaiHttp);
 
-const s3 = new aws.S3();
 const validCreatorId = mongoose.Types.ObjectId();
 const validSubjectId = mongoose.Types.ObjectId();
 const validCourseId = mongoose.Types.ObjectId();
@@ -28,7 +26,7 @@ const lesson = {
   subjectId: validSubjectId.toHexString(),
   termId: validTermId.toHexString(),
   content: 'Lesson One is important',
-  transcripts: '["Welcome to the first lesson"]'
+  transcripts: '["Welcome to the first lesson"]',
 };
 const lessonUpdate = {
   title: 'Lesson Two',
@@ -39,8 +37,8 @@ const lessonUpdate = {
 };
 const videos = [{
   path: './src/test/videos/fileOne.mp4',
-  name: 'fileOne.mp4'
-}]
+  name: 'fileOne.mp4',
+}];
 
 const invalidToken = 'invalid.jwt.token';
 const staffToken = userUtils.generateToken(

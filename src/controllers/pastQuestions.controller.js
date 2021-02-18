@@ -14,8 +14,8 @@ export default class PastQuestionsCategoryController {
      */
   static async getOneCategory(req, res) {
     const pqCategoryId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) { 
-      return Response.BadRequestError(res, 'CategoryId is invalid'); 
+    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) {
+      return Response.BadRequestError(res, 'CategoryId is invalid');
     }
     try {
       const pqCategory = await PQCategory.findById(pqCategoryId);
@@ -60,7 +60,7 @@ export default class PastQuestionsCategoryController {
       if (!pqCategory) return Response.NotFoundError(res, 'category does not exist');
       const categoryValues = { $set: req.body };
       const pastQuestionUpdate = await PQCategory.findOneAndUpdate(
-        { _id: pqCategoryId }, categoryValues, { returnOriginal: false }
+        { _id: pqCategoryId }, categoryValues, { returnOriginal: false },
       );
       return Response.Success(res, { pastQuestion: pastQuestionUpdate }, 200);
     } catch (error) {

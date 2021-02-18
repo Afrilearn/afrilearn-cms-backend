@@ -92,10 +92,10 @@ describe('UPDATE A PAST QUESTION CATEGORY', () => {
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('success');
           res.body.data.should.have.property('pastQuestion');
-            res.body.data.pastQuestion.should.have
-              .property('name')
-              .to.equals('TestCategory');
-            done();
+          res.body.data.pastQuestion.should.have
+            .property('name')
+            .to.equals('TestCategory');
+          done();
         });
     });
 

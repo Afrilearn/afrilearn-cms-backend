@@ -59,7 +59,7 @@ export default class MajorSubjectController {
       if (!mainSubject) return Response.NotFoundError(res, 'subject does not exist');
       const subjectValues = { $set: req.body };
       const subjectUpdate = await MajorSubject.findOneAndUpdate(
-        { _id: mainSubjectId }, subjectValues, { returnOriginal: false }
+        { _id: mainSubjectId }, subjectValues, { returnOriginal: false },
       );
       return Response.Success(res, { mainSubject: subjectUpdate }, 200);
     } catch (error) {
