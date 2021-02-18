@@ -28,11 +28,11 @@ export default class FileUpload {
       };
       s3.upload(params, (err, data) => {
         if (err) {
-          reject (err);
+          throw err;
         }
         fs.unlinkSync(file.path);
         resolve(data);
       });
-    }).catch(err => { throw err });
+    })
   }
 }

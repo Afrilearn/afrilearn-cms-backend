@@ -148,7 +148,7 @@ export default class LessonController {
       for (let i = 0; i < imageArrays.length; i++) {
         req.body.questionsArray[i].question_image = imageArrays[i][0].Location;
         req.body.questionsArray[i].images = [imageArrays[i][1].Location, imageArrays[i][2].Location,
-          imageArrays[i][3].Location, imageArrays[i][4].Location];
+        imageArrays[i][3].Location, imageArrays[i][4].Location];
       }
 
       const result = await Question.create({ ...req.body });
@@ -207,8 +207,9 @@ export default class LessonController {
         req.body.questionsArray = JSON.parse(req.body.questionsArray);
         for (let i = 0; i < imageArrays.length; i++) {
           req.body.questionsArray[i].question_image = imageArrays[i][0].Location;
-          req.body.questionsArray[i].images = [imageArrays[i][1].Location, imageArrays[i][2].Location,
-            imageArrays[i][3].Location, imageArrays[i][4].Location];
+          req.body.questionsArray[i].images = [imageArrays[i][1].Location,
+          imageArrays[i][2].Location, imageArrays[i][3].Location,
+          imageArrays[i][4].Location];
         }
       }
 
