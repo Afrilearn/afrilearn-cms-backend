@@ -14,8 +14,8 @@ export default class PastQuestionsCategoryController {
      */
   static async getOneCategory(req, res) {
     const pqCategoryId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) { 
-      return Response.BadRequestError(res, 'CategoryId is invalid'); 
+    if (!mongoose.Types.ObjectId.isValid(pqCategoryId)) {
+      return Response.BadRequestError(res, 'CategoryId is invalid');
     }
     try {
       const pqCategory = await PQCategory.findById(pqCategoryId);
