@@ -34,7 +34,11 @@ const testSubject = {
 
 let subject;
 
+<<<<<<< HEAD
 const route = '/api/v1/main-subjects';
+=======
+const route = '/api/v1/major-subjects';
+>>>>>>> develop
 
 describe('UPDATE A MAJOR SUBJECT', () => {
   before(async () => {

@@ -6,7 +6,9 @@ import mongoose from 'mongoose';
 import userUtils from '../utils/user.utils';
 import Response from '../utils/response.utils';
 import PaymentController from '../controllers/payment.controller';
-import PaymentTransactions from '../db/models/payments.model';
+import PaymentTransactions from '../db/models/transaction.model';
+import EnrolledCourses from '../db/models/enrolledCourses.model';
+import Users from '../db/models/users.model';
 
 import app from '../index';
 import PaymentPlans from '../db/models/paymentPlans.model';
@@ -935,6 +937,272 @@ describe(`/GET ${transactionUrl}/transactions`, () => {
             .to.equals('Not authorized to access data');
           done();
         });
+    });
+  });
+});
+
+const manualUrl = '/api/v1/payments/manual_activation';
+describe('MANUAL ACTIVATION', () => {
+  const upload = {
+    transactionRef: '123456',
+    email: 'victor@example.com',
+    paymentPlan: {
+      name: 'gold',
+      duration: '3',
+      amount: 24000,
+    },
+    courseId: mongoose.Types.ObjectId(),
+    classId: mongoose.Types.ObjectId(),
+  };
+  describe('SUCCESSFULLY ACTIVATE MANUALLY', () => {
+    let user, plan, courseId, classId, userUpload;
+    beforeEach(async () => {
+      userUpload = {
+        email: 'victoronwukwe@example.com',
+        fullName: 'VictorOnwukwe',
+      };
+      await Users.deleteMany({ email: userUpload.email });
+      await PaymentPlans.deleteMany({ name: 'gold' });
+      user = await Users.create(userUpload);
+      plan = await PaymentPlans.create({
+        name: 'gold',
+        duration: 3,
+        amount: 24000,
+      });
+      courseId = mongoose.Types.ObjectId();
+      classId = mongoose.Types.ObjectId();
+    });
+    afterEach(async () => {
+      await Users.deleteMany({ email: userUpload.email });
+      await EnrolledCourses.deleteMany();
+      await PaymentPlans.deleteMany({ _id: plan._id });
+    });
+
+    it('should successfully activate payment plan', (done) => {
+      chai
+        .request(app)
+        .post(manualUrl)
+        .set('token', adminToken)
+        .send({
+          transactionRef: '123456',
+          email: user.email,
+          paymentPlan: plan,
+          courseId,
+          classId,
+        })
+        .end((err, res) => {
+          res.should.have.status(201);
+          res.body.should.have.property('status').to.equals('success');
+          res.body.data.should.have.property('transaction');
+          res.body.data.transaction.should.have
+            .property('tx_ref')
+            .to.equals('123456');
+          res.body.data.transaction.userId._id.should.equals(
+            user._id.toHexString(),
+          );
+          res.body.data.transaction.userId.fullName.should.equals(
+            user.fullName,
+          );
+          res.body.data.transaction.userId.email.should.equals(user.email);
+          res.body.data.transaction.paymentPlanId._id.should.equals(
+            plan._id.toHexString(),
+          );
+          res.body.data.transaction.paymentPlanId.amount.should.equals(
+            plan.amount,
+          );
+          res.body.data.transaction.paymentPlanId.name.should.equals(plan.name);
+          res.body.data.transaction.paymentPlanId.duration.should.equals(
+            plan.duration,
+          );
+          done();
+        });
+    });
+  });
+
+  describe('FAKE INTERNAL SERVER ERROR', () => {
+    let stub;
+    before(() => {
+      stub = sinon.stub(Response, 'InternalServerError').returnsThis();
+    });
+    after(() => {
+      stub.restore();
+    });
+    it('returns status of 500', async () => {
+      const req = undefined;
+      await PaymentController.payManually(req);
+      stub.should.have.callCount(1);
+    });
+  });
+
+  describe('TOKEN VALIDATION', () => {
+    it('should return 401 with error message if no token is provided', (done) => {
+      chai
+        .request(app)
+        .post(baseUrl)
+        .send(upload)
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('error')
+            .to.equals('Not authorized to access data');
+          done();
+        });
+    });
+    it('should return 401 status with error message if an invalid token is provided', (done) => {
+      chai
+        .request(app)
+        .post(baseUrl)
+        .set('token', invalidToken)
+        .send(upload)
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('error')
+            .to.equals('Not authorized to access data');
+          done();
+        });
+    });
+  });
+
+  describe('ADMIN ACCESS', () => {
+    it('should return 401 with error if user is moderator', (done) => {
+      chai
+        .request(app)
+        .post(baseUrl)
+        .set('token', moderatorToken)
+        .send(upload)
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('error')
+            .to.equals('Not authorized to access data');
+          done();
+        });
+    });
+    it('should return 401 with error if user is staff', (done) => {
+      chai
+        .request(app)
+        .post(baseUrl)
+        .set('token', staffToken)
+        .send(upload)
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.have.property('status').to.equals('error');
+          res.body.should.have
+            .property('error')
+            .to.equals('Not authorized to access data');
+          done();
+        });
+    });
+  });
+
+  describe('INPUT VALIDATION', () => {
+    let dynamicUpload, request;
+    beforeEach(() => {
+      request = chai.request(app).post(manualUrl).set('token', adminToken);
+      dynamicUpload = {
+        transactionRef: '123456',
+        email: 'victor@example.com',
+        paymentPlan: {
+          name: 'gold',
+          duration: '3',
+          amount: 24000,
+        },
+        courseId: mongoose.Types.ObjectId(),
+        classId: mongoose.Types.ObjectId(),
+      };
+    });
+
+    it('should not activate payment if transaction ref is not provided', (done) => {
+      delete dynamicUpload.transactionRef;
+      request.send(dynamicUpload).end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.have.property('status').to.equals('error');
+        res.body.should.have
+          .property('errors')
+          .to.include('Reference number is required');
+        done();
+      });
+    });
+    it('should not activate payment if transaction ref is not a string', (done) => {
+      dynamicUpload.transactionRef = 2;
+      request.send(dynamicUpload).end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.have.property('status').to.equals('error');
+        res.body.should.have
+          .property('errors')
+          .to.include('Reference number must be a string');
+        done();
+      });
+    });
+    it('should not activate payment if transaction ref is empty', (done) => {
+      dynamicUpload.transactionRef = '';
+      request.send(dynamicUpload).end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.have.property('status').to.equals('error');
+        res.body.should.have
+          .property('errors')
+          .to.include('Reference number cannot be empty');
+        done();
+      });
+    });
+    it('should not activate payment if user email is not provided', (done) => {
+      delete dynamicUpload.email;
+      request.send(dynamicUpload).end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.have.property('status').to.equals('error');
+        res.body.should.have
+          .property('errors')
+          .to.include('User email is required');
+        done();
+      });
+    });
+    it('should not activate payment if user email is not a valid email', (done) => {
+      dynamicUpload.email = 'victor@';
+      request.send(dynamicUpload).end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.have.property('status').to.equals('error');
+        res.body.should.have
+          .property('errors')
+          .to.include('User email is not a valid email');
+        done();
+      });
+    });
+    it('should not activate payment if payment plan is not provided', (done) => {
+      delete dynamicUpload.paymentPlan;
+      request.send(dynamicUpload).end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.have.property('status').to.equals('error');
+        res.body.should.have
+          .property('errors')
+          .to.include('Payment plan is required');
+        done();
+      });
+    });
+    it('should not activate payment if course id is not a valid mongoose id', (done) => {
+      dynamicUpload.courseId = 'invalidmongooseid';
+      request.send(dynamicUpload).end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.have.property('status').to.equals('error');
+        res.body.should.have
+          .property('errors')
+          .to.include('Course id is not a valid mongoose ID');
+        done();
+      });
+    });
+    it('should not activate payment if class id is not a valid mongoose id', (done) => {
+      dynamicUpload.classId = 'invalidmongooseid';
+      request.send(dynamicUpload).end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.have.property('status').to.equals('error');
+        res.body.should.have
+          .property('errors')
+          .to.include('Class id is not a valid mongoose ID');
+        done();
+      });
     });
   });
 });

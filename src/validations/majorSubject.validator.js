@@ -1,4 +1,5 @@
 import { check, validationResult } from 'express-validator';
+import fs from 'fs';
 import Response from '../utils/response.utils';
 
 /**
@@ -38,6 +39,7 @@ class AddMajorSubject {
   static myValidationResult(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      fs.unlinkSync(req.file.path);
       const errArr = errors.array().map(({ msg }) => msg);
       return Response.InvalidRequestParamsError(res, errArr);
     }

@@ -5,7 +5,6 @@ import Sinonchai from 'sinon-chai';
 import mongoose from 'mongoose';
 import Users from '../db/models/cmsUsers.model';
 import userUtils from '../utils/user.utils';
-import Response from '../utils/response.utils';
 
 import app from '../index';
 
@@ -60,16 +59,6 @@ describe('No Matching Endpoint', () => {
 
 describe(`/PATCH ${baseUrl}/change_password`, () => {
   let userId;
-  beforeEach(async () => {
-    await Users.deleteMany();
-    const createdUser = await Users.create(user);
-    userId = createdUser._id;
-  });
-  afterEach((done) => {
-    Users.deleteMany((err) => {
-      if (!err) done();
-    });
-  });
   describe('SUCCESSFUL PASSWORD CHANGE', () => {
     beforeEach(async () => {
       await Users.deleteMany();
@@ -101,10 +90,16 @@ describe(`/PATCH ${baseUrl}/change_password`, () => {
 
   describe('FAKE INTERNAL SERVER ERROR', () => {
     let stub;
-    before(() => {
-      stub = sinon.stub(Response, 'Success').throws(new Error('error'));
+    before(async () => {
+      await Users.deleteMany();
+      const createdUser = await Users.create(user);
+      userId = createdUser._id;
+      stub = sinon.stub(Users, 'findByIdAndUpdate').throws(new Error('error'));
     });
-    after(() => {
+    after((done) => {
+      Users.deleteMany((err) => {
+        if (!err) done();
+      });
       stub.restore();
     });
     it('returns status of 500', (done) => {

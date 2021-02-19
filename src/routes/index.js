@@ -16,7 +16,7 @@ router.use('/auth', authRouter);
 router.use('/past-questions', pastQuestionsRouter);
 router.use('/users', userRouter);
 router.use('/courses', coursesRouter);
-router.use('/main-subjects', mainSubjectsRouter);
+router.use('/major-subjects', mainSubjectsRouter);
 router.use('/term', termRouter);
 router.use('/course_categories', courseCategoryRouter);
 router.use('/lesson', lessonRouter);

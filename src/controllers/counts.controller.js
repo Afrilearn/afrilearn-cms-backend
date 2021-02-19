@@ -5,7 +5,18 @@ import Response from '../utils/response.utils';
 import Questions from '../db/models/questions.model';
 import EnrolledCourses from '../db/models/enrolledCourses.model';
 
+/**
+ * CountsController class
+ * @class CountsController
+ */
 export default class CountsController {
+  /**
+   * @memberof UserController
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} with JSON containing counts
+   * @returns {Response.InternalServerError} if error occurs
+   */
   static async fetchAllCounts(req, res) {
     try {
       const courses = await Courses.countDocuments();

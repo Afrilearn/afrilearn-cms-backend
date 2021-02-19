@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import multer from 'multer';
 import AuthMiddleware from '../middlewares/auth.middleware';
 import MajorSubjectController from '../controllers/mainSubjects.controller';
 import MajorSubjectMiddleware from '../middlewares/majorSubject.middleware';
@@ -13,8 +14,10 @@ router.get(
   MajorSubjectController.fetchAllSubjects,
 );
 
+const upload = multer({ dest: 'temp/' });
 router.post(
   '/',
+  upload.single('media'),
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
   AddMajorSubjectValidator.validateData(),
