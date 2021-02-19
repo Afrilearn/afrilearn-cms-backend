@@ -53,7 +53,7 @@ export default class CoursesController {
   static async editCourse(req, res) {
     try {
       const { dbResult } = req;
-      dbResult.set({ ...req.body, updatedAt: Date.now() });
+      dbResult.set({ ...req.body });
       const result = await dbResult.save();
 
       Response.Success(res, { course: result });
@@ -91,7 +91,10 @@ export default class CoursesController {
         courseId: req.params.courseId,
         pastQuestionTypeId: req.body.pastQuestionId,
       });
-      const course = await Courses.findOne({ _id: req.params.courseId });
+      const course = await Courses.findById(req.params.courseId).populate({
+        path: 'relatedPastQuestions',
+        populate: { path: 'pastQuestionTypeId' },
+      });
 
       Response.Success(res, { course }, 201);
     } catch (err) {
@@ -112,7 +115,11 @@ export default class CoursesController {
         courseId: req.params.courseId,
         mainSubjectId: req.body.mainSubjectId,
       });
-      const course = await Courses.findOne({ _id: req.params.courseId });
+
+      const course = await Courses.findById(req.params.courseId).populate({
+        path: 'relatedSubjects',
+        populate: { path: 'mainSubjectId' },
+      });
 
       Response.Success(res, { course }, 201);
     } catch (err) {

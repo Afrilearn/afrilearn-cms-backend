@@ -83,8 +83,6 @@ describe('COURSES', () => {
             res.body.data.course.should.have
               .property('creatorId')
               .to.equals(course.creatorId.toHexString());
-            res.body.data.course.should.have.property('createdAt');
-            res.body.data.course.should.have.property('updatedAt');
             done();
           });
       });
@@ -110,8 +108,6 @@ describe('COURSES', () => {
             res.body.data.course.should.have
               .property('creatorId')
               .to.equals(course.creatorId.toHexString());
-            res.body.data.course.should.have.property('createdAt');
-            res.body.data.course.should.have.property('updatedAt');
             done();
           });
       });
@@ -420,10 +416,6 @@ describe('COURSES', () => {
             res.body.data.course.creatorId.should.equals(
               course.creatorId.toHexString(),
             );
-            res.body.data.course.should.have.property('updatedAt');
-            res.body.data.course.should.have
-              .property('createdAt')
-              .not.to.equals(res.body.data.course.updatedAt);
             done();
           });
       });
@@ -928,8 +920,8 @@ describe('COURSES', () => {
             res.body.data.course.should.have
               .property('creatorId')
               .to.equals(dbCourse.creatorId.toHexString());
-            res.body.data.course.should.have.property('createdAt');
-            res.body.data.course.should.have.property('updatedAt');
+            res.body.data.course.should.have.property('relatedPastQuestions');
+            res.body.data.course.relatedPastQuestions.should.be.an('array');
             done();
           });
         it('should create a new related past question if user is moderator', (done) => {
@@ -954,8 +946,6 @@ describe('COURSES', () => {
               res.body.data.course.should.have
                 .property('creatorId')
                 .to.equals(dbCourse.creatorId.toHexString());
-              res.body.data.course.should.have.property('createdAt');
-              res.body.data.course.should.have.property('updatedAt');
               done();
             });
         });
@@ -1161,8 +1151,8 @@ describe('COURSES', () => {
             res.body.data.course.should.have
               .property('creatorId')
               .to.equals(dbCourse.creatorId.toHexString());
-            res.body.data.course.should.have.property('createdAt');
-            res.body.data.course.should.have.property('updatedAt');
+            res.body.data.course.should.have.property('relatedSubjects');
+            res.body.data.course.relatedSubjects.should.be.an('array');
             done();
           });
         it('should create a new related subject if user is moderator', (done) => {
@@ -1187,8 +1177,6 @@ describe('COURSES', () => {
               res.body.data.course.should.have
                 .property('creatorId')
                 .to.equals(dbCourse.creatorId.toHexString());
-              res.body.data.course.should.have.property('createdAt');
-              res.body.data.course.should.have.property('updatedAt');
               done();
             });
         });
