@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import chaiHttp from 'chai-http';
 import sinon from 'sinon';
 import Sinonchai from 'sinon-chai';
+import aws from 'aws-sdk';
 import app from '../../index';
 import MajorSubject from '../../db/models/mainSubjects.model';
 import Helper from '../../utils/user.utils';
@@ -48,65 +49,106 @@ after(async () => {
 
 describe('ADD A MAJOR SUBJECT', () => {
   describe(`/POST ${route}`, () => {
+    describe('SUCCESSFUL CREATION', () => {
+      let uploadedFile;
+      after(async () => {
+        const s3 = new aws.S3();
+        aws.config.setPromisesDependency();
+        aws.config.update({
+          secretAccessKey: process.env.S3_ACCESS_SECRET,
+          accessKeyId: process.env.S3_ACCESS_KEY,
+          region: 'us-east-1',
+        });
+        const params = {
+          Bucket: 'afrilearn',
+          Key: `subject-images/${uploadedFile}`,
+        };
+
+        await s3.deleteObject(params).promise();
+      });
+      it('should add a major subject successfully', (done) => {
+        const image = {
+          path: './src/test/images/test.jpg',
+          name: 'test.jpg',
+        };
+        chai
+          .request(app)
+          .post(route)
+          .set('x-access-token', adminToken)
+          .field('name', testSubject.name)
+          .field('introText', testSubject.introText)
+          .attach('media', image.path, image.name)
+          .end((error, res) => {
+            res.should.have.status(201);
+            res.body.should.be.an('object');
+            res.body.should.have.property('status').eql('success');
+            res.body.should.have.property('data').to.be.an('object');
+            res.body.data.should.have.property('subject').to.be.an('object');
+            res.body.data.subject.should.have
+              .property('name')
+              .eql(testSubject.name);
+            res.body.data.subject.should.have
+              .property('imageUrl')
+              .to.include(image.name);
+            res.body.data.subject.should.have
+              .property('introText')
+              .eql(testSubject.introText);
+            const file = res.body.data.subject.imageUrl;
+            uploadedFile = file.slice(file.lastIndexOf('/') + 1);
+            done();
+          });
+      });
+    });
     it('it should return unauthorized if user is not logged in', (done) => {
-      chai.request(app)
+      chai
+        .request(app)
         .post(route)
         .end((error, res) => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('Not authorized to access data');
+          res.body.should.have
+            .property('error')
+            .eql('Not authorized to access data');
           done();
         });
     });
 
     it('it should return an unauthorized error if user is not an admin or moderator', (done) => {
-      chai.request(app)
+      chai
+        .request(app)
         .post(route)
         .set('x-access-token', staffToken)
         .end((error, res) => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('Not authorized to access data');
+          res.body.should.have
+            .property('error')
+            .eql('Not authorized to access data');
           done();
         });
     });
 
     it('it should return an invalid token error if token provided is not valid', (done) => {
-      chai.request(app)
+      chai
+        .request(app)
         .post(route)
         .set('x-access-token', 'invalidToken')
         .end((error, res) => {
           res.should.have.status(401);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('error');
-          res.body.should.have.property('error').eql('Not authorized to access data');
-          done();
-        });
-    });
-
-    it('should add a major subject successfully', (done) => {
-      chai.request(app)
-        .post(route)
-        .set('x-access-token', adminToken)
-        .send({
-          name: testSubject.name,
-          introText: testSubject.introText,
-        })
-        .end((error, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('object');
-          res.body.should.have.property('status').eql('success');
-          res.body.should.have.property('data').to.be.an('object');
-          res.body.data.should.have.property('name').eql(testSubject.name);
-          res.body.data.should.have.property('introText').eql(testSubject.introText);
+          res.body.should.have
+            .property('error')
+            .eql('Not authorized to access data');
           done();
         });
     });
 
     it('should fail to add a subject with no name field in request', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post(route)
         .set('x-access-token', adminToken)
         .send({ introText: testSubject.introText });
@@ -123,7 +165,8 @@ describe('ADD A MAJOR SUBJECT', () => {
     });
 
     it('should fail to add a subject with empty name string', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post(route)
         .set('x-access-token', adminToken)
         .send({ name: '', classification: testSubject.classification });
@@ -136,8 +179,12 @@ describe('ADD A MAJOR SUBJECT', () => {
       expect(res.body).to.have.property('errors');
       expect(res.body).to.be.an('object');
       expect(res.body.errors).to.be.an.instanceOf(Array);
-      expect(res.body.errors).not.to.include.members(['Subject Name is required']);
-      expect(res.body.errors).to.include.members(['Subject Name cannot be empty']);
+      expect(res.body.errors).not.to.include.members([
+        'Subject Name is required',
+      ]);
+      expect(res.body.errors).to.include.members([
+        'Subject Name cannot be empty',
+      ]);
     });
   });
 
