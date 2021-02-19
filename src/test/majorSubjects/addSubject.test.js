@@ -40,11 +40,7 @@ const testSubject2 = {
   classification: 'Classification',
 };
 
-<<<<<<< HEAD
 const route = '/api/v1/main-subjects';
-=======
-const route = '/api/v1/major-subjects';
->>>>>>> develop
 
 after(async () => {
   await MajorSubject.deleteMany({ name: testSubject.name });
