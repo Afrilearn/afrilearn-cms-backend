@@ -356,9 +356,10 @@ describe('TERMS', () => {
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have
-              .property('message')
-              .to.equals('term updated successfully');
+            res.body.data.should.have.property('term');
+            res.body.data.term.should.have
+              .property('name')
+              .to.equals(termUpdate.name);
             done();
           });
       });
@@ -371,9 +372,10 @@ describe('TERMS', () => {
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have
-              .property('message')
-              .to.equals('term updated successfully');
+            res.body.data.should.have.property('term');
+            res.body.data.term.should.have
+              .property('name')
+              .to.equals(termUpdate.name);
             done();
           });
       });

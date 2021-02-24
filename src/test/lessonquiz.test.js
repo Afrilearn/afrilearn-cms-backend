@@ -10,6 +10,9 @@ import Response from '../utils/response.utils';
 import app from '../index';
 import Question from '../db/models/questions.model';
 
+const aws = require('aws-sdk');
+const s3 = new aws.S3();
+
 chai.should();
 chai.use(Sinonchai);
 chai.use(chaiHttp);
@@ -30,18 +33,28 @@ const lesson = {
 };
 
 const question = {
-  lessonId: validLessonId,
-  creator_Id: validCreatorId,
-  question: 'What is your name?',
-  options: ['Taye', 'Taiwo', 'ELizabeth'],
-  correct_option: '1',
-  explanation: 'random explanation',
+  lessonId: validLessonId.toHexString(),
+  creator_Id: validCreatorId.toHexString(),
+  questionsArray:
+        [{
+          question: 'What is your name?',
+          options: ['Taye', 'Taiwo', 'ELizabeth'],
+          correct_option: '1',
+          explanation: 'random explanation',
+        }],
 };
 const questionUpdate = {
   options: ['Taye', 'Taiwo', 'ELizabeth'],
   correct_option: '2',
   explanation: 'another random explanation',
 };
+const images = [
+  { path: './src/test/images/cooker1.jpg' },
+  { path: './src/test/images/cooker2.jpg' },
+  { path: './src/test/images/cooker3.jpg' },
+  { path: './src/test/images/cooker4.jpg' },
+  { path: './src/test/images/cooker5.jpg' },
+];
 const invalidToken = 'invalid.jwt.token';
 const staffToken = userUtils.generateToken(
   mongoose.Types.ObjectId(),
@@ -63,31 +76,65 @@ const baseUrl = '/api/v1/lesson';
 describe('LESSON QUIZ', () => {
   describe(`/POST ${baseUrl}/quiz`, () => {
     describe('SUCCESSFUL QUIZ CREATION', () => {
-      beforeEach((done) => {
-        Question.deleteMany((err) => {
-          if (!err) done();
-        });
+      let uploadedFile = [];
+      beforeEach(async () => {
+        await Question.deleteMany();
       });
-      afterEach((done) => {
-        Question.deleteMany((err) => {
-          if (!err) done();
+      afterEach(async () => {
+        await Question.deleteMany();
+        const s3 = new aws.S3();
+        aws.config.setPromisesDependency();
+        aws.config.update({
+          secretAccessKey: process.env.S3_ACCESS_SECRET,
+          accessKeyId: process.env.S3_ACCESS_KEY,
+          region: 'us-east-1',
         });
+
+        const objects = [];
+        for (let i = 0; i < 5; i++) {
+          objects.push({
+            Key: `test/${uploadedFile[i]}`,
+          });
+        }
+
+        const params = {
+          Bucket: 'afrilearn',
+          Delete: {
+            Objects: objects,
+            Quiet: false,
+          },
+        };
+        await s3.deleteObjects(params).promise();
+        uploadedFile = [];
       });
       it('should create question if request is valid and user is admin', (done) => {
         chai
           .request(app)
           .post(`${baseUrl}/quiz`)
           .set('token', adminToken)
-          .send(question)
+          .set('content-type', 'multipart/form-data')
+          .field('lessonId', question.lessonId)
+          .field('creator_Id', question.creator_Id)
+          .field('questionsArray', JSON.stringify(question.questionsArray))
+          .attach('images', images[0].path)
+          .attach('images', images[1].path)
+          .attach('images', images[2].path)
+          .attach('images', images[3].path)
+          .attach('images', images[4].path)
           .end((err, res) => {
             res.should.have.status(201);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have.property('question');
-            res.body.data.question.should.have
-              .property('question')
-              .to.equals(question.question);
-            res.body.data.question.should.have.property('createdAt');
-            res.body.data.question.should.have.property('updatedAt');
+            res.body.data.should.have.property('questions');
+            res.body.data.questions.should.have
+              .property('questionsArray');
+            res.body.data.questions.should.have.property('createdAt');
+            res.body.data.questions.should.have.property('updatedAt');
+            const question_file = res.body.data.questions.questionsArray[0].question_image;
+            uploadedFile.push(question_file.slice(question_file.lastIndexOf('/') + 1));
+            const options_files = res.body.data.questions.questionsArray[0].images;
+            for (let i = 0; i < 4; i++) {
+              uploadedFile.push(options_files[i].slice(options_files[i].lastIndexOf('/') + 1));
+            }
             done();
           });
       });
@@ -95,38 +142,64 @@ describe('LESSON QUIZ', () => {
         chai
           .request(app)
           .post(`${baseUrl}/quiz`)
-          .set('token', adminToken)
-          .send(question)
+          .set('token', moderatorToken)
+          .set('content-type', 'multipart/form-data')
+          .field('lessonId', question.lessonId)
+          .field('creator_Id', question.creator_Id)
+          .field('questionsArray', JSON.stringify(question.questionsArray))
+          .attach('images', images[0].path)
+          .attach('images', images[1].path)
+          .attach('images', images[2].path)
+          .attach('images', images[3].path)
+          .attach('images', images[4].path)
           .end((err, res) => {
             res.should.have.status(201);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have.property('question');
-            res.body.data.question.should.have
-              .property('question')
-              .to.equals(question.question);
-            res.body.data.question.should.have.property('createdAt');
-            res.body.data.question.should.have.property('updatedAt');
+            res.body.data.should.have.property('questions');
+            res.body.data.questions.should.have
+              .property('questionsArray');
+            res.body.data.questions.should.have.property('createdAt');
+            res.body.data.questions.should.have.property('updatedAt');
+            const question_file = res.body.data.questions.questionsArray[0].question_image;
+            uploadedFile.push(question_file.slice(question_file.lastIndexOf('/') + 1));
+            const options_files = res.body.data.questions.questionsArray[0].images;
+            for (let i = 0; i < 4; i++) {
+              uploadedFile.push(options_files[i].slice(options_files[i].lastIndexOf('/') + 1));
+            }
             done();
           });
       });
-    });
-    it('should create question if request is valid and user is staff', (done) => {
-      chai
-        .request(app)
-        .post(`${baseUrl}/quiz`)
-        .set('token', staffToken)
-        .send(question)
-        .end((err, res) => {
-          res.should.have.status(201);
-          res.body.should.have.property('status').to.equals('success');
-          res.body.data.should.have.property('question');
-          res.body.data.question.should.have
-            .property('question')
-            .to.equals(question.question);
-          res.body.data.question.should.have.property('createdAt');
-          res.body.data.question.should.have.property('updatedAt');
-          done();
-        });
+      it('should create question if request is valid and user is staff', (done) => {
+        chai
+          .request(app)
+          .post(`${baseUrl}/quiz`)
+          .set('token', staffToken)
+          .set('content-type', 'multipart/form-data')
+          .field('lessonId', question.lessonId)
+          .field('creator_Id', question.creator_Id)
+          .field('questionsArray', JSON.stringify(question.questionsArray))
+          .attach('images', images[0].path)
+          .attach('images', images[1].path)
+          .attach('images', images[2].path)
+          .attach('images', images[3].path)
+          .attach('images', images[4].path)
+          .end((err, res) => {
+            res.should.have.status(201);
+            res.body.should.have.property('status').to.equals('success');
+            res.body.data.should.have.property('questions');
+            res.body.data.questions.should.have
+              .property('questionsArray');
+            res.body.data.questions.should.have.property('createdAt');
+            res.body.data.questions.should.have.property('updatedAt');
+            const question_file = res.body.data.questions.questionsArray[0].question_image;
+            uploadedFile.push(question_file.slice(question_file.lastIndexOf('/') + 1));
+            const options_files = res.body.data.questions.questionsArray[0].images;
+            for (let i = 0; i < 4; i++) {
+              uploadedFile.push(options_files[i].slice(options_files[i].lastIndexOf('/') + 1));
+            }
+            done();
+          });
+      });
     });
     describe('FAKE INTERNAL SERVER ERROR', () => {
       let stub;
@@ -151,6 +224,34 @@ describe('LESSON QUIZ', () => {
           });
       });
     });
+    // describe('FAKE INTERNAL SERVER ERROR', () => {
+    //     let stub;
+
+    //     before(() => {
+    //         stub = sinon.stub(s3, 'upload').throws(new Error('error'));
+    //     });
+    //     after(() => {
+    //         stub.restore();
+    //     });
+    //     it('returns status of 500', (done) => {
+    //         chai
+    //             .request(app)
+    //             .post(`${baseUrl}/quiz`)
+    //             .set('token', staffToken)
+    //             .set('content-type', 'multipart/form-data')
+    //             .field('lessonId', question.lessonId)
+    //             .field('creator_Id', question.creator_Id)
+    //             .field('questionsArray', JSON.stringify(question.questionsArray))
+    //             .attach('images', images[0].path)
+    //             .end((err, res) => {
+    //                 res.should.have.status(500);
+    //                 res.body.should.have
+    //                     .property('error')
+    //                     .to.equals('could not add quiz');
+    //                 done();
+    //             });
+    //     });
+    // });
     describe('TOKEN VALIDATION', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
@@ -189,33 +290,13 @@ describe('LESSON QUIZ', () => {
       beforeEach(() => {
         request = chai.request(app).post(`${baseUrl}/quiz`).set('token', adminToken);
         dynamicQuestion = {
-          question: 'Test Question',
-          options: ['Wemimi', 'Astol'],
+          questionsArray: [{
+            question: 'How are you?',
+          }],
         };
       });
-
-      it('should not create question if question is not provided', (done) => {
-        delete dynamicQuestion.question;
-        request.send(dynamicQuestion).end((err, res) => {
-          res.should.have.status(400);
-          res.body.should.have.property('status').to.equals('error');
-          res.body.should.have.property('errors').to.include('Question is required');
-          done();
-        });
-      });
-      it('should not create question if question is empty', (done) => {
-        dynamicQuestion.question = '';
-        request.send(dynamicQuestion).end((err, res) => {
-          res.should.have.status(400);
-          res.body.should.have.property('status').to.equals('error');
-          res.body.should.have
-            .property('errors')
-            .to.include('Question cannot be empty');
-          done();
-        });
-      });
       it('should not create question if question is not string', (done) => {
-        dynamicQuestion.question = 2;
+        dynamicQuestion.questionsArray[0].question = 2;
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -226,7 +307,7 @@ describe('LESSON QUIZ', () => {
         });
       });
       it('should not create question if explanation is empty', (done) => {
-        dynamicQuestion.explanation = '';
+        dynamicQuestion.questionsArray[0].explanation = '';
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -237,7 +318,7 @@ describe('LESSON QUIZ', () => {
         });
       });
       it('should not create question if explanation is not string', (done) => {
-        dynamicQuestion.explnation = 2;
+        dynamicQuestion.questionsArray[0].explanation = 2;
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -292,7 +373,7 @@ describe('LESSON QUIZ', () => {
         });
       });
       it('should not create quiz if images is not an array', (done) => {
-        dynamicQuestion.images = 2;
+        dynamicQuestion.questionsArray[0].images = 2;
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -303,7 +384,7 @@ describe('LESSON QUIZ', () => {
         });
       });
       it('should not create quiz if options are not provided', (done) => {
-        delete dynamicQuestion.options;
+        delete dynamicQuestion.questionsArray[0].options;
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -347,28 +428,6 @@ describe('LESSON QUIZ', () => {
         });
       });
     });
-    describe('QUIZ INEXISTENCE', () => {
-      beforeEach((done) => {
-        Question.create(question, (err) => {
-          if (!err) done();
-        });
-      });
-      it('should send back 409 status with error if question exists', (done) => {
-        chai
-          .request(app)
-          .post(`${baseUrl}/quiz`)
-          .set('token', adminToken)
-          .send(question)
-          .end((err, res) => {
-            res.status.should.equals(409);
-            res.body.should.have.property('status').to.equals('error');
-            res.body.should.have
-              .property('error')
-              .to.equals('question already exists');
-            done();
-          });
-      });
-    });
   });
 
   describe(`/GET ${baseUrl}/:lessonId/quiz`, () => {
@@ -403,12 +462,6 @@ describe('LESSON QUIZ', () => {
             res.body.should.have.property('status').to.equals('success');
             res.body.data.should.have.property('questions');
             res.body.data.questions.length.should.equals(3);
-            const questions = res.body.data.questions.map(
-              (questionInstance) => questionInstance.question,
-            );
-            for (let i = 1; i < 4; i += 1) {
-              questions.should.include(`QuizTest${i}`);
-            }
             done();
           });
       });
@@ -422,12 +475,6 @@ describe('LESSON QUIZ', () => {
             res.body.should.have.property('status').to.equals('success');
             res.body.data.should.have.property('questions');
             res.body.data.questions.length.should.equals(3);
-            const questions = res.body.data.questions.map(
-              (questionInstance) => questionInstance.question,
-            );
-            for (let i = 1; i < 4; i += 1) {
-              questions.should.include(`QuizTest${i}`);
-            }
             done();
           });
       });
@@ -441,12 +488,6 @@ describe('LESSON QUIZ', () => {
             res.body.should.have.property('status').to.equals('success');
             res.body.data.should.have.property('questions');
             res.body.data.questions.length.should.equals(3);
-            const questions = res.body.data.questions.map(
-              (questionInstance) => questionInstance.question,
-            );
-            for (let i = 1; i < 4; i += 1) {
-              questions.should.include(`QuizTest${i}`);
-            }
             done();
           });
       });
@@ -506,72 +547,102 @@ describe('LESSON QUIZ', () => {
     });
   });
 
-  describe(`/PUT ${baseUrl}/quiz/:quizId`, () => {
-    let quizId;
+  describe(`/PUT ${baseUrl}/lessonId/quiz`, () => {
+    let lessonId;
+    let uploadedFile = [];
     beforeEach(async () => {
+      await Lesson.deleteMany();
       await Question.deleteMany();
-      const createdQuiz = await Question.create(question);
-      quizId = createdQuiz._id;
-    });
-    afterEach((done) => {
-      Question.deleteMany((err) => {
-        if (!err) done();
+      const createdLesson = await Lesson.create(lesson);
+      lessonId = createdLesson._id;
+      await Question.create({
+        lessonId, creator_Id: mongoose.Types.ObjectId(),
       });
     });
-    describe('SUCCESS', () => {
-      beforeEach(async () => {
-        await Question.deleteMany();
-        const createdQuiz = await Question.create(question);
-        quizId = createdQuiz._id;
-      });
-      afterEach((done) => {
-        Question.deleteMany((err) => {
-          if (!err) done();
-        });
+    afterEach(async () => {
+      await Lesson.deleteMany();
+      await Question.deleteMany();
+      const s3 = new aws.S3();
+      aws.config.setPromisesDependency();
+      aws.config.update({
+        secretAccessKey: process.env.S3_ACCESS_SECRET,
+        accessKeyId: process.env.S3_ACCESS_KEY,
+        region: 'us-east-1',
       });
 
+      const objects = [];
+      for (let i = 0; i < 5; i++) {
+        objects.push({
+          Key: `test/${uploadedFile[i]}`,
+        });
+      }
+
+      const params = {
+        Bucket: 'afrilearn',
+        Delete: {
+          Objects: objects,
+          Quiet: false,
+        },
+      };
+      await s3.deleteObjects(params).promise();
+      uploadedFile = [];
+    });
+    describe('SUCCESS', () => {
       it('should edit question if request is valid and user is admin', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/quiz/${quizId}`)
+          .put(`${baseUrl}/${lessonId}/quiz`)
           .set('token', adminToken)
-          .send(questionUpdate)
+          .set('content-type', 'multipart/form-data')
+          .field('lessonId', question.lessonId)
+          .field('questionsArray', JSON.stringify(question.questionsArray))
+          .attach('images', images[0].path)
+          .attach('images', images[1].path)
+          .attach('images', images[2].path)
+          .attach('images', images[3].path)
+          .attach('images', images[4].path)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have
-              .property('message')
-              .to.equals('Question updated successfully');
+            res.body.data.should.have.property('question');
+            res.body.data.question.should.have
+              .property('questionsArray');
+            const question_file = res.body.data.question.questionsArray[0].question_image;
+            uploadedFile.push(question_file.slice(question_file.lastIndexOf('/') + 1));
+            const options_files = res.body.data.question.questionsArray[0].images;
+            for (let i = 0; i < 4; i++) {
+              uploadedFile.push(options_files[i].slice(options_files[i].lastIndexOf('/') + 1));
+            }
             done();
           });
       });
       it('should edit question if request is valid and user is moderator', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/quiz/${quizId}`)
+          .put(`${baseUrl}/${lessonId}/quiz`)
           .set('token', adminToken)
           .send(questionUpdate)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have
-              .property('message')
-              .to.equals('Question updated successfully');
+            res.body.data.should.have.property('question');
+            res.body.data.question.should.have
+              .property('questionsArray');
             done();
           });
       });
       it('should edit question if request is valid and user is staff', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/quiz/${quizId}`)
+          .put(`${baseUrl}/${lessonId}/quiz`)
           .set('token', adminToken)
           .send(questionUpdate)
           .end((err, res) => {
             res.should.have.status(200);
             res.body.should.have.property('status').to.equals('success');
-            res.body.data.should.have
-              .property('message')
-              .to.equals('Question updated successfully');
+            res.body.data.should.have.property('question');
+            res.body.data.question.should.have
+              .property('questionsArray');
             done();
           });
       });
@@ -588,7 +659,7 @@ describe('LESSON QUIZ', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/quiz/${quizId}`)
+          .put(`${baseUrl}/${lessonId}/quiz`)
           .set('token', adminToken)
           .send(questionUpdate)
           .end((err, res) => {
@@ -605,7 +676,7 @@ describe('LESSON QUIZ', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/quiz/${quizId}`)
+          .put(`${baseUrl}/${lessonId}/quiz`)
           .send(questionUpdate)
           .end((err, res) => {
             res.should.have.status(401);
@@ -619,7 +690,7 @@ describe('LESSON QUIZ', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/quiz/${quizId}`)
+          .put(`${baseUrl}/${lessonId}/quiz`)
           .set('token', invalidToken)
           .send(questionUpdate)
           .end((err, res) => {
@@ -637,14 +708,18 @@ describe('LESSON QUIZ', () => {
       let dynamicQuestion;
       let request;
       beforeEach(() => {
-        dynamicQuestion = {};
+        dynamicQuestion = {
+          questionsArray: [{
+            question: 'How are you?',
+          }],
+        };
         request = chai
           .request(app)
-          .put(`${baseUrl}/quiz/${quizId}`)
+          .put(`${baseUrl}/${lessonId}/quiz`)
           .set('token', adminToken);
       });
       it('should not edit quiz if explanation is empty', (done) => {
-        dynamicQuestion.explanation = '';
+        dynamicQuestion.questionsArray[0].explanation = '';
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -654,8 +729,8 @@ describe('LESSON QUIZ', () => {
           done();
         });
       });
-      it('should not edit quiz if quiz explnation is not string', (done) => {
-        dynamicQuestion.explanation = 2;
+      it('should not edit quiz if quiz explanation is not string', (done) => {
+        dynamicQuestion.questionsArray[0].explanation = 2;
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -666,7 +741,7 @@ describe('LESSON QUIZ', () => {
         });
       });
       it('should not edit quiz if question is not string', (done) => {
-        dynamicQuestion.question = 2;
+        dynamicQuestion.questionsArray[0].question = 2;
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -677,7 +752,7 @@ describe('LESSON QUIZ', () => {
         });
       });
       it('should not edit quiz if images is not an array', (done) => {
-        dynamicQuestion.images = 2;
+        dynamicQuestion.questionsArray[0].images = 2;
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -688,7 +763,7 @@ describe('LESSON QUIZ', () => {
         });
       });
       it('should not edit quiz if options is not an array', (done) => {
-        dynamicQuestion.options = 2;
+        dynamicQuestion.questionsArray[0].options = 2;
         request.send(dynamicQuestion).end((err, res) => {
           res.should.have.status(400);
           res.body.should.have.property('status').to.equals('error');
@@ -709,26 +784,26 @@ describe('LESSON QUIZ', () => {
       it('should send back 404 status with error if question does not exist', (done) => {
         chai
           .request(app)
-          .put(`${baseUrl}/quiz/${quizId}`)
+          .put(`${baseUrl}/${lessonId}/quiz`)
           .set('token', adminToken)
           .end((err, res) => {
             res.status.should.equals(404);
             res.body.should.have.property('status').to.equals('error');
             res.body.should.have
               .property('error')
-              .to.equals('Question does not exist');
+              .to.equals('Lesson quiz does not exist');
             done();
           });
       });
     });
   });
 
-  describe(`/DELETE ${baseUrl}/quiz/:quizid`, () => {
-    let quizId;
+  describe(`/DELETE ${baseUrl}/quiz/:questionId`, () => {
+    let questionId;
     beforeEach(async () => {
       await Question.deleteMany();
       const createdQuiz = await Question.create(question);
-      quizId = createdQuiz._id;
+      questionId = createdQuiz.questionsArray[0]._id;
     });
     afterEach((done) => {
       Question.deleteMany((err) => {
@@ -736,10 +811,11 @@ describe('LESSON QUIZ', () => {
       });
     });
     describe('SUCCESSFUL DELETE', () => {
+      let questionId;
       beforeEach(async () => {
         await Question.deleteMany();
         const createdQuiz = await Question.create(question);
-        quizId = createdQuiz._id;
+        questionId = createdQuiz.questionsArray[0]._id;
       });
       afterEach((done) => {
         Question.deleteMany((err) => {
@@ -749,7 +825,7 @@ describe('LESSON QUIZ', () => {
       it('should delete question if data is valid and user is admin', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/quiz/${quizId}`)
+          .delete(`${baseUrl}/quiz/${questionId}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
@@ -761,10 +837,10 @@ describe('LESSON QUIZ', () => {
             done();
           });
       });
-      it('should delete lesson if data is valid and user is moderator', (done) => {
+      it('should delete question if data is valid and user is moderator', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/quiz/${quizId}`)
+          .delete(`${baseUrl}/quiz/${questionId}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
@@ -776,10 +852,10 @@ describe('LESSON QUIZ', () => {
             done();
           });
       });
-      it('should delete lesson if data is valid and user is a staff', (done) => {
+      it('should delete question if data is valid and user is a staff', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/quiz/${quizId}`)
+          .delete(`${baseUrl}/quiz/${questionId}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
@@ -803,7 +879,7 @@ describe('LESSON QUIZ', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/quiz/${quizId}`)
+          .delete(`${baseUrl}/quiz/${questionId}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(500);
@@ -818,7 +894,7 @@ describe('LESSON QUIZ', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/quiz/${quizId}`)
+          .delete(`${baseUrl}/quiz/${questionId}`)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have.property('status').to.equals('error');
@@ -831,7 +907,7 @@ describe('LESSON QUIZ', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/quiz/${quizId}`)
+          .delete(`${baseUrl}/quiz/${questionId}`)
           .set('token', invalidToken)
           .end((err, res) => {
             res.should.have.status(401);
@@ -853,7 +929,7 @@ describe('LESSON QUIZ', () => {
       it('should send back 404 status with error if Question does not exist', (done) => {
         chai
           .request(app)
-          .delete(`${baseUrl}/quiz/${quizId}`)
+          .delete(`${baseUrl}/quiz/${questionId}`)
           .set('token', adminToken)
           .end((err, res) => {
             res.status.should.equals(404);

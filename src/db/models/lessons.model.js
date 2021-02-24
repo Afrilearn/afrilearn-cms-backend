@@ -35,6 +35,9 @@ const LessonSchema = new mongoose.Schema(
         },
       },
     ],
+    transcripts: {
+      type: Array,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

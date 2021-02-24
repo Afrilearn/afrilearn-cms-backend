@@ -93,9 +93,10 @@ export default class UserController {
    * @returns {Response.Success} if no error occurs
    * @returns {Response.InternalServerError} if error occurs
    */
-  static async fetchEnrolledCourses(req, res) {
+  static async fetchAllEnrolledCourses(req, res) {
     try {
-      const result = await EnrolledCourse.find({ userId: req.params.userId });
+      const result = await EnrolledCourse.find()
+        .populate('courseId');
       return Response.Success(res, { courses: result });
     } catch (error) {
       return Response.InternalServerError(res, 'Error fetching enrolled courses');

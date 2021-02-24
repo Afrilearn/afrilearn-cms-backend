@@ -59,8 +59,10 @@ export default class PastQuestionsCategoryController {
       const pqCategory = await PQCategory.findOne({ _id: pqCategoryId });
       if (!pqCategory) return Response.NotFoundError(res, 'category does not exist');
       const categoryValues = { $set: req.body };
-      await PQCategory.updateOne({ _id: pqCategoryId }, categoryValues);
-      return Response.Success(res, { message: 'category updated successfully' }, 200);
+      const pastQuestionUpdate = await PQCategory.findOneAndUpdate(
+        { _id: pqCategoryId }, categoryValues, { returnOriginal: false },
+      );
+      return Response.Success(res, { pastQuestion: pastQuestionUpdate }, 200);
     } catch (error) {
       return Response.InternalServerError(res, 'Could not update category');
     }

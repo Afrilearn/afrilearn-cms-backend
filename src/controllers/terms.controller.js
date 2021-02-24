@@ -37,8 +37,8 @@ export default class TermsController {
       const term = await Term.findOne({ _id: termId });
       if (!term) return Response.NotFoundError(res, 'term does not exist');
       const termValues = { $set: req.body };
-      await Term.updateOne({ _id: termId }, termValues);
-      return Response.Success(res, { message: 'term updated successfully' }, 200);
+      const termUpdate = await Term.findOneAndUpdate({ _id: termId }, termValues, { returnOriginal: false });
+      return Response.Success(res, { term: termUpdate }, 200);
     } catch (error) {
       return Response.InternalServerError(res, 'Could not update term');
     }

@@ -42,7 +42,7 @@ const testSubject2 = {
 let subject;
 let subject2;
 
-const route = '/api/v1/majorsubject';
+const route = '/api/v1/main-subjects';
 
 describe('DELETE A MAJOR SUBJECT', () => {
   before(async () => {

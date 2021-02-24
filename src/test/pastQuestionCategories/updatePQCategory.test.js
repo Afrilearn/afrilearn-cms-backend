@@ -33,7 +33,7 @@ const testPQCategory = {
 
 let pqCategory;
 
-const route = '/api/v1/pqcategory';
+const route = '/api/v1/past-questions';
 
 describe('UPDATE A PAST QUESTION CATEGORY', () => {
   beforeEach(async () => {
@@ -91,7 +91,10 @@ describe('UPDATE A PAST QUESTION CATEGORY', () => {
           res.should.have.status(200);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('success');
-          res.body.data.should.have.property('message').eql('category updated successfully');
+          res.body.data.should.have.property('pastQuestion');
+          res.body.data.pastQuestion.should.have
+            .property('name')
+            .to.equals('TestCategory');
           done();
         });
     });

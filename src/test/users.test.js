@@ -752,7 +752,7 @@ describe('USERS', () => {
   });
 
   // GET USERS ENROLLED COURSES
-  describe(`/GET ${baseUrl}/:userId/enrolled-courses`, () => {
+  describe(`/GET ${baseUrl}/enrolled-courses`, () => {
     let userId;
     beforeEach(async () => {
       await AfrilearnUsers.deleteMany();
@@ -783,7 +783,7 @@ describe('USERS', () => {
       it('should fetch all user courses for an admin', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .get(`${baseUrl}/enrolled-courses`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
@@ -802,7 +802,7 @@ describe('USERS', () => {
       it('should fetch all user courses for a moderator', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .get(`${baseUrl}/enrolled-courses`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
@@ -821,7 +821,7 @@ describe('USERS', () => {
       it('should fetch all user courses for a staff', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .get(`${baseUrl}/enrolled-courses`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(200);
@@ -843,7 +843,7 @@ describe('USERS', () => {
       it('should return 401 with error message if no token is provided', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .get(`${baseUrl}/enrolled-courses`)
           .end((err, res) => {
             res.should.have.status(401);
             res.body.should.have.property('status').to.equals('error');
@@ -856,7 +856,7 @@ describe('USERS', () => {
       it('should return 401 status with error message if an invalid token is provided', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .get(`${baseUrl}/enrolled-courses`)
           .set('token', invalidToken)
           .end((err, res) => {
             res.should.have.status(401);
@@ -880,7 +880,7 @@ describe('USERS', () => {
       it('returns status of 500', (done) => {
         chai
           .request(app)
-          .get(`${baseUrl}/${userId}/enrolled-courses`)
+          .get(`${baseUrl}/enrolled-courses`)
           .set('token', adminToken)
           .end((err, res) => {
             res.should.have.status(500);

@@ -1,14 +1,17 @@
 import { Router } from 'express';
+import multer from 'multer';
 import AuthMiddleware from '../middlewares/auth.middleware';
-import LessonMiddleware from '../middlewares/lesson.middleware';
 import LessonController from '../controllers/lessons.controller';
 import LessonValidator from '../validations/lessons.validator';
 import ParamsValidator from '../validations/params.validator';
 
 const router = Router();
 
+const upload = multer({ dest: 'temp/' });
+
 router.post(
   '/',
+  upload.array('videoUrls'),
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   LessonValidator.validateLessonCreationData(),
@@ -25,6 +28,7 @@ router.get(
 
 router.put(
   '/:id',
+  upload.array('videoUrls'),
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   LessonValidator.validateLessonEditData(),
@@ -48,30 +52,29 @@ router.get(
 
 router.post(
   '/quiz',
+  upload.array('images'),
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
   LessonValidator.validateQuiz(),
   LessonValidator.quizValidationResult,
-  LessonMiddleware.checkQuestionExists,
   LessonController.createQuiz,
 );
 
 router.put(
-  '/quiz/:quizId',
+  '/:lessonId/quiz',
+  upload.array('images'),
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
-  ParamsValidator.validateMongooseId('quizId'),
-  ParamsValidator.mongooseIdValidationResult,
   LessonValidator.validateQuizUpdate(),
   LessonValidator.quizUpdateValidationResult,
   LessonController.modifyQuiz,
 );
 
 router.delete(
-  '/quiz/:quizId',
+  '/quiz/:questionId',
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209ab2792e63fc841de3c'),
-  ParamsValidator.validateMongooseId('quizId'),
+  ParamsValidator.validateMongooseId('questionId'),
   ParamsValidator.mongooseIdValidationResult,
   LessonController.removeQuiz,
 );

@@ -33,7 +33,7 @@ const testPQCategory2 = {
   categoryId: 6,
 };
 
-const route = '/api/v1/pqcategory';
+const route = '/api/v1/past-questions';
 
 describe('GET ALL PAST QUESTION CATEGORIES', () => {
   before(async () => {
