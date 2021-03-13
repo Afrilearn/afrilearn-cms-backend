@@ -1,3 +1,4 @@
+import s3Storage from 'multer-s3';
 import Response from '../utils/response.utils';
 
 /**
@@ -56,3 +57,14 @@ export default class GeneralServices {
     return next();
   }
 }
+
+// let deletes = [];
+// for(let i = 0; i < 5; i++){
+//   let params = {
+//     bucket: "...",
+//     key: "..."
+//   }
+//   deletes.push(params);
+// }
+
+// await s3Storage.deleteObjects(params).promi;

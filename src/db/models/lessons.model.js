@@ -35,20 +35,12 @@ const LessonSchema = new mongoose.Schema(
         },
       },
     ],
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
+  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true },
 );
 LessonSchema.virtual('questions', {
   ref: 'question',

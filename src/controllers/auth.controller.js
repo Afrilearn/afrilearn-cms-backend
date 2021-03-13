@@ -46,7 +46,7 @@ export default class AuthController {
    * @returns {ServerResponse} response
    */
   static async signIn(req, res) {
-    const signinError = { message: 'Incorrect email or password' };
+    const signinError = 'Incorrect email or password';
     try {
       const user = await CmsUser.findOne({ email: req.body.email });
       if (!user) return Response.UnauthorizedError(res, signinError);

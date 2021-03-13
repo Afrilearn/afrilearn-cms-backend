@@ -19,6 +19,7 @@ class AuthMiddleware {
   static validateToken(req, res, next) {
     const { token: headerToken = null } = req.headers;
     const { token: queryToken = null } = req.query;
+    
 
     const token = queryToken || headerToken || req.headers['x-access-token'];
 

@@ -49,7 +49,7 @@ after(async () => {
 
 describe('ADD A MAJOR SUBJECT', () => {
   describe(`/POST ${route}`, () => {
-    describe('SUCCESSFUL CREATION', () => {
+    describe.only('SUCCESSFUL CREATION', () => {
       let uploadedFile;
       after(async () => {
         const s3 = new aws.S3();

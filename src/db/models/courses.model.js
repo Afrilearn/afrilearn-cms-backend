@@ -5,6 +5,7 @@ const courseSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      unique: true
     },
     alias: {
       type: String,
@@ -12,18 +13,18 @@ const courseSchema = new mongoose.Schema(
     },
     categoryId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'coursecategory',
+      ref: 'courseCategory',
     },
     creatorId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'cmsuser',
+      ref: 'cmsUser',
     },
   },
+  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true },
 );
 
 courseSchema.virtual('relatedPastQuestions', {

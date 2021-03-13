@@ -16,10 +16,10 @@ router.use('/auth', authRouter);
 router.use('/pqcategory', pqCategoryRouter);
 router.use('/users', userRouter);
 router.use('/courses', coursesRouter);
-router.use('/majorsubject', mainSubjectsRouter);
-router.use('/term', termRouter);
+router.use('/main_subjects', mainSubjectsRouter);
+router.use('/terms', termRouter);
 router.use('/course_categories', courseCategoryRouter);
-router.use('/lesson', lessonRouter);
+router.use('/lessons', lessonRouter);
 router.use('/counts', countsRouter);
 router.use('/payments', paymentRoute);
 

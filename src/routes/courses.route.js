@@ -4,6 +4,7 @@ import CourseValidator from '../validations/courses.validator';
 import CoursesMiddleware from '../middlewares/courses.middleware';
 import CoursesController from '../controllers/courses.controller';
 import ParamsValidator from '../validations/params.validator';
+import multer from 'multer';
 
 const router = Router();
 
@@ -43,6 +44,13 @@ router.delete(
   CoursesMiddleware.checkCourseExistence,
   CoursesController.deleteCourse,
 );
+router.delete(
+  '/',
+  AuthMiddleware.validateToken,
+  AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
+  // ParamsValidator.validateMongooseId('courseId'),
+  CoursesController.deleteCourses,
+)
 
 router.post(
   '/:courseId/past-questions',
@@ -55,8 +63,10 @@ router.post(
   CoursesController.linkPastQuestion,
 );
 
+const upload = multer({ dest: 'temp/' });
 router.post(
   '/:courseId/subjects',
+  upload.single('media'),
   AuthMiddleware.validateToken,
   AuthMiddleware.grantAccess('602209c32792e63fc841de3d'),
   ParamsValidator.validateMongooseId('courseId'),

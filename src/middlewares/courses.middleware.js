@@ -42,7 +42,7 @@ export default class CoursesMiddleware {
       next,
       Courses,
       { name: req.body.name },
-      'Course',
+      `Course with name "${req.body.name}"`
     );
   }
 

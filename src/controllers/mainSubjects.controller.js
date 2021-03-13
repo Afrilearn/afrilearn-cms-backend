@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
-import aws from 'aws-sdk';
-import fs from 'fs';
-import Response from '../utils/response.utils';
-import MajorSubject from '../db/models/mainSubjects.model';
+import mongoose from "mongoose";
+import aws from "aws-sdk";
+import fs from "fs";
+import Response from "../utils/response.utils";
+import MajorSubject from "../db/models/mainSubjects.model";
 
 /**
  * This class creates the major subject controller
@@ -20,12 +20,12 @@ export default class MajorSubjectController {
       aws.config.update({
         secretAccessKey: process.env.S3_ACCESS_SECRET,
         accessKeyId: process.env.S3_ACCESS_KEY,
-        region: 'us-east-1',
+        region: "us-east-1",
       });
 
       const params = {
-        ACL: 'public-read',
-        Bucket: 'afrilearn',
+        ACL: "public-read",
+        Bucket: "afrilearn",
         Body: fs.createReadStream(req.file.path),
         Metadata: { fieldName: req.file.fieldname },
         Key: `subject-images/${Date.now() + req.file.originalname}`,
@@ -53,7 +53,7 @@ export default class MajorSubjectController {
       });
     } catch (error) {
       fs.unlinkSync(req.file.path);
-      return Response.InternalServerError(res, 'Could not add subject');
+      return Response.InternalServerError(res, "Could not add subject");
     }
   }
 
@@ -69,7 +69,7 @@ export default class MajorSubjectController {
 
       return Response.Success(res, { subjects: result });
     } catch (err) {
-      Response.InternalServerError(res, 'Error fetching subjects');
+      Response.InternalServerError(res, "Error fetching subjects");
     }
   }
 
@@ -82,20 +82,21 @@ export default class MajorSubjectController {
   static async updateMajorSubject(req, res) {
     const mainSubjectId = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(mainSubjectId)) {
-      return Response.BadRequestError(res, 'mainSubjectId is invalid');
+      return Response.BadRequestError(res, "mainSubjectId is invalid");
     }
     try {
       const mainSubject = await MajorSubject.findOne({ _id: mainSubjectId });
-      if (!mainSubject) return Response.NotFoundError(res, 'subject does not exist');
+      if (!mainSubject)
+        return Response.NotFoundError(res, "subject does not exist");
       const subjectValues = { $set: req.body };
       await MajorSubject.updateOne({ _id: mainSubjectId }, subjectValues);
       return Response.Success(
         res,
-        { message: 'subject updated successfully' },
-        200,
+        { message: "subject updated successfully" },
+        200
       );
     } catch (error) {
-      return Response.InternalServerError(res, 'Could not update subject');
+      return Response.InternalServerError(res, "Could not update subject");
     }
   }
 
@@ -107,11 +108,12 @@ export default class MajorSubjectController {
    */
   static async deleteMajorSubject(req, res) {
     const mainSubjectId = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(mainSubjectId)) return Response.BadRequestError(res, 'mainSubjectId is invalid');
+    if (!mongoose.Types.ObjectId.isValid(mainSubjectId))
+      return Response.BadRequestError(res, "mainSubjectId is invalid");
     try {
       const subject = await MajorSubject.findOne({ _id: mainSubjectId });
       if (!subject) {
-        return Response.NotFoundError(res, 'major subject does not exist');
+        return Response.NotFoundError(res, "major subject does not exist");
       }
       await MajorSubject.deleteOne({ _id: mainSubjectId });
       return Response.Success(
@@ -119,10 +121,10 @@ export default class MajorSubjectController {
         {
           message: `${subject.name} subject deleted successfully`,
         },
-        200,
+        200
       );
     } catch (error) {
-      return Response.InternalServerError(res, 'Could not delete subject');
+      return Response.InternalServerError(res, "Could not delete subject");
     }
   }
 }

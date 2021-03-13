@@ -1,7 +1,9 @@
-import Courses from '../db/models/courses.model';
-import RelatedPastQuestions from '../db/models/relatedPastQuestions.model';
-import Subjects from '../db/models/subjects.model';
-import Response from '../utils/response.utils';
+import Courses from "../db/models/courses.model";
+import RelatedPastQuestions from "../db/models/relatedPastQuestions.model";
+import Subjects from "../db/models/subjects.model";
+import Response from "../utils/response.utils";
+import aws from "aws-sdk";
+import fs from "fs";
 
 /**
  * Contains Courses controller
@@ -22,7 +24,7 @@ export default class CoursesController {
 
       Response.Success(res, { course: result }, 201);
     } catch (err) {
-      Response.InternalServerError(res, 'Error creating course');
+      Response.InternalServerError(res, "Error creating course");
     }
   }
 
@@ -35,11 +37,14 @@ export default class CoursesController {
    */
   static async fetchCourses(req, res) {
     try {
-      const courses = await Courses.find();
+      const courses = await Courses.find()
+        .populate("creatorId", "firstName id")
+        .populate("categoryId", "name id");
 
       Response.Success(res, { courses });
     } catch (err) {
-      Response.InternalServerError(res, 'Error fetching courses');
+      console.log(err);
+      Response.InternalServerError(res, "Error fetching courses");
     }
   }
 
@@ -58,7 +63,10 @@ export default class CoursesController {
 
       Response.Success(res, { course: result });
     } catch (err) {
-      Response.InternalServerError(res, 'Error editing course');
+      Response.InternalServerError(
+        res,
+        `Error editing course. Check that course with name "${req.body.name}" does not already exist`
+      );
     }
   }
 
@@ -72,9 +80,26 @@ export default class CoursesController {
   static async deleteCourse(req, res) {
     try {
       await Courses.deleteOne({ _id: req.params.courseId });
-      Response.Success(res, { message: 'Course deleted successfully' });
+      Response.Success(res, { message: "Course deleted successfully" });
     } catch (err) {
-      Response.InternalServerError(res, 'Error deleting course');
+      Response.InternalServerError(res, "Error deleting course");
+    }
+  }
+
+  /**
+   * @memberof CoursesController
+   * @param {*} req - Payload
+   * @param {*} res - Response object
+   * @returns {Response.Success} if no error occurs
+   * @returns {Response.InternalServerError} if error occurs
+   */
+  static async deleteCourses(req, res) {
+    try {
+      const { courseIds } = req.body;
+      await Courses.deleteMany({ _id: { $in: courseIds } });
+      Response.Success(res, { message: "Courses deleted successfully" });
+    } catch (err) {
+      Response.InternalServerError(res, "Error deleting course");
     }
   }
 
@@ -92,13 +117,13 @@ export default class CoursesController {
         pastQuestionTypeId: req.body.pastQuestionId,
       });
       const course = await Courses.findById(req.params.courseId).populate({
-        path: 'relatedPastQuestions',
-        populate: { path: 'pastQuestionTypeId' },
+        path: "relatedPastQuestions",
+        populate: { path: "pastQuestionTypeId" },
       });
 
       Response.Success(res, { course }, 201);
     } catch (err) {
-      return Response.InternalServerError(res, 'Error linking past question');
+      return Response.InternalServerError(res, "Error linking past question");
     }
   }
 
@@ -111,19 +136,50 @@ export default class CoursesController {
    */
   static async linkSubject(req, res) {
     try {
-      await Subjects.create({
-        courseId: req.params.courseId,
-        mainSubjectId: req.body.mainSubjectId,
+      const s3 = new aws.S3();
+      aws.config.setPromisesDependency();
+      aws.config.update({
+        secretAccessKey: process.env.S3_ACCESS_SECRET,
+        accessKeyId: process.env.S3_ACCESS_KEY,
+        region: "us-east-1",
       });
 
-      const course = await Courses.findById(req.params.courseId).populate({
-        path: 'relatedSubjects',
-        populate: { path: 'mainSubjectId' },
-      });
+      const params = {
+        ACL: "public-read",
+        Bucket: "afrilearn",
+        Body: fs.createReadStream(req.file.path),
+        Metadata: { fieldName: req.file.fieldname },
+        Key: `assigned-subject-images/${Date.now() + req.file.originalname}`,
+      };
 
-      Response.Success(res, { course }, 201);
+      s3.upload(params, (err, data) => {
+        if (err) {
+          throw err;
+        }
+        fs.unlinkSync(req.file.path);
+
+        /**
+         * Adds subject to database
+         */
+        async function create() {
+          const sub = await Subjects.create({
+            courseId: req.params.courseId,
+            mainSubjectId: req.body.mainSubjectId,
+            imageUrl: data.Location,
+          });
+          const subject = await Subjects.findById(sub._id).populate(
+            "mainSubjectId"
+          );
+          // const course = await Courses.findById(req.params.courseId).populate({
+          //   path: "relatedSubjects",
+          //   populate: { path: "mainSubjectId" },
+          // });
+          return Response.Success(res, { subject }, 201);
+        }
+        create();
+      });
     } catch (err) {
-      return Response.InternalServerError(res, 'Error linking subject');
+      return Response.InternalServerError(res, "Error linking subject");
     }
   }
 
@@ -138,11 +194,11 @@ export default class CoursesController {
     try {
       const courseSubjects = await Subjects.find({
         courseId: req.params.courseId,
-      }).populate('mainSubjectId');
+      }).populate("mainSubjectId");
 
       Response.Success(res, { courseSubjects });
     } catch (err) {
-      Response.InternalServerError(res, 'Error fetching course subjects');
+      Response.InternalServerError(res, "Error fetching course subjects");
     }
   }
 
@@ -161,10 +217,10 @@ export default class CoursesController {
       });
 
       Response.Success(res, {
-        message: 'The subject has been deleted successfully',
+        message: "The subject has been deleted successfully",
       });
     } catch (err) {
-      Response.InternalServerError(res, 'Error deleting course subjects');
+      Response.InternalServerError(res, "Error deleting course subjects");
     }
   }
 
@@ -179,11 +235,11 @@ export default class CoursesController {
     try {
       const pastQuestions = await RelatedPastQuestions.find({
         courseId: req.params.courseId,
-      }).populate('pastQuestionTypeId');
+      }).populate("pastQuestionTypeId");
 
       Response.Success(res, { pastQuestions });
     } catch (err) {
-      Response.InternalServerError(res, 'Error fetching course past questions');
+      Response.InternalServerError(res, "Error fetching course past questions");
     }
   }
 
@@ -201,10 +257,10 @@ export default class CoursesController {
       });
 
       Response.Success(res, {
-        message: 'The past question has been deleted successfully',
+        message: "The past question has been deleted successfully",
       });
     } catch (err) {
-      Response.InternalServerError(res, 'Error deleting past question');
+      Response.InternalServerError(res, "Error deleting past question");
     }
   }
 }
